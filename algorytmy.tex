@@ -92,7 +92,7 @@ W tej sekcji mamy pokazany przykład jak pisać pseudo kod:
     \caption{Merge Sort}\label{alg:merge_sort}
     \begin{algorithmic}[1]
     \Procedure{MergeSort}{A, 1, n}
-        \If{|A[1..n]| == 1} 
+        \If{|A[1..n]| == 1}
             \State \Return{A[1..n]}
         \Else
             \State $B = \text{MergeSort}(A, 1, \lfloor n/2 \rfloor)$
@@ -100,7 +100,7 @@ W tej sekcji mamy pokazany przykład jak pisać pseudo kod:
             \State \Return{Merge(B, C)}
         \EndIf
     \EndProcedure
-    \end{algorithmic}    
+    \end{algorithmic}
 \end{algorithm}
 \begin{algorithm}[H]
     \caption{Merge}\label{alg:merge}
@@ -111,13 +111,86 @@ W tej sekcji mamy pokazany przykład jak pisać pseudo kod:
         \ElsIf{$Y = \emptyset$}
             \State \Return{$X$}
         \ElsIf{$X[1] \leq Y[1]$}
-            \State \Return{$[X[1]] \times \text{Merge}(X[2..k], Y[1..n])$}   
+            \State \Return{$[X[1]] \times \text{Merge}(X[2..k], Y[1..n])$}
         \Else
             \State \Return{$[Y[1]] \times \text{Merge}(X[1..k], Y[2..n])$}
         \EndIf
     \EndProcedure
-    \end{algorithmic}       
+    \end{algorithmic}
 \end{algorithm}
+\subsection{Przykład działania Merge Sort}
+\textbf{Example: Sorting the array \([10,\, 2,\, 5,\, 3,\, 7,\, 13,\, 1,\, 6]\) step by step}
+
+\begin{enumerate}
+  \item \textbf{Initial split:}
+  \[
+    [\,10,\, 2,\, 5,\, 3,\, 7,\, 13,\, 1,\, 6\,]
+    \quad\longrightarrow\quad
+    [\,10,\, 2,\, 5,\, 3\,] \quad\text{and}\quad [\,7,\, 13,\, 1,\, 6\,].
+  \]
+
+  \item \textbf{Sort the left half \([10,\, 2,\, 5,\, 3]\):}
+  \begin{enumerate}
+    \item Split into \([10,\, 2]\) and \([5,\, 3]\).
+    \item \(\text{MergeSort}([10,\, 2])\):
+    \begin{itemize}
+      \item Split into \([10]\) and \([2]\).
+      \item Each is already sorted (single element).
+      \item Merge: \([2,\, 10]\).
+    \end{itemize}
+    \item \(\text{MergeSort}([5,\, 3])\):
+    \begin{itemize}
+      \item Split into \([5]\) and \([3]\).
+      \item Each is already sorted.
+      \item Merge: \([3,\, 5]\).
+    \end{itemize}
+    \item Merge \([2,\, 10]\) and \([3,\, 5]\) to get \([2,\, 3,\, 5,\, 10]\).
+  \end{enumerate}
+
+  \item \textbf{Sort the right half \([7,\, 13,\, 1,\, 6]\):}
+  \begin{enumerate}
+    \item Split into \([7,\, 13]\) and \([1,\, 6]\).
+    \item \(\text{MergeSort}([7,\, 13])\):
+    \begin{itemize}
+      \item Split into \([7]\) and \([13]\).
+      \item Each is already sorted.
+      \item Merge: \([7,\, 13]\).
+    \end{itemize}
+    \item \(\text{MergeSort}([1,\, 6])\):
+    \begin{itemize}
+      \item Split into \([1]\) and \([6]\).
+      \item Each is already sorted.
+      \item Merge: \([1,\, 6]\).
+    \end{itemize}
+    \item Merge \([7,\, 13]\) and \([1,\, 6]\) to get \([1,\, 6,\, 7,\, 13]\).
+  \end{enumerate}
+
+  \item \textbf{Final merge:} Merge the two sorted halves:
+  \[
+    [\,2,\, 3,\, 5,\, 10\,] \quad\text{and}\quad [\,1,\, 6,\, 7,\, 13\,]
+    \quad\longrightarrow\quad [\,1,\, 2,\, 3,\, 5,\, 6,\, 7,\, 10,\, 13\,].
+  \]
+\end{enumerate}
+
+\noindent
+Hence, after all the recursive splits and merges, the final sorted array is:
+\[
+[\,1,\, 2,\, 3,\, 5,\, 6,\, 7,\, 10,\, 13\,].
+\]
+
+\subsection{Złożoność Merge Sort}
+\begin{itemize}
+    \item Złożoność czasowa
+        \begin{itemize}
+            \item $T(n) = 2T(n/2) + \Theta(n)$
+            \item $T(n) = \Theta(n \log n)$
+        \end{itemize}
+    \item Złożoność pamięciowa
+        \begin{itemize}
+            \item $M(n) = n + M(n/2)$
+            \item $M(n) = \Theta(n)$
+        \end{itemize}
+\end{itemize}
 
 \section{Wykład \date{2025-03-10}}
 \subsection{Notacja Asypmtotyczna}
