@@ -1,4 +1,3 @@
-<!-- create a readme for my notes from uni repo --!>
 # Notatki z zajęć na studiach
 ![stock notatek](https://jkogut.pl/images/notes.jpeg)
 Notatki elektroniczne zacząłem prowadzić od 4 semestru moich studuiów.
