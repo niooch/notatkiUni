@@ -1,0 +1,317 @@
+\documentclass[11pt,a4paper]{article}
+
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue]{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+
+% Dodatkowe ustawienia
+\title{Notatki}
+\author{Imię i nazwisko}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+\section{Wstęp}
+to są notatki z przedmoitu Programowanie Współbieżne prowadzonym przez drKika na Politechnice Wrocławskiej. Na roku 2, semestrze 4, roku 2025.
+
+\section{Wykład 1}
+\subsection{Języki Programowania}
+Bedziemy programować w Adzie oraz Go.
+
+\subsubsection{Lista 1 -- Zadania Go}
+Kożystamy z zadan ``Go by Example'' oraz \href{https://go.dev/}{Go.dev}.
+Przykład kodu w Go:
+\begin{enumerate}
+\item Hello world \begin{verbatim}
+    package main
+
+    import "fmt"
+
+    func main() {
+        fmt.Println("Hello, world")
+    }
+    \end{verbatim}
+\item pętle (wystepuje tylko for) \begin{verbatim}
+    package main
+
+    import "fmt"
+
+    func main() {
+        for i := 0; i < 10; i++ {
+            fmt.Println(i)
+        }
+    }
+    \end{verbatim}
+\item if \begin{verbatim}
+    package main
+
+    import "fmt"
+
+    func main() {
+        if 7%2 == 0 {
+            fmt.Println("7 is even")
+        } else {
+            fmt.Println("7 is odd")
+        }
+    }
+    \end{verbatim}
+\item switch \begin{verbatim}
+    package main
+
+    import (
+        "fmt"
+        "time"
+    )
+
+    func main() {
+        switch time.Now().Weekday() {
+        case time.Saturday, time.Sunday:
+            fmt.Println("weekend")
+        default:
+            fmt.Println("weekday")
+        }
+    }
+    \end{verbatim}
+    rowniez mozemy robic swiche po wyrazeniach
+    \begin{verbatim}
+    whatAmI :=func(i interface{}) {
+        switch t := i.(type) {
+        case bool:
+            fmt.Println("I'm a bool")
+        case int:
+            fmt.Println("I'm an int")
+        default:
+            fmt.Printf("Don't know type %T\n", t)
+        }
+    }
+    whatAmI(true)
+    whatAmI(1)
+    whatAmI("hey")
+    \end{verbatim}
+\item tablice \begin{verbatim}
+    package main
+
+    import "fmt"
+
+    func main() {
+        var a [5]int
+        fmt.Println("emp:", a)
+
+        a[4] = 100
+        fmt.Println("set:", a)
+        fmt.Println("get:", a[4])
+
+        fmt.Println("len:", len(a))
+
+        b := [5]int{1, 2, 3, 4, 5}
+        fmt.Println("dcl:", b)
+
+        var twoD [2][3]int
+        for i := 0; i < 2; i++ {
+            for j := 0; j < 3; j++ {
+                twoD[i][j] = i + j
+            }
+        }
+        fmt.Println("2d: ", twoD)
+    }
+    \end{verbatim}
+    \begin{itemize}
+    \item len() zwraca długość tablicy i innych struktur danych dla których jest zdefiniowana.
+    \item append() dodaje element na koniec tablicy.
+    \end{itemize}
+\item slices \begin{verbatim}
+    s := make([]string, 3)
+    fmt.Println("emp:", s)
+
+    s[0] = "a"
+    s[1] = "b"
+    s[2] = "c"
+    fmt.Println("set:", s)
+    fmt.Println("get:", s[2])
+
+    fmt.Println("len:", len(s))
+    \end{verbatim}
+    \begin{itemize}
+        \item append() dodaje element na koniec slice'a.
+        \item copy() kopiuje elementy z jednego slice'a do drugiego.
+        \item mozna rowniez tworzyc dwuwymiarowe slice'y.
+    \end{itemize}
+\item mapy \begin{verbatim}
+    m := make(map[string]int)
+
+    m["k1"] = 7
+    m["k2"] = 13
+
+    fmt.Println("map:", m)
+
+    v1 := m["k1"]
+    fmt.Println("v1: ", v1)
+
+    fmt.Println("len:", len(m))
+    \end{verbatim}
+    \begin{itemize}
+        \item delete(mapa, <klucz>) usuwa element z mapy.
+        \item mapy sa referencjami do wartosci.
+        \item normalnie jak javie/cppie.
+    \end{itemize}
+\item pseudo krotki \begin{verbatim}
+    delete(m, "k2")
+    fmt.Println("map:", m)
+    _, prs := m["k2"]
+    fmt.Println("prs:", prs)
+    \end{verbatim}
+\item range \begin{verbatim}
+    nums := []int{2, 3, 4}
+    sum := 0
+    for _, num := range nums {
+        sum += num
+    }
+    fmt.Println("sum:", sum)
+
+    for i, num := range nums {
+        if num == 3 {
+            fmt.Println("index:", i)
+        }
+    }
+    \end{verbatim}
+    \begin{itemize}
+        \item range zwraca indeks i wartosc.
+        \item mozna rowniez uzyc range na mapach.
+    \end{itemize}
+\item funkcje \begin{verbatim}
+    func plus(a int, b int) int {
+        return a + b
+    }
+
+    res := plus(1, 2)
+    fmt.Println("1+2 =", res)
+
+
+
+    func intSeq() func() int {
+        i := 0
+        return func() int {
+            i++
+            return i
+        }
+    }
+    \end{verbatim}
+    \begin{itemize}
+        \item istnieje cos takiego jak closures. Czyli funkcje wewnatrz funkcji. maja pojebane jakies zmienne lokalne nie wiem czemu to pisze, bo sa te wszystkie slajdy, mozna tam poczytac jak bialy czlowiek.
+        \item funkcje moga zwracac wiele wartosci.
+        \item mozna rowniez przekazywac funkcje jako argumenty.
+    \end{itemize}
+\item structs \begin{verbatim}
+    type person struct {
+        name string
+        age  int
+    }
+
+    fmt.Println(person{"Bob", 20})
+    fmt.Println(person{name: "Alice", age: 30})
+    fmt.Println(person{name: "Fred"})
+    fmt.Println(&person{name: "Ann", age: 40})
+
+    s := person{name: "Sean", age: 50}
+    fmt.Println(s.name)
+
+    sp := &s
+    fmt.Println(sp.age)
+
+    sp.age = 51
+    fmt.Println(sp.age)
+    \end{verbatim}
+    \begin{itemize}
+        \item mozna tworzyc struktury.
+        \item mozna tworzyc wskazniki do struktur.
+    \end{itemize}
+\item metody \begin{verbatim}
+    type rect struct {
+        width, height int
+    }
+
+    func (r *rect) area() int {
+        return r.width * r.height
+    }
+
+    func (r rect) perim() int {
+        return 2*r.width + 2*r.height
+    }
+    \end{verbatim}
+    \begin{itemize}
+        \item metody mozna tworzyc dla "klas" (struktur).
+        \item nie musza one sie zajdowac w klasie moga byc gdziekolwiek.
+    \end{itemize}
+\item intefejsy \begin{verbatim}
+    type geometry interface {
+        area() int
+        perim() int
+    }
+
+    func measure(g geometry) {
+        fmt.Println(g)
+        fmt.Println(g.area())
+        fmt.Println(g.perim())
+    }
+    \end{verbatim}
+    \begin{itemize}
+        \item interfejsy sa zbiorami metod.
+        \item mozna je implementowac dla struktur.
+    \end{itemize}
+\item gorutyny \begin{verbatim}
+    func f(from string) {
+        for i := 0; i < 3; i++ {
+            fmt.Println(from, ":", i)
+        }
+    }
+
+    f("direct")
+
+    go f("goroutine")
+
+    go func(msg string) {
+        fmt.Println(msg)
+    }("going")
+
+    time.Sleep(time.Second)
+    fmt.Println("done")
+    \end{verbatim}
+    \begin{itemize}
+        \item gorutyny to lekkie wątki.
+        \item mozna je tworzyc za pomoca go.
+        \item mozna rowniez tworzyc anonimowe gorutyny.
+    \end{itemize}
+\item channels \begin{verbatim}
+    messages := make(chan string)
+
+    go func() { messages <- "ping" }()
+
+    msg := <-messages
+    fmt.Println(msg)
+    \end{verbatim}
+    \begin{itemize}
+        \item kanaly sluza do komunikacji miedzy gorutynami.
+        \item mozna je tworzyc za pomoca make(chan <typ>).
+        \item mozna rowniez tworzyc kanaly buforowane.
+    \end{itemize}
+\end{enumerate}
+
+
+
+
+\section{Podsumowanie}
+Podsumowanie lub zakończenie notatek.
+
+\end{document}

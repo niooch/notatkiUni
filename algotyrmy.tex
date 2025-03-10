@@ -1,0 +1,422 @@
+\documentclass[11pt,a4paper]{article}
+
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\usepackage{algorithm}               % Algorytmy
+\usepackage{algpseudocode}           % Pseudokod
+\geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+
+% Dodatkowe ustawienia
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\title{Notatki z Algorytmów i Struktur Danych}
+\author{Jakub Kogut}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+
+\section{Wstęp}
+To będa notatki z przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
+\subsection{Informacje}
+Prowadzący Przedmiot: \textbf{Zbychu Gołębiewski}
+\begin{itemize}
+    \item Należy kontaktować się przez maila: \href{mailto:zbigniew.golebiewski@pwr.edu.pl}{mail}
+    \item Konsultacje \textbf{216/D1}:
+        \begin{itemize}
+            \item Wtorek 13:00-15:00
+            \item Środa 9:00-11:00
+        \end{itemize}
+    \item Wiecej info na stronie \href{https://cs.pwr.edu.pl/golebiewski/teaching/aisd.php}{przedmiotu}
+    \item Literatura
+        \begin{itemize}
+            \item Algorithms, Dasgupta, Papadimitriou, Vazirani
+            \item Algorithms, Sedgewick, Wayne (strona internetowa książki)
+            \item Algorithms Designs, Jon Kleinberg and Eva Trados
+            \item Wprowadzenie do algorytmów, Cormen, Leiserson, Rivest, Stein
+            \item Sztuka programowania (wszystkie tomy), Donald E. Knuth
+        \end{itemize}
+\end{itemize}
+\subsection{Ocenianie}
+Ocena z kursu składa się z:
+\begin{itemize}
+    \item Oceny z egzaminu -- E
+    \item Oceny z ćwiczeń -- C
+    \item Oceny z laboratorium -- L
+\end{itemize}
+Wszystkie oceny są z zakresu $[0,100]$. Ocena końcowa jest wyliczana ze wzoru:
+\[
+    K = \frac{1}{2}E + \frac{1}{4}C + \frac{1}{4}L
+\]
+
+\section{Wykład \date{2025-03-03}}
+\subsection{Przykładowy Problem}
+Sortowanie:
+\begin{itemize}
+    \item Input: $n$ liczb $a_1, a_2, \ldots, a_n, |A|$, gdzie $|A|$ to długośc tablicy
+    \item Output: permutacja $a_1', a_2', \ldots, a_n'$ taka, że $a_1' \leq a_2' \leq \ldots \leq a_n'$
+\end{itemize}
+Najważniejsze w algorytmach jest to, żeby były POPRAWNE: edge case, ...
+
+\subsection{Jak mierzyć złożoność algorytmów}
+\begin{enumerate}
+    \item Worst Case Analysis T(n) $\leftarrow$ stosowane najcześciej
+    \item Average Case Analysis
+        \begin{itemize}
+            \item zakładamy pewnien rozkład prawdopodobieństwa na danych wejściowych
+            \item $T$ -- zmienna losowa liczby operacji wykonanych przez algorytm
+                \[
+                    T(n) = \max\{\# \text{operacji dla danego wejścia}\}
+                \]
+            \item $E[T]$ -- wartość oczekiwana $T$ $\rightarrow$ średnia liczba operacji, to co nas interesuje
+        \end{itemize}
+\end{enumerate}
+\subsection{Przykład algorytmu}
+W tej sekcji mamy pokazany przykład jak pisać pseudo kod:
+\begin{algorithm}[H]
+    \caption{Merge Sort}\label{alg:merge_sort}
+    \begin{algorithmic}[1]
+    \Procedure{MergeSort}{A, 1, n}
+        \If{|A[1..n]| == 1} 
+            \State \Return{A[1..n]}
+        \Else
+            \State $B = \text{MergeSort}(A, 1, \lfloor n/2 \rfloor)$
+            \State $C = \text{MergeSort}(A, \lfloor n/2 \rfloor, n)$
+            \State \Return{Merge(B, C)}
+        \EndIf
+    \EndProcedure
+    \end{algorithmic}    
+\end{algorithm}
+\begin{algorithm}[H]
+    \caption{Merge}\label{alg:merge}
+    \begin{algorithmic}[1]
+    \Procedure{Merge}{X[1..k], Y[1..n]}
+        \If{$X = \emptyset$}
+            \State \Return{$Y$}
+        \ElsIf{$Y = \emptyset$}
+            \State \Return{$X$}
+        \ElsIf{$X[1] \leq Y[1]$}
+            \State \Return{$[X[1]] \times \text{Merge}(X[2..k], Y[1..n])$}   
+        \Else
+            \State \Return{$[Y[1]] \times \text{Merge}(X[1..k], Y[2..n])$}
+        \EndIf
+    \EndProcedure
+    \end{algorithmic}       
+\end{algorithm}
+
+\section{Wykład \date{2025-03-10}}
+\subsection{Notacja Asypmtotyczna}
+Na wykładzie będziemy omawiali:
+\begin{itemize}
+    \item Notację dużego O $O(n)$ //ograniczenie górne
+        \begin{itemize}
+                \item Definicja $O(n)$:
+                \[
+                    O(g(n)) = \{ f(n) \mid \exists c > 0, \exists n_0 \in \mathbb{N}, \forall n \geq n_0, 0 \leq f(n) \leq c \cdot g(n) \}
+                \]
+            \item Uwaga! \newline
+                Jeśli
+                \[
+                    \limsup_{n \to \infty} \frac{f(n)}{g(n)} < \infty
+                \]
+                to
+                \[
+                    \limsup_{n \to \infty} \frac{f(n)}{g(n)} = \lim_{n \to \infty} \frac{f(n)}{g(n)}
+                \]
+            \item Przykład:
+                \begin{itemize}
+                    \item $2n^2=O(n^3)$
+                        dla $n_0 = 2, c = 1$ Definicja jest spełniona
+                    \item $f(n) = n^3 + O(n^2)$ jest to jeden z sposobów użycia $O(n)$
+                        \[
+                            \exists h(n) = O(n^2) \quad \text{takie, że} \quad f(n) = n^3 + h(n)
+                        \]
+                \end{itemize}
+        \end{itemize}
+    \item Notację omega //ograniczenie dolne
+        \begin{itemize}
+            \item Definicja
+                \[
+                    \Omega(g(n)) = \{ f(n) \mid \exists c > 0, \exists n_0 \in \mathbb{N}, \forall n \geq n_0, 0 \leq c \cdot g(n) \leq f(n) \}
+                \]
+            \item Przykład
+                \begin{itemize}
+                    \item $n^3 = \Omega(2n^2)$
+                    \item $n = \Omega(\log n)$
+                \end{itemize}
+        \end{itemize}
+    \item Notację theta $\theta(n)$ //ograniczenie z dwóch stron
+        \begin{itemize}
+            \item Definicja
+                \[
+                    \Theta(g(n)) = \{ f(n) \mid \exists c_1, c_2 > 0, \exists n_0 \in \mathbb{N}, \forall n \geq n_0, 0 \leq c_1 \cdot g(n) \leq f(n) \leq c_2 \cdot g(n) \}
+                \]
+            \item Przykład
+                \begin{itemize}
+                    \item $n^3 = \Theta(n^3)$
+                    \item $n^3 = \Theta(n^3 + 2n^2)$
+                    \item $log n +8 + \frac{1}{12n} = \Theta(\log n)$
+                \end{itemize}
+            \item Uwaga!
+                \[
+                    f(n) = \Theta(g(n)) \iff f(n) = O(g(n)) \land f(n) = \Omega(g(n))
+                \]
+                Można to zapisać jako klasy funkcji:
+                \[
+                    \Theta(g(n)) = O(g(n)) \cap \Omega(g(n))
+                \]
+        \end{itemize}
+    \item Patologiczny przykład:
+        mamy funkcje $g(n) = n$ oraz $f(n) = n^{1+sin{\frac{\pi n}{2}}}$, a więc
+        \[
+            f(n) = \begin{cases}
+                n^2 & \text{dla n parzystych} \\
+                n & \text{dla n nieparzystych}
+            \end{cases}
+        \]
+        wtedy
+        \[
+            \limsup_{n \to \infty} \frac{f(n)}{g(n)} = \infty
+            \limsup_{n \to \infty} \frac{g(n)}{f(n)} = \infty
+        \]
+        zatem
+        $f \neq O(g)$ oraz $g \neq O(f)$
+    \item o małe
+        \begin{itemize}
+            \item Definicja
+                \[
+                    o(g(n)) = \{ f(n) \mid \forall c > 0, \exists n_0 \in \mathbb{N}, \forall n \geq n_0, 0 \leq f(n) < c \cdot g(n) \}
+                \]
+                Równoważnie
+                \[
+                    lim_{n \to \infty} \frac{f(n)}{g(n)} = 0
+                \]
+            \item Przykład
+                \begin{itemize}
+                    \item $n^2 = o(n^3)$ i $n^2 O(n^3)$ ale $n^2 \neq o(n^2)$
+                    \item $n = o(n^2)$
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+\subsection{Rekurencja}
+\begin{itemize}
+    \item Metoda podstawienia (metoda dowodu indukcyjnego)
+        \begin{enumerate}
+        \item Zadnij Odpowiedź (bez stałych)
+        \item Sprawdź przez indukcję czy odpowiedź jest poprawna
+        \item Wylicz stałe
+        \end{enumerate}
+        \begin{itemize}
+            \item Przykład
+                \begin{itemize}
+                    \item $T(n) = T(\frac{n}{2}) + n$
+                    \item Pierwotny strzał: $T(n) = O(n^3)$
+                    \item cel: Pokazać, że $\exists c>0: T(n) \leq c \cdot n^3$
+                        \begin{itemize}
+                            \item warunek początowy: $T(1) = 1 \leq c$
+                            \item krok indukcyjny: załóżmy, że $\forall k \leq n: T(k) \leq ck^3$
+                        \end{itemize}
+                        \[
+                            T(n) = 4T(\frac{n}{2}) + n \leq 4c(\frac{n}{2})^3 + n = \frac{1}{2}cn^3 + n \leq cn^3 \quad \text{dla} \quad c \geq 2
+                        \]
+                        jednakże ``Przestrzeliliśmy'' znacznie, spróbojmy wzmocnić założenie indukcyjne:
+                        \[
+                            T(n) \leq c_1k^2 -c_2k, k < n
+                        \]
+                        wtedy mamy:
+                        \[
+                            T(n) = 4T(\frac{n}{2}) +n \leq 4(c_1(\frac{n}{2})^2 - c_2(\frac{n}{2})) + n = c_1n^2 - 2c_2n + n \leq c_1n^2 - c_2n
+                        \]
+                        zatem $c_1 = 1, c_2 = 1$ i $T(n) = O(n^2)$ \qed
+                \end{itemize}
+            \item Przykład
+                \begin{itemize}
+                    \item $T(n) = 2T(\sqrt{n}) + \log n$
+                        \newline
+                        załóżmy, że $n$ jest potęgą liczby $2$, czyli $n = 2^m$
+                        \[
+                            T(2^m) = 2T(2^{\frac{m}{2}}) + m
+                        \]
+                        Co implikuje
+                        \[
+                            T(2^\frac{m}{2}) \rightarrow S(m)
+                        \]
+                        wtedy
+                        \[
+                            S(m) = 2S(\frac{m}{2}) + m
+                        \]
+                        rozwiązując rekurencję otrzymujemy
+                        \[
+                            S(m) = m \log m
+                        \]
+                        zatem
+                        \[
+                            T(n) = \log n \log \log n
+                        \]
+                \end{itemize}
+        \end{itemize}
+
+\end{itemize}
+
+\section{Ćwiczenia}
+tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
+
+\subsection{Lista 2}
+robiona na zajęciach \date{2025-03-10}
+\subsubsection{zadanie 1}
+Wylicz ile linijek wypisze poniższy program (podaj wynik będacy funkcją od n w postaci asymptotycznej $\Theta(\cdot)$). Można założyć, że $n$ jest potęgą liczby $3$.
+\begin{algorithm}
+\begin{algorithmic}[1]
+\State \textbf{function} f(n)
+\If{$n > 1$}
+    \State print\_line('still going')
+    \State f(n/3)
+    \State f(n/3)
+\EndIf
+\end{algorithmic}
+\end{algorithm}
+w pseudo kodzie pojawia sie nastepujaca rekurencja:
+\[
+    T(n) = 2T(\frac{n}{3}) + 1
+\]
+rozwiąże ją używając metody podstawienia. Niech $n=3^k, k = \log_3 n$, wtedy:
+\[
+    T(3^k) = 2T(3^{k-1}) + 1
+\]
+Zatem przyjmując $S(k) = T(3^k)$ mamy:
+\[
+    S(k) = 2S(k-1) + 1
+\]
+rozwiązując rekurencję otrzymujemy:
+\[
+    S(k) = 2^k - 1
+\]
+zatem
+\[
+    T(n) = 2^{\log_3 n} - 1 = n^{\log_3 2} - 1 = \Theta(n^{\log_3 2})
+\]
+analogicznie liczmy jaka jest wykonana ``praca'' wykonana przez program w drzweie rekursji.
+
+\subsubsection{zadanie 2}
+Niech $f(n)$ i $g(n)$ będą funkcjami asymptotycznie nieujemnymi (tzn. nieujemnymi dla dostatecznie dużego $n$). Korzystając z definicji notacji $\Theta$, udowodnij, że:
+\[
+\max\{f(n), g(n)\} = \Theta(f(n) + g(n)).
+\]
+\begin{proof}
+    Z definicji notacji $\Theta$ mamy:
+    \[
+        f(n)=\Theta(g(n)) \iff \exists c_1, c_2 > 0, \exists n_0 \in \mathbb{N}, \forall n \geq n_0, 0 \leq c_1 \cdot g(n) \leq f(n) \leq c_2 \cdot g(n)
+    \]
+    skoro $f(n)$ i $g(n)$ są asymptotycznie nieujemne to:
+    \[
+        \exists n_f: \forall n \geq n_f, f(n) \geq 0
+    \]
+    \[
+        \exists n_g: \forall n \geq n_g, g(n) \geq 0
+    \]
+    zatem
+    \[
+        n_0=\max\{n_f, n_g\}
+    \]
+    a więc
+    \[
+        f(n) \leq \max\{f(n), g(n)\}
+    \]
+    \[
+        g(n) \leq \max\{f(n), g(n)\}
+    \]
+    dodając obie nierówności otrzymujemy:
+    \[
+        f(n) + g(n) \leq 2 \cdot \max\{f(n), g(n)\}
+    \]
+    zatem
+    \[
+        \forall n \geq n_0: \max\{f(n), g(n)\} \leq f(n) + g(n) \leq 2 \cdot \max\{f(n), g(n)\}
+    \]
+    a więc z definicji mamy
+    \[
+        \max\{f(n), g(n)\} = \Theta(f(n) + g(n))
+    \]
+\end{proof}
+
+\subsubsection{zadanie 3}
+Wylicz asymptotyczną złożoność (używając notacji $\Theta$) poniższych fragmentów programów:
+
+\begin{algorithm}
+\caption{Pierwszy fragment kodu}
+\begin{algorithmic}[1]
+\For{$i = 1$ to $n$}
+    \State $j = i$
+    \While{$j < n$}
+        \State $sum = P(i, j)$
+        \State $j = j + 1$
+    \EndWhile
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+\caption{Drugi fragment kodu}
+\begin{algorithmic}[1]
+\For{$i = 1$ to $n$}
+    \State $j = i$
+    \While{$j < n$}
+        \State $sum = R(i, j)$
+        \State $j = j + j$
+    \EndWhile
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+Gdzie:
+\begin{itemize}
+    \item koszt wykonania procedury $P(i,j)$ wynosi $\Theta(1)$,
+    \item koszt wykonania procedury $R(i,j)$ wynosi $\Theta(j)$.
+\end{itemize}
+
+\begin{proof}
+    \begin{itemize}
+        \item Pierwszy fragment kodu
+            \begin{itemize}
+                \item Wewnętrzna pętla wykonuje się $n-i$ razy
+                \item Koszt wykonania procedury $P(i,j)$ wynosi $\Theta(1)$
+                \item Zatem koszt wykonania wewnętrznej pętli wynosi $\Theta(n-i)$
+                \item Zatem koszt wykonania całego fragmentu wynosi
+                    \[
+                        \sum_{i=1}^{n} \Theta(n-i) = \Theta(n^2)
+                    \]
+            \end{itemize}
+        \item Drugi fragment kodu
+            \begin{itemize}
+                \item Wewnętrzna pętla wykonuje się $\log_2 n$ razy
+                \item Koszt wykonania procedury $R(i,j)$ wynosi $\Theta(j)$
+                \item Zatem koszt wykonania wewnętrznej pętli wynosi $\Theta(\log_2 n)$
+                \item Zatem koszt wykonania całego fragmentu wynosi
+                    \[
+                        \sum_{i=1}^{n} \Theta(\log_2 n) = \Theta(n \log_2 n)
+                    \]
+            \end{itemize}
+    \end{itemize}
+\end{proof}
+
+
+
+\section{Podsumowanie}
+Podsumowanie lub zakończenie notatek.
+
+\end{document}
