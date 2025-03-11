@@ -13,6 +13,7 @@
 \usepackage{algorithm}               % Algorytmy
 \usepackage{algpseudocode}           % Pseudokod
 \usepackage{fancyvrb}                  % boxy wokol sekcji
+\usepackage{listings}               % Kod programu
 \geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
 
 % Dodatkowe ustawienia
@@ -218,7 +219,488 @@ pitagorasTrzy n = [(x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n],
 
 
 
-\section{Podsumowanie}
-Podsumowanie lub zakończenie notatek.
+\section{Ćwiczenia}
+W tym miejscu będa pojawiały się notatki z laboratorów (ćwiczeń)
+\subsection{Ćwiczenia 11-03-2025}
+\subsubsection{Zadanie 1}
+\begin{Verbatim}[frame=single]
+power :: Int => Int => Int
+power x y = y ˆ x
+
+p2 = power 4
+p3 = power 3
+\end{Verbatim}
+\begin{enumerate}
+    \item Wyznacz w GCHI wartość wyrażenia \( (p2 \circ p3)^2 \) i wyjaśnij, dlaczego otrzymałeś ten wynik.
+    \item Zbadaj typy funkcji \( p2 \), \( p3 \) i \( (p2 \circ p3) \).
+    \item Zapisz powyższe funkcje za pomocą wyrażeń lambda.
+\end{enumerate}
+\bigskip
+\hrule
+\bigskip
+\[
+    Int \rightarrow Int \rightarrow Int
+\]
+Zapis strzałkowy definuje nam typ funkcji operacja => jest wiążaca z prawej strony, wiec można by było to również zapisać jako:
+\[
+    power::Int \rightarrow (Int \rightarrow Int)
+\]
+\begin{enumerate}
+    \item podpunkt 1
+\[
+    (p2 \circ p3)^2 = p2(p3(x))^2 = 4(3^x)^2 = 4 \cdot 9^x
+\]
+\item podpunkt 2
+    \begin{Verbatim}[frame=single]
+>:t p2
+p2 :: Int -> Int
+>:t p3
+p3 :: Int -> Int
+>:t (p2 . p3)
+(p2 . p3) :: Int -> Int
+    \end{Verbatim}
+\item podpunkt 3
+    \begin{Verbatim}[frame=single]
+p2 = \x -> power 4 x
+p3 = \x -> power 3 x
+    \end{Verbatim}
+\end{enumerate}
+\subsubsection{Zadanie 2}
+\[
+2 \wedge 3 \wedge 2, \quad (2 \wedge 3) \wedge 2, \quad 2 \wedge (2 \wedge 3).
+\]
+Dowiedz się, jaka jest łączność oraz siła operatora \(\wedge\) za pomocą polecenia:
+\[
+:i (\wedge).
+\]
+\bigskip
+\hrule
+\bigskip
+\begin{Verbatim}[frame=single]
+>:i (^)
+(^) :: (Num a, Integral b) => a -> b -> a
+        -- Defined in ‘GHC.Real’
+infixr 8 ^
+\end{Verbatim}
+Operator \(\wedge\) jest prawostronnie łączny, a jego siła wynosi 8 (najwyższa możliwa wartość, wyłącznie wyższe jest nałożenie funkcji na zmienną). W nawiasie \textbf{Num a, Integraf b} oznacza, że operator \(\wedge\) bierze jeden argument typu \textbf{Num} i drugi typu \textbf{Integral}.
+\[
+    2 \wedge 3 \wedge 2 = 2 \wedge (3 \wedge 2) = 2 \wedge 9 = 512
+\]
+\[
+    (2 \wedge 3) \wedge 2 = 8 \wedge 2 = 64
+\]
+\[
+    2 \wedge (2 \wedge 3) = 2 \wedge 8 = 256
+\]
+
+\subsubsection{Zadanie 3}
+\begin{Verbatim}[frame=single]
+f : : Int => Int
+f x = x ˆ 2
+g : : Int => Int => Int
+g x y = x+2*y
+h : : . . . .
+h x y = f ( g x y )
+\end{Verbatim}
+\begin{enumerate}
+    \item Jaki jest typ funkcji \( h \)? (tzn. uzupełnij \dots\ w powyższym listingu)
+    \item Czy \( h = f \circ g \)?
+    \item Czy \( h \, x = f(g \, x) \)?
+\end{enumerate}
+\bigskip
+\hrule
+\bigskip
+\begin{enumerate}
+    \item Typ funkcji \( h \) to:
+        \[
+            h::Int \rightarrow Int \rightarrow Int
+        \]
+    \item Nie, ponieważ:
+        \[
+            h(x,y) = f(g(x,y)) = f(x+2y) = (x+2y)^2
+        \]
+    \item Tak, ponieważ:
+        \[
+            h(x) = f(g(x)) = f(x+2x) = (x+2x)^2 = 9x^2
+        \]
+\end{enumerate}
+
+\subsubsection{Zadanie 4}
+Zapisz operacje binarne \( (+) \), \( (\ast) \) za pomocą lambda wyrażeń.
+\bigskip
+\hrule
+\bigskip
+\begin{Verbatim}[frame=single]
+add = \x -> (\y -> x + y)
+mul = \x -> (\y -> x * y)
+\end{Verbatim}
+Co to daje?
+Mozna teraz zapisać 2+3 jako:
+\begin{itemize}
+    \item add 2 3
+    \item (add 2) 3
+    \item add 2 (3)
+    \item (\$3) (2 add)
+\end{itemize}
+
+\subsubsection{Zadanie 5}
+Zapisz funkcje:
+
+\[
+f(x) = 1 + x \cdot (x + 1), \quad g(x, y) = x + y^2, \quad h(y, x) = x + y^2
+\]
+
+za pomocą lambda wyrażeń w językach C++, Python, JavaScript oraz Haskell.
+\bigskip
+\hrule
+\bigskip
+
+W języku Haskell:
+\begin{Verbatim}[frame=single]
+f = \x -> 1 + x * (x + 1)
+g = \x -> \y -> x + y^2
+h = \y -> \x -> x + y^2
+\end{Verbatim}
+
+W języku Python:
+\begin{Verbatim}[frame=single]
+f = lambda x: 1 + x * (x + 1)
+g = lambda x, y: x + y**2
+h = lambda y, x: x + y**2
+\end{Verbatim}
+
+W języku JavaScript:
+\begin{Verbatim}[frame=single]
+f = x => 1 + x * (x + 1)
+g = (x, y) => x + y**2
+h = (y, x) => x + y**2
+\end{Verbatim}
+
+W języku C++:
+\begin{Verbatim}[frame=single]
+auto f = [](int x) { return 1 + x * (x + 1); };
+auto g = [](int x, int y) { return x + y*y; };
+auto h = [](int y, int x) { return x + y*y; };
+\end{Verbatim}
+
+\subsubsection{Zadanie 6}
+Ustalmy zbiory \( A, B, C \). Niech
+
+\[
+\text{curry} : C^{B \times A} \to (C^B)^A
+\]
+
+będzie funkcją zadaną wzorem:
+
+\[
+\text{curry}(\varphi) = \lambda a \in A \to (\lambda b \in B \to \varphi(b, a)).
+\]
+
+oraz niech
+
+\[
+\text{uncurry} : (C^B)^A \to C^{B \times A}
+\]
+
+będzie zadana wzorem:
+
+\[
+\text{uncurry}(\psi)(b, a) = (\psi(a))(b).
+\]
+
+\begin{enumerate}
+    \item Pokaż, że \( \text{curry} \circ \text{uncurry} = \text{id}_{(C^B)^A} \) oraz \( \text{uncurry} \circ \text{curry} = \text{id}_{C^{B \times A}} \).
+
+    \item Wywnioskuj z tego, że \( |(C^B)^A| = |C^{B \times A}| \). Przypomnij sobie dowód tego twierdzenia, który poznałeś na pierwszym semestrze studiów.
+
+    \item Spróbuj zdefiniować w języku Haskell odpowiedniki funkcji \texttt{curry} i \texttt{uncurry}.
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{enumerate}
+    \item Pokażemy, że \( \text{curry} \circ \text{uncurry} = \text{id}_{(C^B)^A} \) oraz \( \text{uncurry} \circ \text{curry} = \text{id}_{C^{B \times A}} \).
+        \begin{itemize}
+            \item \( \text{curry} \circ \text{uncurry} \)
+                \begin{equation}
+                    \begin{aligned}
+                        (\text{curry} \circ \text{uncurry})(\psi)
+                        &= \text{curry}(\text{uncurry}(\psi)) \\
+                        &= \text{curry}(\lambda a \in A \to (\lambda b \in B \to \psi(a)(b))) \\
+                        &= \lambda a \in A \to (\lambda b \in B \to \psi(a)(b)).
+                    \end{aligned}
+                \end{equation}
+
+            \item \( \text{uncurry} \circ \text{curry} \)
+                \begin{equation}
+                    \begin{aligned}
+                        (\text{uncurry} \circ \text{curry})(\varphi)
+                        &= \text{uncurry}(\text{curry}(\varphi)) \\
+                        &= \text{uncurry}(\lambda a \in A \to (\lambda b \in B \to \varphi(b, a))) \\
+                        &= \lambda b \in B \to (\lambda a \in A \to \varphi(b, a)).
+                    \end{aligned}
+                \end{equation}
+        \end{itemize}
+        Z powyższych równań wynika, że \( \text{curry} \circ \text{uncurry} = \text{id}_{(C^B)^A} \) oraz \( \text{uncurry} \circ \text{curry} = \text{id}_{C^{B \times A}} \). \qed
+    \item Możemy pokazać że \texttt{curry} i \texttt{uncurry} są iniekcjami niewprost, nakładając odpowiednio przeciwne funkcje na obie strony równości:
+                \begin{itemize}
+            \item Załóżmy, że \( \text{curry}(\varphi_1) = \text{curry}(\varphi_2) \). Wtedy:
+                \begin{equation}
+                    \begin{aligned}
+                        \text{curry}(\varphi_1)(a)(b) &= \text{curry}(\varphi_2)(a)(b) \\
+                        \varphi_1(b, a) &= \varphi_2(b, a) \\
+                        \varphi_1 &= \varphi_2.
+                    \end{aligned}
+                \end{equation}
+            \item Załóżmy, że \( \text{uncurry}(\psi_1) = \text{uncurry}(\psi_2) \). Wtedy:
+                \begin{equation}
+                    \begin{aligned}
+                        \text{uncurry}(\psi_1)(b, a) &= \text{uncurry}(\psi_2)(b, a) \\
+                        \psi_1(a)(b) &= \psi_2(a)(b) \\
+                        \psi_1 &= \psi_2.
+                    \end{aligned}
+                \end{equation}
+        \end{itemize}
+        A więc istnieje biekcja między \( (C^B)^A \) i \( C^{B \times A} \), co oznacza, że te zbiory mają taką samą moc. \qed
+    \item W języku Haskell funkcje \texttt{curry} i \texttt{uncurry} można zdefiniować następująco:
+        \begin{Verbatim}[frame=single]
+curry :: ((b, a) -> c) -> a -> b -> c
+curry f x y = f (y, x)
+        \end{Verbatim}
+        \begin{Verbatim}[frame=single]
+uncurry :: (a -> b -> c) -> (a, b) -> c
+uncurry f (x, y) = f x y
+        \end{Verbatim}
+
+\end{enumerate}
+
+\subsubsection{Zadanie 7}
+Podaj przykłady funkcji następujących typów:
+\[
+(\text{Int} \Rightarrow \text{Int}) \Rightarrow \text{Int}
+\]
+
+\[
+(\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int})
+\]
+
+\[
+(\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int})
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{itemize}
+    \item Funkcja typu \( (\text{Int} \Rightarrow \text{Int}) \Rightarrow \text{Int} \):
+        \begin{Verbatim}[frame=single]
+f :: (Int -> Int) -> Int
+f g = g 0
+        \end{Verbatim}
+    \item Funkcja typu \( (\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int}) \):
+        \begin{Verbatim}[frame=single]
+f :: (Int -> Int) -> (Int -> Int)
+f g x = g (g x)
+        \end{Verbatim}
+    \item Funkcja typu \( (\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int}) \Rightarrow (\text{Int} \Rightarrow \text{Int}) \):
+        \begin{Verbatim}[frame=single]
+f :: (Int -> Int) -> (Int -> Int) -> (Int -> Int)
+f g h x = g (h x)
+        \end{Verbatim}
+\end{itemize}
+
+\subsubsection{Zadanie 8}
+Załóżmy, że chcesz oprogramować funkcję, która dla danych liczb \( a, b \) oraz funkcji \( f: \mathbb{R} \to \mathbb{R} \) oblicza
+\[
+\int_{a}^{b} f(x) \,dx.
+\]
+Jaki powinien być typ tej funkcji?
+
+\bigskip
+\hrule
+\bigskip
+
+Typ tej funkcji powinien być następujący:
+\[
+    \text{Num(a)} \implies a \rightarrow a \rightarrow (a \rightarrow a) \rightarrow a
+\]
+mogłaby ona wyglądać następująco:
+\begin{Verbatim}[frame=single]
+integral :: (Double -> Double) -> Double -> Double -> Double
+integral f a b = undefined
+\end{Verbatim}
+
+\subsubsection{Zadanie 9 -- (Eliminacja Pętli)}
+Wybierz jeden z języków Python, C++ lub JavaScript.
+
+\begin{enumerate}
+    \item Masz daną (czyli oprogramowaną) funkcję \( f: \mathbb{N} \to \mathbb{N} \). Oprogramuj funkcję, która dla danego \( n \in \mathbb{N} \) oblicza
+    \[
+    \sum_{k=0}^{n} f(k).
+    \]
+    Zrób to najpierw (standardowo) za pomocą pętli, a potem oprogramuj ją bez użycia pętli, za pomocą rekursji.
+
+    \item Rozważamy następującą funkcję napisaną w pseudokodzie:
+        \begin{Verbatim}[frame=single]
+FUNCTION f(x: DOUBLE): DOUBLE
+BEGIN
+    DOUBLE y = sin(x);
+    RETURN y*y + y + x;
+ENDFNC
+        \end{Verbatim}
+
+    Oprogramuj tę funkcję w wybranym języku i następnie wyeliminuj zmienną lokalną \( y \) z tego kodu, bez pogarszania jego efektywności.
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{enumerate}
+    \item Oto rozwiązanie w języku C++:
+        \begin{lstlisting}[language=C++]
+#include <iostream>
+using namespace std;
+
+// Example implementation of function f: N -> N.
+// You can replace this with any function of type int -> int.
+int f(int x) {
+    // Example: f(x) = x + 1
+    return x + 1;
+}
+
+// Function that sums using a loop:
+int sumLoop(int n) {
+    int sum = 0;
+    for (int k = 0; k <= n; ++k) {
+        sum += f(k);
+    }
+    return sum;
+}
+
+// Function that sums using recursion:
+int sumRec(int n) {
+    if(n == 0)
+        return f(0);
+    else
+        return sumRec(n - 1) + f(n);
+}
+
+int main() {
+    int n;
+    cout << "Enter n: ";
+    cin >> n;
+    cout << "Sum computed with loop: " << sumLoop(n) << endl;
+    cout << "Sum computed recursively: " << sumRec(n) << endl;
+    return 0;
+}
+\end{lstlisting}
+    funkcja \texttt{sumLoop} oblicza sumę za pomocą pętli, a funkcja \texttt{sumRec} oblicza sumę rekurencyjnie.
+    \[
+        \text{sumRec}(n) = \left\{
+            \begin{array}{ll}
+                f(0) & \text{gdy } n = 0 \\
+                \text{sumRec}(n-1) + f(n) & \text{gdy } n > 0
+            \end{array}
+        \right.
+    \]
+\item Rozwiazanie w Haskellu:
+    \begin{Verbatim}[frame=single]
+f :: Double -> Double
+f x = sin x * sin x + sin x + x
+    \end{Verbatim}
+    \begin{Verbatim}[frame=single]
+f' :: Double -> Double
+f' x = sin x * sin x + sin x + x
+    \end{Verbatim}
+\end{enumerate}
+
+\subsubsection{Zadanie 10}
+Zaimplementuj samodzielnie następujące funkcje działające na listach z Prelude:
+\begin{enumerate}
+    \item map
+    \item zip
+    \item zipWith
+    \item filter
+    \item take
+    \item drop
+    \item fib
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{enumerate}
+    \item Funkcja \texttt{map}:
+        \begin{Verbatim}[frame=single]
+map' :: (a -> b) -> [a] -> [b]
+map' f [] = []
+map' f (x:xs) = f x : map' f xs
+        \end{Verbatim}
+    \item Funkcja \texttt{zip}\footnote{Funkcja \texttt{zip} zwraca listę par, które są złożone z elementów listy wejściowej.
+        Jeśli jedna z list jest krótsza, to wynikowa lista będzie miała długość krótszej z nich. \newline
+    Przykład: \texttt{zip [1,2,3] ['a','b','c','d']} zwróci \texttt{[(1,'a'),(2,'b'),(3,'c')]}.}:
+        \begin{Verbatim}[frame=single]
+zip' :: [a] -> [b] -> [(a, b)]
+zip' [] _ = []
+zip' _ [] = []
+zip' (x:xs) (y:ys) = (x, y) : zip' xs ys
+        \end{Verbatim}
+    \item Funkcja \texttt{zipWith}\footnote{Funkcja \texttt{zipWith} działa podobnie jak \texttt{zip}, ale zamiast zwracać parę elementów, zwraca wynik funkcji, która jest podana jako argument. \newline
+        Przykład: \texttt{zipWith (+) [1,2,3] [4,5,6]} zwróci \texttt{[5,7,9]}.}:
+        \begin{Verbatim}[frame=single]
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
+        \end{Verbatim}
+    \item Funkcja \texttt{filter}\footnote{Funkcja \texttt{filter} zwraca listę elementów, które spełniają warunek podany jako argument. \newline
+        Przykład: \texttt{filter even [1..10]} zwróci \texttt{[2,4,6,8,10]}.}:
+        \begin{Verbatim}[frame=single]
+filter' :: (a -> Bool) -> [a] -> [a]
+filter' _ [] = []
+filter' p (x:xs)
+    | p x = x : filter' p xs
+    | otherwise = filter' p xs
+        \end{Verbatim}
+    \item Funkcja \texttt{take}\footnote{Funkcja \texttt{take} zwraca listę składającą się z \( n \) pierwszych elementów listy wejściowej. \newline
+        Przykład: \texttt{take 3 [1,2,3,4,5]} zwróci \texttt{[1,2,3]}.}:
+        \begin{Verbatim}[frame=single]
+take' :: Int -> [a] -> [a]
+take' 0 _ = []
+take' _ [] = []
+take' n (x:xs) = x : take' (n - 1) xs
+        \end{Verbatim}
+    \item Funkcja \texttt{drop}\footnote{Funkcja \texttt{drop} zwraca listę, która jest wynikiem usunięcia \( n \) pierwszych elementów z listy wejściowej. \newline
+        Przykład: \texttt{drop 3 [1,2,3,4,5]} zwróci \texttt{[4,5]}.}:
+        \begin{Verbatim}[frame=single]
+drop' :: Int -> [a] -> [a]
+drop' 0 xs = xs
+drop' _ [] = []
+drop' n (_:xs) = drop' (n - 1) xs
+        \end{Verbatim}
+    \item Funkcja \texttt{fib}\footnote{Funkcja \texttt{fib} zwraca listę liczb Fibonacciego do \( n \)-tego elementu.}:
+        \begin{Verbatim}[frame=single]
+fib :: Int -> [Int]
+fib n = take' n (map' fib' [0..])
+    where
+        fib' 0 = 0
+        fib' 1 = 1
+        fib' n = fib (n - 1) + fib (n - 2)
+        \end{Verbatim}
+\end{enumerate}
+Fajne złożenie funkcji \texttt{fib} z \texttt{zipWith}:
+\begin{Verbatim}[frame=single]
+fib :: [Int]
+fib = 0 : 1 : zipWith (+) fib (tail fib)
+\end{Verbatim}
+co pozwala na generowanie listy liczb Fibonacciego w nieskończoność.
+Na przykład \texttt{take 10 fib} zwróci \texttt{[0,1,1,2,3,5,8,13,21,34]}.
+
+
 
 \end{document}
