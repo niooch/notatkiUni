@@ -1,0 +1,79 @@
+\documentclass[11pt,a4paper]{article}
+
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+
+% Dodatkowe ustawienia
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}  % Ustawienia linków
+\title{Notatki Technologie Sieciowe}
+\author{Jakub Kogut}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+
+\section{Wstęp}
+Notatki z przedmiotu \textit{Technologie sieciowe} na kierunku Informatyka Algorytmiczna na Politechnice Wrocławskiej na semestrze 4 2025r.
+\begin{itemize}
+    \item Prowadzący: dr inż. Łukasz Krzywiecki
+    \item email: \href{mailto:lukasz.krzywiecki@pwr.edu.pl}{mail}
+    \item konsultacje D1/210
+        \begin{itemize}
+            \item Mon. 11:00 - 13:00, MSTeams, D-1:210
+            \item Wed. 11:00 - 13:00, MSTeams, D-1:210 (The 1st and the 2nd week of the month)
+            \item Fri. 15:00 - 17:00, MSTeams, (Last 2 weeks of the month)
+        \end{itemize}
+\end{itemize}
+
+\section{Wykład \date{2025-03-11}}
+\subsection{Czym jest sieć komputerowa?}
+%załącz grafike sieci do pliku jako obraz ./Weighted-Graph.png
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{./Weighted-Graph.png}
+    \caption{Przykład sieci komputerowej}
+\end{figure}
+Jest to ważony graf, w którym nodami są komputery, a krawędziami połączenia między nimi. Waga krawędzi można interpretować jako:
+\begin{itemize}
+    \item przepustowość łącza -- ilość danych, które można wysłać przez łącze
+    \item opóźnienie
+    \item szerokość pasma -- szerokość zakresu częstotliwości, który jest wykorzystywany przez nadawane lub odbierane sygnały w danym medium transmisyjnym. Szerokość pasma jest wyrażana w różnicy pomiędzy najwyższą a najniższą częstotliwością składnika transmitowanego sygnału
+\end{itemize}
+\subsection{Jak wyglądały kiedyś połączenia sieciowe?}
+Używano kabla koncetrycznego \texiit{Coaxial Cable} (10Mb/s) oraz kabla skrętkowego \textit{Twisted Pair} (około 100Mb/s). Współcześnie używa się światłowodów, które mają przepustowość rzędu 10Gb/s.
+\subsection{Jak dane są przesyłane w kablu?}
+Istnieją różne sposoby modulacji sygnału:
+\begin{itemize}
+    \item częstotliwościowa -- polegajaca na zmianie częstotliwości sygnału
+    \item amplitudowa -- polegająca na zmianie amplitudy sygnału
+    \item fazowa -- polegająca na zmianie fazy sygnału
+    \item jeżeli używamy światłowodu, to używamy modulacji światła
+    \item mieszane:
+        \begin{itemize}
+            \item QAM -- polegająca na zmianie amplitudy i fazy sygnału, użwyają konstelacji czętotliwości
+        \end{itemize}
+\end{itemize}
+\subsection{Jak wygląda komunikacja w protokole Ethernet?}
+Każda wiadomość przesyłana przez sieć opakowana jest w \textbf{ramkę Ethernetową}. Wkładane są w nią kolejne warstwy odpowiednich protokołów.
+\begin{enumerate}
+    \item Ethernet
+    \item IP -- Internet Protocol. Na jego warstwie znajduje się protokół ICMP używany przez program \textit{Ping}.
+    \item TCP/UDP -- Transmiton Control Protocol/User Datagram Protocol
+\end{enumerate}
+
+\section{Podsumowanie}
+
+\end{document}
