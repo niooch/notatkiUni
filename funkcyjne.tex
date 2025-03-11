@@ -1,0 +1,224 @@
+\documentclass[11pt,a4paper]{article}
+
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\usepackage{algorithm}               % Algorytmy
+\usepackage{algpseudocode}           % Pseudokod
+\usepackage{fancyvrb}                  % boxy wokol sekcji
+\geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+
+% Dodatkowe ustawienia
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}  % Ustawienia linków
+\title{Notatki Programowanie Funkcyjne}
+\author{Jakub Kogut}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+
+\section{Wstęp}
+Notatki z programowania funkcyjnego prowadzone przez GOATA profesora Jacka Cichonia na semestrze 4 2025. Zajęcia laboratoryjne prowadzone są przez dr Dominika Bojko.
+
+\section{Wykład \date{11-03-2025}}
+Na tym wykładzie skupimy się na przygotowaniu środowiska pracy do programowania funkcyjnego w języku Haskell.
+\subsection{Struktura kodu w Haskell}
+Przykładowy kod wygląda następująco:
+\begin{Verbatim}[frame=single]
+{-  file = W2.hs
+    autor = JK
+    date = 11-03-2025
+-}
+module W2 where
+id' x = x
+\end{Verbatim}
+Następnie w terminalu, w którym mamy odpalone GHCI wpisujemy:
+\begin{Verbatim}[frame=single]
+>:l W2.hs
+>:r
+>id' 5
+5
+>:t id'
+id' :: a -> a //co oznacza id :: forall a => a->a
+\end{Verbatim}
+Co matematycznie można zapisać jako:
+\[
+    exp=(\lambda a:Typ \rightarrow ( a \rightarrow a))
+\]
+\begin{itemize}
+    \item Przykład:
+        \begin{itemize}
+            \item $exp(Int)::Int \rightarrow Int$
+            \item $exp(Bool)::Bool \rightarrow Bool$
+            \item $exp(Double)::Double \rightarrow Double$
+        \end{itemize}
+\end{itemize}
+Cichoń radzi, aby narpiew zastanowić się jaki powinnen być typ funkcji, a dopiero potem zastanawiać się nad implementacją, ponoć oszczędza to \textit{czas i nerwy}.
+\subsection{Typy w Haskellu}
+\begin{itemize}
+    \item Typy proste:
+        \begin{itemize}
+            \item Int
+            \item Double
+            \item Char
+            \item Bool
+        \end{itemize}
+    \item Typy złożone:
+        \begin{itemize}
+            \item Listy
+            \item Krotki
+            \item Funkcje
+        \end{itemize}
+\end{itemize}
+
+\begin{itemize}
+    \item Przykład:
+        \begin{itemize}
+            \item funkcja Collatz'a
+                $coll::Int \rightarrow Int$
+                \begin{Verbatim}[frame=single]
+coll n
+    | n==1 = 1
+    | even n = coll (n `div` 2)
+    | odd n = coll (3*n+1)
+                \end{Verbatim}
+                Symbol \textbf{|} oznacza wyrażenie z wykożystaniem strażników \textit{guards}. Zapis taki jest podobny do matematycznego zapisu funkcji:
+                \[
+                    coll(n)=\left\{
+                        \begin{array}{ll}
+                            1 & \text{gdy } n=1 \\
+                            coll(\frac{n}{2}) & \text{gdy } n \text{ jest parzyste} \\
+                            coll(3n+1) & \text{gdy } n \text{ jest nieparzyste}
+                        \end{array}
+                    \right.
+                \]
+                Nie jest to bezpieczna funkcja, ponieważ dla liczb ujemnych zapętli się ona w nieskończoność. \newline
+                Można zauważyć, że funkcja ta zwraca zawsze liczbę $1$. Ciekawa jest liczba kroków, które są potrzebne do osiągnięcia tej wartości. Dla $n=27$ potrzeba $111$ kroków, dla $n=28$ potrzeba $18$ kroków, dla $n=29$ potrzeba $111$ kroków.
+            \item Nowa funkcja Collatz'a\newline
+                collatz::(Int,Int) $\rightarrow$ (Int,Int)
+                \begin{Verbatim}[frame=single]
+collatz (n,steps)
+    | n==1 = (n,steps)
+    | even n = collatz (n `div` 2,steps+1)
+    | odd n = collatz (3*n+1,steps+1)
+                \end{Verbatim}
+                Funkcja ta zwraca parę liczb, pierwsza to wynik funkcji Collatz'a, a druga to liczba kroków potrzebna do osiągnięcia tej wartości.\newline
+                Spróbujmy ją sobie odpalić:
+                \begin{Verbatim}[frame=single]
+>collatz (97,0)
+(1,118)
+                \end{Verbatim}
+                Jak widać dla $n=97$ potrzeba $118$ kroków, aby osiągnąć wartość $1$.
+            \item Funkcja lenz \textit{lenght of collatz} zwracająca długość ciągu Collatz'a dla danej liczby:\newline
+                lenz::Int $\rightarrow$ Int
+                \begin{Verbatim}[frame=single]
+lenz n = snd (collatz (n,0))
+                \end{Verbatim}
+        \end{itemize}
+\end{itemize}
+\subsection{Listy}
+Definicja listy w Haskellu:\newline
+\text{[a]} - lista elementów typu a
+\[
+    \text{[a]} = \{[a_1, \dots, a_k] \mid a_1, \dots, a_k \in a, k \in \mathbb{N}\}
+\]
+\begin{Verbatim}[frame=single]
+>:t [1,2,3]
+[1,2,3] :: Num a => [a]
+>:t [1::Integer, 2, 3]
+[1,2,3] :: [Integer]
+\end{Verbatim}
+\subsubsection{Operacje na listach}
+\begin{itemize}
+    \item Dodawanie elementu na początku listy
+        \begin{Verbatim}[frame=single]
+>:t (1:[2,3])
+(1:[2,3]) :: Num a => [a]
+        \end{Verbatim}
+    \item Konkatenacja list
+        \begin{Verbatim}[frame=single]
+>:t [1,2]++[3,4]
+[1,2]++[3,4] :: Num a => [a]
+        \end{Verbatim}
+\end{itemize}
+\subsubsection{Podstawowe funkcje operujace na listach}
+\begin{itemize}
+    \item length::[a] $\rightarrow$ Int
+        \begin{itemize}
+            \item length [] = 0
+            \item length (x:xs) = 1 + length xs
+        \end{itemize}
+    \item head::[a] $\rightarrow$ a \newline
+        zwraca pierwszy element listy
+        \begin{itemize}
+            \item head (x:xs) = x
+            \item head [] = error "empty list"
+        \end{itemize}
+    \item tail::[a] $\rightarrow$ [a] \newline
+        zwraca listę bez pierwszego elementu
+        \begin{itemize}
+            \item tail (x:xs) = xs
+            \item tail [] = error "empty list"
+        \end{itemize}
+    \item last::[a] $\rightarrow$ a \newline
+        zwraca ostatni element listy
+        \begin{itemize}
+            \item last [x] = x
+            \item last (x:xs) = last xs
+            \item last [] = error "empty list"
+        \end{itemize}
+    \item filter::(a $\rightarrow$ Bool) $\rightarrow$ [a] $\rightarrow$ [a]
+        \begin{itemize}
+            \item filter p [] = []
+            \item filter p (x:xs) = if p x then x : filter p xs else filter p xs
+            \item filter ($\lamda$n $\rightarrow$ n>0) [-1,2,-3,4] = [2,4]
+            \item filter even [1..10] = [2,4,6,8,10]\newline
+                Jak zdefiniować funkcje \textif{filter}:
+                \begin{Verbatim}[frame=single]
+filter p [] = []
+filter p (x:xs)
+    | p x = x : filter p xs
+    | otherwise = filter p xs
+                \end{Verbatim}
+        \end{itemize}
+    \item map::(a $\rightarrow$ b) $\rightarrow$ [a] $\rightarrow$ [b] \newline
+        zwraca listę, która powstaje zastosowaniem funkcji do każdego elementu listy
+        \begin{itemize}
+            \item map f [] = []
+            \item map f (x:xs) = f x : map f xs
+            \item map ($\lamda$n $\rightarrow$ n*n) [1,2,3] = [1,4,9]
+            \item map ($\lamda$n $\rightarrow$ $n^3$) [1..10] = [1..1000]
+        \end{itemize}
+        gdzie \textbf{[1..10]} to skrót od \textbf{[1,2,3,4,5,6,7,8,9,10]}
+\end{itemize}
+
+\subsubsection{List comprehension}
+Polega na tworzeniu listy na podstawie innych list.
+\[
+    \boxed{[f x_1, x_2, x_3 \mid x_1 \leftarrow xs, x_2 \leftarrow ys, x_3 \leftarrow zs]}
+\]
+Przykład:
+\begin{itemize}
+    \item chcemy stworzyć listę wszystkich trójek pitagorejskich ponizej liczby n.
+        \begin{Verbatim}[frame=single]
+pitagorasTrzy n = [(x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n],
+                  x^2 + y^2 == z^2, gcd xy == 1]
+        \end{Verbatim}
+\end{itemize}
+
+
+
+\section{Podsumowanie}
+Podsumowanie lub zakończenie notatek.
+
+\end{document}
