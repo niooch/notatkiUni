@@ -1026,7 +1026,113 @@ Napisz funkcję \texttt{splits}, która dla danej listy $xs$ wyznaczy listę wsz
 \hrule
 \bigskip
 
+Funkcja \texttt{splits} powinna zwracać listę par, które są wynikiem podziału listy wejściowej na dwie części. Warto zauważyć, że dla każdego elementu listy wejściowej można zrobić podział na dwie części: jedną z elementem i drugą bez niego. W ten sposób można zrobić wszystkie możliwe podziały listy.
 
+\begin{Verbatim}[frame=single]
+splits' :: [a] -> [([a], [a])]
+splits' [] = [([], [])]
+splits' (x:xs) = ([], x:xs) : [(x:ys, zs) | (ys, zs) <- splits' xs]
+\end{Verbatim}
+
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć listę, której jedynym elementem jest para pustych list
+        \[
+            \texttt{splits' [] = [([], [])]}
+        \]
+    \item W przeciwnym przypadku zwróć listę, której pierwszym elementem jest para pustej listy i listy wejściowej, a resztę listy tworzą pary, które są wynikiem rekurencyjnego wywołania funkcji \texttt{splits'} na liście bez pierwszego elementu
+        \[
+            \texttt{splits' (x:xs) = ([], x:xs) : [(x:ys, zs) | (ys, zs) <- splits' xs]}
+        \]
+\end{enumerate}
+
+
+\subsubsection{Zadanie 21}
+Oto jedna z możliwych implementacji funkcji \texttt{partition}:
+\begin{Verbatim}[frame=single]
+partition :: (a => Bool) => [a] => ([a], [a])
+partition p xs = (filter p xs , filter (not . p) xs)
+\end{Verbatim}
+Ulepsz implementację tej funkcji: powinna zwracać ten sam wynik, ale powinna przchodzić przez listę tylko raz.
+
+\bigskip
+\hrule
+\bigskip
+
+Oto ulepszona implementacja funkcji \texttt{partition}: funkcja \texttt{partition'} przechodzi przez listę tylko raz, dzięki użyciu akumulatorów.
+
+\begin{Verbatim}[frame=single]
+partition' :: (a -> Bool) -> [a] -> ([a], [a])
+partition' p xs = partition'' p xs [] []
+
+partition'' :: (a -> Bool) -> [a] -> [a] -> [a] -> ([a], [a])
+partition'' _ [] ys zs = (ys, zs)
+partition'' p (x:xs) ys zs
+    | p x = partition'' p xs (ys ++ [x]) zs
+    | otherwise = partition'' p xs ys (zs ++ [x])
+\end{Verbatim}
+
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć parę list \texttt{ys} i \texttt{zs}
+        \[
+            \texttt{partition'' \_ [] ys zs = (ys, zs)}
+        \]
+    \item W przeciwnym przypadku jeśli warunek \texttt{p} jest spełniony to dodaj element do listy \texttt{ys} i rekurencyjnie wywołaj funkcję \texttt{partition''} na reszcie listy, a jeśli nie to dodaj element do listy \texttt{zs} i rekurencyjnie wywołaj funkcję \texttt{partition''} na reszcie listy
+        \[
+            \texttt{partition'' p (x:xs) ys zs = \ldots}
+        \]
+\end{enumerate}
+Przykładowe wywołanie:
+\begin{Verbatim}[frame=single]
+> partition' even [1..10]
+([2,4,6,8,10],[1,3,5,7,9])
+\end{Verbatim}
+
+
+\subsubsection{Zadanie 22}
+Zaimplementuj samodzielnie funkcje \texttt{permutations} (znajduje się ona w module \textbf{Data.List}), która dla danej listy wyznaczy listę wszystkich jej permutacji (możemy założyć, ze wszystkie elementy listy wejściowej sa różne).
+
+\bigskip
+\hrule
+\bigskip
+
+Oto implementacja funkcji \texttt{permutations} w języku Haskell:
+\begin{Verbatim}[frame=single]
+permutations' :: [a] -> [[a]]
+permutations' [] = [[]]
+permutations' (x:xs) = [ys ++ [x] ++ zs | perm <- permutations' xs,
+                                          (ys, zs) <- splits' perm]
+\end{Verbatim}
+
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć listę, której jedynym elementem jest pusta lista
+        \[
+            \texttt{permutations' [] = [[]]}
+        \]
+    \item W przeciwnym przypadku zwróć listę, której elementami są wszystkie możliwe permutacje listy wejściowej, które powstają przez dodanie elementu \texttt{x} na różne pozycje w permutacjach listy bez pierwszego elementu
+        \begin{Verbatim}
+permutations' (x:xs) = [ys ++ [x] ++ zs
+            | perm <- permutations' xs, (ys, zs) <- splits' perm]
+        \end{Verbatim}
+\end{enumerate}
+
+
+
+\subsubsection{Zadanie 23 -- Klasyczny Problem hetmanów}
+Celem jest umieszczenie ośmiu hetmanów na szachownicy tak, aby żadne dwa hetmany nie atakowały się nawzajem, tj. nie mogą znajdować się w:
+\begin{itemize}
+    \item tym samym rzędzie,
+    \item tej samej kolumnie,
+    \item tej samej przekątnej.
+\end{itemize}
+\begin{enumerate}
+    \item Zaimplementuj problem wyszukiwania położeń Hetmanów w Haskell’u korzystając z funkcji \texttt{permutations}.
+    \item Dwa rozwiązania nazywamy równoważne jeśli pierwsze z nich można otrzymać za pomocą złożeń odbicia poziomego \textit{(reverse)} oraz odbicia pionowego (np. \texttt{map ($\lambda$ x-> n+1-x))} z drugiego. Ile jest nierównoważnych poprawnych rozstawień hetmanów?
+\end{enumerate}
+\textbf{Wskazówka}: Przedstaw pozycje hetmanów jako listę liczb [1, ..., n]. Przykład: ciąg [4, 2, 7, 3, 6, 8, 5, 1] oznacza, że hetman w pierwszej kolumnie jest w rzędzie 4, hetman w drugiej kolumnie jest w rzędzie 2 itd.
+
+\bigskip
+\hrule
+\bigskip
 
 
 \end{document}
