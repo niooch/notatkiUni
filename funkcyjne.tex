@@ -856,7 +856,7 @@ amicablePairs = [ (n, m)
                 , sumaDzielnikow m == n ]
 
 > amicablePairs
-%TODO niech się policzy
+[(220,284),(1184,1210),(2620,2924),(5020,5564),(6232,6368)]
 \end{Verbatim}
 
 \subsubsection{Zadanie 16}
@@ -930,5 +930,103 @@ dcpValues = [dcp' n | n <- [100, 200..10000]]
 
 \subsection{Listy -- część 1.}
 Na początku tych zadań należało zastanowić się nad implementacją istniejących już funkcji z Prelude, a następnie zaimplementować je samodzielnie.
+\subsubsection{Zadanie 17}
+Napisz funkcję \texttt{nub}, która usunie z listy wszystkie duplikaty, np.
+\[
+\texttt{nub [1,1,2,2,2,1,4,1] == [1,2,4]}
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+Oto implementacja funkcji \texttt{nub} w języku Haskell:
+
+\begin{Verbatim}[frame=single]
+nub' :: (Eq a) => [a] -> [a]
+nub' [] = []
+nub' (x:xs) = x : nub' (filter (/= x) xs)
+\end{Verbatim}
+
+\subsubsection*{Jak to działa?}
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć pustą
+        \[
+            \texttt{nub' [] = []}
+        \]
+    \item W przeciwnym przypadku zwróć listę, której pierwszym elementem jest pierwszy element listy wejściowej (\texttt{x:xs} dzieli listę -- wyciąga pierwszy element), a resztę listy tworzy rekurencyjne wywołanie funkcji \texttt{nub'} na liście, z której usunięto wszystkie wystąpienia pierwszego elementu (\texttt{filter (/= x) xs} usuwa z xs wszystko co jest \texttt{x}).
+        \[
+            \texttt{nub' (x:xs) = x : nub' (filter (/= x) xs)}
+        \]
+\end{enumerate}
+
+\subsubsection{Zadanie 18}
+Napisz funkcję \texttt{inits}, która dla danej listy wyznaczy listę wszystkich jej odcinków
+początkowych, np.
+\[
+    \texttt{inits [1,2,3,4] == [[],[1],[1,2],[1,2,3],[1,2,3,4]]}
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+Funkcja \texttt{inits} również powinna wykonywać się rekurencyjnie. Zabieramy po jednym elemencie i wpisujemy do listy.
+\begin{Verbatim}[frame=single]
+inits' :: [a] -> [[a]]
+inits' [] = [[]]
+inits' (x:xs) = [] : map (x:) (inits' xs)
+\end{Verbatim}
+Działa to w bardzo podobny sposób jak poprzednie:
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć pustą listę
+        \[
+            \texttt{inits' [] = [[]]}
+        \]
+    \item W przeciwnym przypadku narzuć mapą na wszystkie elementy listy rekurencyjne wywołanie funkcji \texttt{inits'} na liście bez pierwszego elementu, a następnie dodaj na początek każdej z tych list pierwszy element listy wejściowej
+        \[
+            \texttt{inits' (x:xs) = [] : map (x:) (inits' xs)}
+        \]
+\end{enumerate}
+
+\subsubsection{Zadanie 19}
+Napisz funkcję \texttt{tails}, która dla danej listy wyznaczy listę wszystkich jej odcinków początkowych, np.:
+\[
+    \texttt{tails [1,2,3,4] == [[],[4],[3,4],[2,3,4],[1,2,3,4]]}
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+Funkcja \texttt{tails} działa analogicznie do funkcji \texttt{inits}, ale zamiast zdejmować elementy z początku listy, zdejmuje je z końca.
+\begin{Verbatim}[frame=single]
+tails' :: [a] -> [[a]]
+tails' [] = [[]]
+tails' (x:xs) = (x:xs) : tails' xs
+\end{Verbatim}
+\begin{enumerate}
+    \item Jeśli lista pusta to zwróć pustą listę
+        \[
+            \texttt{tails' [] = [[]]}
+        \]
+    \item W przeciwnym przypadku zwróć listę, której pierwszym elementem jest cała lista wejściowa, a resztę listy tworzy rekurencyjne wywołanie funkcji \texttt{tails'} na liście bez pierwszego elementu
+        \[
+            \texttt{tails' (x:xs) = (x:xs) : tails' xs}
+        \]
+\end{enumerate}
+
+\subsubsection{Zadanie 20}
+Napisz funkcję \texttt{splits}, która dla danej listy $xs$ wyznaczy listę wszystkich par ($ys,zs$) takich, że
+\[
+    \texttt{xs == ys++zs}
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+
+
 
 \end{document}
