@@ -701,6 +701,234 @@ fib = 0 : 1 : zipWith (+) fib (tail fib)
 co pozwala na generowanie listy liczb Fibonacciego w nieskończoność.
 Na przykład \texttt{take 10 fib} zwróci \texttt{[0,1,1,2,3,5,8,13,21,34]}.
 
+\subsubsection{Zadanie 11}
+Niech \( f = (2^{\wedge}) \) oraz \( g = (\wedge 2) \). Podaj interpretację tych funkcji.
 
+Sprawdź wartości wyrażenia:
+\[
+\text{map } (\wedge 2) [1..10] \quad \text{oraz} \quad \text{map } (2^{\wedge}) [1..10]
+\]
+i wyjaśnij otrzymane wyniki.
+
+\bigskip
+\hrule
+\bigskip
+
+Funkcja \( f = (2 \, \wedge) \) podnosi liczbę do kwadratu, a funkcja \( g = (\wedge \, 2) \) podnosi 2 do potęgi danej liczby.
+\begin{Verbatim}[frame=single]
+> map (^ 2) [1..10]
+[1,4,9,16,25,36,49,64,81,100]
+> map (2 ^) [1..10]
+[2,4,8,16,32,64,128,256,512,1024]
+\end{Verbatim}
+
+\subsubsection{Zadanie 12}
+Dowiedz się, jak można przekonwertować elementy typu \texttt{Int} oraz \texttt{Integer} na typy \texttt{Float} i \texttt{Double}. Dowiedz się, jaki jest format funkcji typu \texttt{round} z \texttt{Double} do \texttt{Int}.
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{itemize}
+    \item Konwersja z \texttt{Int} na \texttt{Float}:
+        \begin{Verbatim}[frame=single]
+fromIntegral :: (Integral a, Num b) => a -> b
+        \end{Verbatim}
+    \item Konwersja z \texttt{Int} na \texttt{Double}:
+        \begin{Verbatim}[frame=single]
+fromIntegral :: (Integral a, Num b) => a -> b
+        \end{Verbatim}
+    \item Konwersja z \texttt{Integer} na \texttt{Float}:
+        \begin{Verbatim}[frame=single]
+fromInteger :: Num a => Integer -> a
+        \end{Verbatim}
+    \item Konwersja z \texttt{Integer} na \texttt{Double}:
+        \begin{Verbatim}[frame=single]
+fromInteger :: Num a => Integer -> a
+        \end{Verbatim}
+    \item Funkcja \texttt{round} z \texttt{Double} na \texttt{Int}:
+        \begin{Verbatim}[frame=single]
+round :: (RealFrac a, Integral b) => a -> b
+        \end{Verbatim}
+\end{itemize}
+
+\subsection{Elementy Teorii Liczb}
+Trochę teorii liczb, bo czemu nie?
+\subsubsection{Zadanie 13}
+Funkcję Eulera \(\varphi\) nazywamy funkcją określoną wzorem:
+\begin{equation}
+    \varphi(n) = \text{card}\left(\{k \leq n : \gcd(k, n) = 1\}\right),
+\end{equation}
+o dziedzinie \(\mathbb{N}^+\).
+\begin{enumerate}
+    \item Oprogramuj funkcję \(\varphi\) (funkcja \(\gcd\) jest dostępna w bibliotece \texttt{Prelude}).
+    \item Napisz funkcję, która dla danej liczby naturalnej \(n\) wyznacza sumę:
+        \[
+            \sum_{k \mid n} \varphi(k).
+        \]
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{enumerate}
+    \item Oto implementacja funkcji \(\varphi\) w języku Haskell:
+        \begin{Verbatim}[frame=single]
+phi :: Int -> Int
+phi n = length [k | k <- [1..n], gcd k n == 1]
+
+> phi 10
+4
+        \end{Verbatim}
+    \item Oto implementacja funkcji, która wyznacza sumę \(\sum_{k \mid n} \varphi(k)\):
+        \begin{Verbatim}[frame=single]
+sumPhi :: Int -> Int
+sumPhi n = sum [phi k | k <- [1..n], n `mod` k == 0]
+
+> sumPhi 10
+10
+        \end{Verbatim}
+\end{enumerate}
+
+\subsubsection{Zadanie 14}
+Liczbę naturalną \(n\) nazywamy \textit{doskonałą}, jeżeli spełnia warunek:
+\begin{equation}
+    n = \sum \{ d : 1 \leq d < n \land d \mid n \}.
+\end{equation}
+
+Na przykład liczba \(6\) jest liczbą doskonałą, ponieważ:
+\begin{equation}
+    6 = 1 + 2 + 3.
+\end{equation}
+
+Wyznacz wszystkie liczby doskonałe mniejsze od \(10\,000\).
+
+\textbf{Uwaga:} Do tej pory nie wiadomo, czy istnieje nieskończenie wiele liczb doskonałych.
+
+\bigskip
+\hrule
+\bigskip
+
+Oto implementacja funkcji, która znajduje wszystkie liczby doskonałe mniejsze od \(10\,000\):
+\begin{Verbatim}[frame=single]
+isPerfect :: Int -> Bool
+isPerfect n = n == sum [d | d <- [1..n-1], n `mod` d == 0]
+
+perfectNumbers :: [Int]
+perfectNumbers = [n | n <- [1..9999], isPerfect n]
+
+> perfectNumbers
+[6,28,496,8128]
+\end{Verbatim}
+
+\subsubsection{Zadanie 15}
+Parę liczb naturalnych \((m, n)\) nazywamy \textit{zaprzyjaźnionymi}, jeżeli suma dzielników właściwych każdej z nich równa się drugiej:
+\[
+    \sigma(m) - m = n, \quad \sigma(n) - n = m,
+\]
+gdzie \(\sigma(n)\) oznacza sumę wszystkich dzielników liczby \(n\).
+
+Znajdź wszystkie zaprzyjaźnione pary, których oba składniki są mniejsze od \(10^5\).
+
+\textbf{Uwaga:} Do tej pory nie wiadomo, czy istnieje nieskończenie wiele par liczb zaprzyjaźnionych.
+
+\bigskip
+\hrule
+\bigskip
+
+Tak może wyglądać funkcja szukająca liczb zaprzyjaźnionych w podanym zakresie:
+\begin{Verbatim}[frame=single]
+sumaDzielnikow :: Int -> Int
+sumaDzielnikow 1 = 0
+sumaDzielnikow n = 1 + sum [ if x * x == n then x
+                            else if n `mod` x == 0 then x + (n `div` x)
+                            else 0
+                            | x <- [2..(floor . sqrt . fromIntegral) n], x * x <= n ]
+    where
+        limit = (floor . sqrt . fromIntegral) n
+
+amicablePairs :: [(Int, Int)]
+amicablePairs = [ (n, m)
+                | n <- [2..maxVal-1]
+                , let m = sumaDzielnikow n
+                , m > n, m < maxVal
+                , sumaDzielnikow m == n ]
+
+> amicablePairs
+%TODO niech się policzy
+\end{Verbatim}
+
+\subsubsection{Zadanie 16}
+Dla \(n \in \mathbb{N}^+\) definiujemy:
+\begin{equation}
+    \text{dcp}(n) = \frac{1}{2 n^2} \left| \{(k, l) \in \{1, \dots, n\} : \gcd(k, l) = 1\} \right|.
+\end{equation}
+
+\begin{enumerate}
+    \item Zaimplementuj tę funkcję w języku Haskell za pomocą \textit{list comprehension}.
+    \item Zoptymalizuj ten kod, pisząc rekurencyjną wersję tej funkcji.
+    \item Wyznacz wartości tej funkcji dla \(n = 100, 200, 300, \dots, 10000\) i postaw jaką rozsądną hipotezę o:
+        \begin{equation}
+            \lim\limits_{n \to \infty} \text{dcp}(n).
+        \end{equation}
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{enumerate}
+    \item Przykładowa implementacja przy użyciu \textit{list comprehension}:
+        \begin{Verbatim}[frame=single]
+dcp :: Int -> Double
+dcp n = 1 / (2 * fromIntegral (n^2))
+        * fromIntegral (length [(k, l)
+                                | k <- [1..n], l <- [1..n], gcd k l == 1])
+
+> dcp 10
+0.315
+        \end{Verbatim}
+    \item Optymalizacja kodu przy użyciu rekurencji:
+        \begin{Verbatim}[frame=single]
+dcp' :: Int -> Double
+dcp' n = 1 / (2 * fromIntegral (n^2)) * fromIntegral (dcp'' n 1 1)
+
+dcp'' :: Int -> Int -> Int -> Int
+dcp'' n k l
+    | k > n     = 0
+    | l > n     = dcp'' n (k + 1) 1
+    | gcd k l == 1 = 1 + dcp'' n k (l + 1)
+    | otherwise = dcp'' n k (l + 1)
+
+> dcp' 10
+0.315
+        \end{Verbatim}
+    \item Wyznaczenie wartości funkcji dla \(n = 100, 200, 300, \dots, 10000\):
+        \begin{Verbatim}[frame=single]
+dcpValues :: [Double]
+dcpValues = [dcp' n | n <- [100, 200..10000]]
+
+> dcpValues
+[0.30435,0.3057875,0.30441666666666667,0.304234375,0.304462,
+0.3041652777777778,0.3041173469387755,0.30429609375,0.3041055555555556,
+0.3041915,0.3042293388429752,0.30401770833333336,0.30404940828402366,
+0.30412627551020405,0.30408066666666667,0.3039966796875,
+0.3041839100346021,0.3040300925925926,0.3040048476454294,0.304146875,
+0.304041156462585,0.3039759297520661,0.30407854442344046,
+0.3040509548611111,0.3039804,0.3040543639053254,0.3040213305898491,
+0.30399381377551016,0.3040546373365042,0.30402083333333335,
+0.3040220083246618,0.304030029296875,0.3039801193755739,
+0.30399476643598616,0.30402542857142856,0.30400150462962966,
+0.30400697589481374,0.30404456371191135,0.30397827087442475,
+0.30397509375,0.3040405413444378,0.30397174036281177,
+0.30401695511087073,0.3040362345041322,0.3039997777777778,
+0.30397993856332706,0.3040101177003169,*** Exception: stack overflow
+        \end{Verbatim}
+        Na podstawie uzyskanych wartości można postawić hipotezę, że granica funkcji \(\text{dcp}(n)\) dla \(n \to \infty\) wynosi około \(0.304\). Wartość ta może być przybliżona do wartości funkcji Eulera \(\frac{6}{\pi^2}\). \qed
+\end{enumerate}
+
+\subsection{Listy -- część 1.}
+Na początku tych zadań należało zastanowić się nad implementacją istniejących już funkcji z Prelude, a następnie zaimplementować je samodzielnie.
 
 \end{document}
