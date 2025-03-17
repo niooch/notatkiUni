@@ -6,6 +6,9 @@
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage{marginnote}
+\usepackage{tikz}
+\usetikzlibrary{trees}
 \usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
 \usepackage{graphicx}                  % Obsługa grafiki
 \usepackage{hyperref}                  % Linki i spis treści
@@ -348,7 +351,199 @@ Na wykładzie będziemy omawiali:
         \end{itemize}
 
 \end{itemize}
+\section{Wykład \date{2025-03-17}}
+\subsection{Dzrzewo rekursji}
+Przykład dzewa rekursji:
+\begin{itemize}
+    \item $T(n) = T(\frac{n}{2})+T(\frac{n}{4}) + n^2$
+\end{itemize}
+\begin{center}
+\begin{tikzpicture}
+    [level distance=1.5cm,
+    level 1/.style={sibling distance=4cm},
+    level 2/.style={sibling distance=2cm}]
+    \node {$n^2$}
+        child {node {$\frac{n^2}{4}$}
+            child {node {$\frac{n^2}{16}$}}
+            child {node {$\frac{n^2}{64}$}}
+        }
+        child {node {$\frac{n^2}{16}$}
+            child {node {$\frac{n^2}{64}$}}
+            child {node {$\frac{n^2}{256}$}}
+        };
+      \node[draw=none] at (-4.5,0) {$n^2$};
+      \node[draw=none] at (-4.5,-1.5) {$\frac{5}{16}n^2$};
+      \node[draw=none] at (-4.5,-3) {$\frac{25}{256}n^2$};
+\end{tikzpicture}
+\end{center}
+\subsubsection*{Uwaga!}
+Nie jest to formalne rozwiązanie problemu. Nie można używać drzewa rekursji do dowodzenia złożoności algorytmów. Jest to jedynie intuicyjne podejście do problemu. Trzeba policzyć to na piechote, aby było formalnie.\newline
+Aby policzyć $T(n)$ musimy policzyć sumę wszystkich wierzchołków w drzewie rekursji.
+\[
+    T(n) = \sum^{\infty}_{k=0} \left(\frac{5}{16}\right)^k \cdot n^2 = n^2 \sum^{\infty}_{k=0} \left(\frac{5}{16}\right)^k = n^2 \frac{1}{1-\frac{5}{16}} = n^2 \frac{16}{11} = \frac{16}{11}n^2
+\]
+A wiec $T(n) = O(n^2)$
+\newline
+Możemy to policzyć dokładniej dostajac mniejsze wyrazy w sumie.
+%TODO przepisac od szymiego
 
+\subsecton{Metoda iteracyjna}
+Weźmy na przykład taką rekurencję:
+\[
+    T(n) = 3T(\frac{n}{4}) + n
+\]
+Zobaczmy co się dzieje po podstawieniu rekurencji do samej siebie:
+\begin{enumerate}
+    \item $T(n) = 3T(\frac{n}{4}) + n$
+    \item $T(n) = 3(3T(\frac{n}{16}) + \frac{n}{4}) + n = 3^2T(\frac{n}{16}) + \frac{3}{4}n + n$
+    \item $T(n) = 3^2(3T(\frac{n}{64}) + \frac{n}{16}) + \frac{3}{4}n + n = 3^3T(\frac{n}{64}) + \frac{3}{16}n + \frac{3}{4}n + n$
+    \item \dots \footnote{Warto zauważyć, że jest to analogicznie do liczenia sumy wszystkich nodów drzewa rekursji}
+\end{enumerate}
+A więc ogólnie wychodzi:
+\[
+    %T(n) = \sum^{\log_{2}n}_{k=0} \frac{{3}{4}
+\]
+\subsection{Master Theorem}
+Niech $a \geq 1, b > 1, f(n), d \in \mathbb{N}$ oraz $f(n)$ będzie funkcją nieujemną. Rozważmy rekurencję:
+\[
+    T(n) = aT(\frac{n}{b}) + \Theta(n^d)
+\]
+gdzie $a$ i $b$ są stałymi, a $f(n)$ jest funkcją nieujemną. Wtedy:
+\begin{enumerate}
+    \item $\Theta(n^d)$ jeśli $d > \log_b a$
+    \item $\Theta(n^d \log n)$ jeśli $d = \log_b a$
+    \item $\Theta(n^{\log_b a})$ jeśli $d < \log_b a$
+\end{enumerate}
+\subsubsection*{Szkic D-d}
+Do przedstawienia problemu użyjemy drzewa rekursji. Rozważmy rekurencję:
+\[
+    T(n) = aT(\frac{n}{b}) + \Theta(n^d)
+\]
+\begin{center}
+\begin{tikzpicture}
+    [level distance=1.5cm,
+    level 1/.style={sibling distance=4cm},
+    level 2/.style={sibling distance=2cm}]
+    \node {$c \cdot n^d$}
+        child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
+            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
+            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
+        }
+        child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
+            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
+            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
+        };
+      \node[draw=none] at (-4.5,0) {$n^d$};
+      \node[draw=none] at (-4.5,-1.5) {$\frac{n^d}{b^d}$};
+      \node[draw=none] at (-4.5,-3) {$\frac{n^d}{b^{2d}}$};
+  \end{tikzpicture} %TODO zrobic lepsze drzewo...
+\end{center}
+\begin{enumerate}
+    \item suma kosztoów w $k$--tym kroku
+        \[
+            a^k c (\frac{n}{b^k})^d = c (\frac{a}{b^d})^k n^d
+        \]
+        gdzie $c(\frac{n}{b^k})^d$ to koszt jednego podproblemu w $k$--tym kroku
+    \item obliczenie wysokości drzewa:
+        \[
+            \frac{n}{b^h} = 1 \rightarrow h = \log_b n
+        \]
+    \item Obliczenie $T(n)$
+        \begin{equation*}
+            T(n) = \Theta(\sum^{\log_b n}_{k=0} c\frac{a}{b^k}n^d) \\
+                 &= \Theta(c \cdot n^d \sum^{\log_b n}_{k=0} (\frac{a}{b^d})^k) \\
+                 &= \Theta(c \cdot n^d \frac{1-(\frac{a}{b^d})^{\log_b n + 1}}{1-\frac{a}{b^d}}) \implies T(n) = \Theta(n^d)
+        \end{equation*}
+    \item rozważmy 3 przypadki:
+        \begin{enumerate}
+            \item $d > \log_b a$ \marginpar{root -- heavy}
+                \[
+                    T(n) = \Theta(n^d)
+                \]
+            \item $d = \log_b a$ \marginpar{równo}
+                \[
+                    T(n) = \Theta(n^d \log n)
+                \]
+            \item $d < \log_b a$ \marginpar{leaf -- heavy}
+                \[
+                    T(n) = \Theta(n^{\log_b a})
+                \]
+        \end{enumerate}
+\end{enumerate}
+
+\subsubsection*{Przykłady}
+\begin{itemize}
+    \item $T(n) = 4T(\frac{n}{2}) + 11n$ \newline
+        Wtedy kożystając z \textbf{Master Theorem} mamy:
+        \[
+            a = 4, b = 2, d = 1
+        \]
+        Jak i również
+        \[
+            \log_b a = \log_2 4 = 2 > 1 = d \implies T(n) = \Theta(n^2)7
+        \]
+    \item $T(n) = 4T(\frac{n}{3}) + 3n^2$ \newline
+        Wtedy
+        \[
+            a = 4, b = 3, d = 2
+        \]
+        Jak i również
+        \[
+            \log_b a = \log_3 4 > 2 = d \implies T(n) = \Theta(n^{\log_3 4})
+        \]
+    \item $T(n) = 27T(\frac{n}{3}) + \frac{n^2}{3}$ \newline
+        Wtedy
+        \[
+            a = 27, b = 3, d = 2
+        \]
+        Jak i również
+        \[
+            \log_b a = \log_3 27 = 3 > 2 = d \implies T(n) = \Theta(n^3\log n)
+        \]
+\end{itemize}
+
+\subsection{Metoda dziel i zwyciężaj (D\&C)}
+Na czym ona polega?
+\begin{enumerate}
+    \item Podział problemu na mniejsze podproblemy \footnote{W zapisie rekurencyjnym $T(n) = cT(cn) + \underline{n^d}$}
+    \item Rozwiazanie rekurencyjnie mniejsze podpoblemy
+    \item połącz rozwiązania podproblemów w celu rozwiązania problemu wejściowego
+\end{enumerate}
+\subsubsection*{Algorytm -- Binary Search}
+\begin{itemize}
+    \item \textbf{Input}: posortowania tablica \texttt{A[1..n]} oraz element \texttt{x}
+    \item \textbf{Output}: indeks \texttt{i} taki, że \texttt{A[i] = x} lub \texttt{0} jeśli \texttt{x} nie występuje w \texttt{A}
+        \item przebieg algorytmu: %pseudokod
+            \begin{algorithm}[H]
+                \caption{Binary Search}
+                \begin{algorithmic}[1]
+                    \Procedure{BinarySearch}{A, x}
+                        \State $l = 1$
+                        \State $r = |A|$
+                        \While{$l \leq r$}
+                            \State $m = \lfloor \frac{l+r}{2} \rfloor$
+                            \If{$A[m] = x$}
+                                \State \Return{$m$}
+                            \ElsIf{$A[m] < x$}
+                                \State $l = m + 1$
+                            \Else
+                                \State $r = m - 1$
+                            \EndIf
+                        \EndWhile
+                        \State \Return{0}
+                    \EndProcedure
+                \end{algorithmic}
+            \end{algorithm}
+        \item \textbf{Asypmtotyka}
+            Algorytm spełnia następująca rekurencje:
+            \[
+                T(n) = T(\frac{n}{2}) + \Theta(1)
+            \]
+            Rozwiązując za pomocą \textbf{Master Theorem} otrzymujemy:
+            \[
+                T(n) = \Theta(\log n)
+            \]
+\end{itemize}
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
@@ -488,10 +683,96 @@ Gdzie:
             \end{itemize}
     \end{itemize}
 \end{proof}
+Dla pewnosci sprawdzone empirycznie:
+%zalacz wykres wykresAlgoZad3.png
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{wykresAlgoZad3.png}
+\end{figure}
 
+\subsubsection{zadanie 4}
+Wyznacz asymptotyczne oszacowanie górne dla następujących rekurencji:
 
+\begin{itemize}
+    \item $T(n) = 2T(n/2) + 1$
+    \item $T(n) = 2T(n/2) + n$
+    \item $T(n) = 3T(n/2) + n \log n$
+\end{itemize}
 
-\section{Podsumowanie}
-Podsumowanie lub zakończenie notatek.
+\bigskip
+\hrule
+\bigskip
+
+Kożystając z \textbf{Master Theorem} możemy wyznaczyć ograniczenie dla tych rekurencji.
+\begin{itemize}
+    \item $T(n) = 2T(n/2) + 1$
+        \begin{proof}
+            \[
+                a = 2, b = 2, d = 0
+            \]
+            \[
+                \log_b a = \log_2 2 = 1 > 0 = d
+            \]
+            \[
+                T(n) = \Theta(n)
+            \]
+        \end{proof}
+    \item $T(n) = 2T(n/2) + n$
+        \begin{proof}
+            \[
+                a = 2, b = 2, d = 1
+            \]
+            \[
+                \log_b a = \log_2 2 = 1 = d
+            \]
+            \[
+                T(n) = \Theta(n \log n)
+            \]
+        \end{proof}
+    \item $T(n) = 3T(n/2) + n \log n$
+        \begin{proof}
+            \[
+                a = 3, b = 2, d = 1
+            \]
+            \[
+                \log_b a = \log_2 3 > 1 = d
+            \]
+            \[
+                T(n) = \Theta(n^{\log_2 3})
+            \]
+        \end{proof}
+\end{itemize}
+
+\subsubsection{zadanie 5}
+Zaprojektuj algorytm wczytujący z wejścia tablicę liczb $A[1], \ldots, A[N]$ i przygotowujący tablicę $B$ tak, że na jej podstawie będzie potrafił odpowiadać na pytania:
+\begin{enumerate}
+    \item ile wynosi suma elementów tablicy $A$ od miejsca $i$ do miejsca $j$ włącznie, dla $i < j$.
+    \item Jaka jest złożoność czasowa Twojego algorytmu? Ile pamięci zajmuje tablica $B$?
+    \item Ile zajmuje odpowiedź na jedno pytanie?
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+Przykładowy algorytm mógłby wyglądać następująco:
+\begin{algorithm}
+    \caption{Algorytm do zadania 5.}
+    \begin{algorithmic}[1]
+        \State $B[1] = A[1]$
+        \For{$i = 2$ to $N$}
+            \State $B[i] = B[i-1] + A[i]$
+        \EndFor
+        \Procedure{Sum}{i, j}
+            \State \Return{$B[j] - B[i-1]$}
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+Co tu się dzieje?
+\begin{itemize}
+    \item W pierwszej pętli obliczamy sumy prefiksowe tablicy $A$ i zapisujemy je w tablicy $B$.
+    \item W procedurze \texttt{Sum} zwracamy różnicę między dwoma elementami tablicy $B$.
+\end{itemize}
 
 \end{document}
