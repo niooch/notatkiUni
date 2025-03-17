@@ -731,14 +731,13 @@ Kożystając z \textbf{Master Theorem} możemy wyznaczyć ograniczenie dla tych 
         \end{proof}
     \item $T(n) = 3T(n/2) + n \log n$
         \begin{proof}
+            \text{Dolne ograniczenie}
             \[
-                a = 3, b = 2, d = 1
+                T(n) = 3T(n/2) + n \implies^{\text{Master Theorem}} T(n) = \Theta(n^{\log_2 3})
             \]
+            \text{Górne ograniczenie}
             \[
-                \log_b a = \log_2 3 > 1 = d
-            \]
-            \[
-                T(n) = \Theta(n^{\log_2 3})
+                T(n) = 3T(n/2) + n^{1.1} \implies^{\text{Master Theorem}} T(n) = \Theta(n^{1.1})
             \]
         \end{proof}
 \end{itemize}
@@ -774,5 +773,41 @@ Co tu się dzieje?
     \item W pierwszej pętli obliczamy sumy prefiksowe tablicy $A$ i zapisujemy je w tablicy $B$.
     \item W procedurze \texttt{Sum} zwracamy różnicę między dwoma elementami tablicy $B$.
 \end{itemize}
+
+\begin{itemize}
+    \item Złożoność czasowa algorytmu wynosi $\Theta(n)$.
+    \item Tablica $B$ zajmuje $\Theta(n)$ pamięci.
+    \item Odpowiedź na jedno pytanie zajmuje $\Theta(1)$ czasu.
+\end{itemize}
+
+\subsubsection{zadanie 6}
+Pokaż, jak grać w grę w "10 pytań", w której wiadomo, że wybrana liczba jest dodatnia, ale nie jest na początku znane górne ograniczenie jej wartości. Ile pytań potrzebujesz, żeby zgadnąć dowolną liczbę (liczba pytań może zależeć od wielkości liczby)?
+
+\bigskip
+\hrule
+\bigskip
+
+W grze "10 pytań" możemy zadać pytania w stylu "czy liczba jest większa od $x$?". W ten sposób możemy zredukować przestrzeń poszukiwań. W pierwszym pytaniu zapytajmy, czy liczba jest większa od $1$. Jeśli tak, to zapytajmy, czy liczba jest większa od $2$. W ten sposób możemy zredukować przestrzeń poszukiwań do $2^k$ dla pewnego $k$. W ten sposób możemy znaleźć dowolną liczbę w $k$ pytaniach.
+
+\subsubsection{zadanie 7}
+Używając algorytmu \textbf{divide-and-conquer} do mnożenia liczb wykonaj mnożenie dwóch liczb binarnych 11011, 1010.
+
+\bigskip
+\hrule
+\bigskip
+
+Algorytm \textbf{divide-and-conquer} do mnożenia liczb działa w następujący sposób:
+\begin{enumerate}
+    \item Podziel liczby na dwie równe części.
+    \item Rekurencyjnie pomnóż te części.
+    \item Połącz wyniki.
+\end{enumerate}
+
+Mnożenie dwóch liczb binarnych $11011$ i $1010$ możemy zrealizować w następujący sposób:
+\begin{enumerate}
+    \item Podziel liczby na dwie równe części: $1101$, $1$ oraz $10$, $10$.
+    \item Rekurencyjnie pomnóż te części: $1101 \cdot 10 = 11010$.
+    \item Połącz wyniki: $11010 + 110100 = 1000000$.
+\end{enumerate}
 
 \end{document}
