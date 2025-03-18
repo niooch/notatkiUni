@@ -509,41 +509,253 @@ Na czym ona polega?
     \item Rozwiazanie rekurencyjnie mniejsze podpoblemy
     \item połącz rozwiązania podproblemów w celu rozwiązania problemu wejściowego
 \end{enumerate}
-\subsubsection*{Algorytm -- Binary Search}
+\subsubsection{Algorytm -- Binary Search}
 \begin{itemize}
     \item \textbf{Input}: posortowania tablica \texttt{A[1..n]} oraz element \texttt{x}
     \item \textbf{Output}: indeks \texttt{i} taki, że \texttt{A[i] = x} lub \texttt{0} jeśli \texttt{x} nie występuje w \texttt{A}
-        \item przebieg algorytmu: %pseudokod
-            \begin{algorithm}[H]
-                \caption{Binary Search}
-                \begin{algorithmic}[1]
-                    \Procedure{BinarySearch}{A, x}
-                        \State $l = 1$
-                        \State $r = |A|$
-                        \While{$l \leq r$}
-                            \State $m = \lfloor \frac{l+r}{2} \rfloor$
-                            \If{$A[m] = x$}
-                                \State \Return{$m$}
-                            \ElsIf{$A[m] < x$}
-                                \State $l = m + 1$
-                            \Else
-                                \State $r = m - 1$
-                            \EndIf
-                        \EndWhile
-                        \State \Return{0}
-                    \EndProcedure
-                \end{algorithmic}
-            \end{algorithm}
-        \item \textbf{Asypmtotyka}
-            Algorytm spełnia następująca rekurencje:
-            \[
-                T(n) = T(\frac{n}{2}) + \Theta(1)
-            \]
-            Rozwiązując za pomocą \textbf{Master Theorem} otrzymujemy:
-            \[
-                T(n) = \Theta(\log n)
-            \]
+    \item przebieg algorytmu: %pseudokod
+        \begin{algorithm}[H]
+            \caption{Binary Search}
+            \begin{algorithmic}[1]
+                \Procedure{BinarySearch}{A, x}
+                \State $l = 1$
+                \State $r = |A|$
+                \While{$l \leq r$}
+                \State $m = \lfloor \frac{l+r}{2} \rfloor$
+                \If{$A[m] = x$}
+                \State \Return{$m$}
+                \ElsIf{$A[m] < x$}
+                \State $l = m + 1$
+                \Else
+                \State $r = m - 1$
+                \EndIf
+                \EndWhile
+                \State \Return{0}
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item \textbf{Asypmtotyka}
+        Algorytm spełnia następująca rekurencje:
+        \[
+            T(n) = T(\frac{n}{2}) + \Theta(1)
+        \]
+        Rozwiązując za pomocą \textbf{Master Theorem} otrzymujemy:
+        \[
+            T(n) = \Theta(\log n)
+        \]
 \end{itemize}
+
+\subsubsection{Algorytm -- potęgowanie liczby do naturalnej potęgi}
+\begin{itemize}
+    \item \textbf{Problem}: obliczanie $x^n$\\
+        Można rozbić mnożenie $n$ $x$ na odpowiednie podproblemy:
+        %podkresl n/2 xksów
+        \[
+            x^n = \underbrace{x \cdot x \cdot \dots \cdot x}_{\frac{n}{2}} \cdot \underbrace{x \cdot x \cdot \dots \cdot x}_{\frac{n}{2}}
+        \]
+        A więc mamy:
+        \[
+            x^n = \begin{cases}
+                x^{\frac{n}{2}} \cdot x^{\frac{n}{2}} & \text{dla n parzystych} \\
+                x^{\frac{n-1}{2}} \cdot x^{\frac{n-1}{2}} \cdot x & \text{dla n nieparzystych}
+            \end{cases}
+        \]
+    \item \textbf{Asymptotyka}: \\
+        Algorytm spełnia następującą rekurencję:
+        \[
+            T(n) = T(\frac{n}{2}) + \Theta(1)
+        \]
+        Rozwiązując za pomocą \textbf{Master Theorem} otrzymujemy:
+        \[
+            T(n) = \Theta(\log n)
+        \]
+\end{itemize}
+
+\subsubsection{Obliczenie n-tej liczby Fibonacciego}
+\begin{itemize}
+    %TODO dorysowac drzewo jak u Szymiego
+    \item \textbf{Problem}:
+        \[
+            F_n = \begin{cases}
+                0 & \text{dla n = 0} \\
+                1 & \text{dla n = 1} \\
+                F_{n-1} + F_{n-2} & \text{dla n > 1}
+            \end{cases}
+        \]
+    \item \textbf{Algorytmy}:
+        \begin{enumerate}
+            \item Naiwna rekurencja używająca definicji. Asymptotyka wynosi $\Theta(\phi^n)$
+            \item \textit{bottom up} -- iteracyjne obliczanie kolejnych liczb Fibonacciego. Asymptotyka wynosi $\Theta(n)$
+            \item Kożystanie z wzoru wynikającego z rozwiązanej rekurencji:
+                \[
+                    F_n = \frac{1}{\sqrt{5}} \left( \left(\frac{1+\sqrt{5}}{2}\right)^n - \left(\frac{1-\sqrt{5}}{2}\right)^n \right)
+                \]
+                Problem z tym podejsciem polega na niedokładnym przybilżeniu przez komputery wartości $\phi$
+            \item Kożystając z lematu:
+                \[
+                    \begin{pmatrix}
+                        1 & 1 \\
+                        1 & 0
+                    \end{pmatrix}^n
+                    =
+                    \begin{pmatrix}
+                        F_{n+1} & F_n \\
+                        F_n & F_{n-1}
+                    \end{pmatrix},
+                \]
+                \begin{proof}
+                    \begin{enumerate}
+                        \item Krok indukcyjny:
+                            \[
+                                %TODO dowod
+                            \]
+                    \end{enumerate}
+                \end{proof}
+                Algorytm ten ma złożoność $\Theta(n\log n)$
+        \end{enumerate}
+\end{itemize}
+
+\subsubsection{Mnożenie liczb}
+\begin{itemize}
+    \item \textbf{Input}: $x, y$ takie, że $\max\{|x|, |y|\}$
+    \item \textbf{Output}: $x \cdot y$
+    \item \textbf{Algorytmy}:
+        \begin{enumerate}
+            \item standardowe mnożenie szkolne -- mnożenia w słupku jego asyptotyka wynosi $\Theta(n^2)$
+            \item Podejście metodą \textbf{D\&C}
+                \begin{itemize}
+                    \item \textbf{Podejście}: Rozbijamy liczby na dwie równe części, a następnie mnożymy je przez siebie \\
+                        Możemy zapisać $x$ oraz $y$ jako:
+                        \[
+                            x = \underbrace{x_L \cdot 2^{\frac{n}{2}}}_{\frac{n}{2} \text{bitów}} +\underbrace{x_R}_{\frac{n}{2} \text{bitów}}
+                        \]
+                        \[
+                            y = \underbrace{y_L \cdot 2^{\frac{n}{2}}}_{\frac{n}{2} \text{bitów}} +\underbrace{y_R}_{\frac{n}{2} \text{bitów}}
+                        \]
+                        Proces mnożenia wygląda następująco:
+                        \[
+                            x \cdot y = (x_L \cdot 2^n) \cdot  %TODO przepisac od Szymiego ten algorytm
+                        \]
+                        Generalnie wszytkie wykonywane powyżej operacje są giga tanie bo opreacje takie jak mnożenie przez $2^k$ wiąże się jedynie z przesunięciem bitowym.
+                    \item \textbf{Asymptotyka}: Nasz algorytm spełnia następującą rekurencje na podstawie zapisanego wyżej równania
+                        \[
+                            T(n) = 4T(\frac{n}{2}) + \Theta(n)
+                        \]
+                        Kożystając ponownie z \textbf{Master Theorem} można wywnioskować, że algorytm ma złożoność $\Theta(n^2)$. Zatem nie ma żadnego znacznego przyśpieszenia, nawet prawdopodobnie stała ukryta w $\Theta(n^2)$ jest gorsza niż w standardowym podjesciu
+                \end{itemize}
+            \item Metoda Gaussa
+                \begin{itemize}
+                    \item Rozważmy mnożenie liczb zespolonych
+                        \[
+                            (a+ib)(c+id) = ac + i(ad+bc) + bd
+                        \]
+                        \[
+                            bc + ad = (a+b)(c+d) - ac - bd
+                        \]
+                        zatem
+                        \[
+                            x \cdot y = x_Ly_L \cdot 2^n + ((x_L + x_R)(y_L + y_R) - x_Ly_L - x_Ry_R) \cdot 2^{\frac{n}{2}} + x_Ry_R
+                        \]
+                    \item \textbf{Asymptotyka}: algorytm ten spełnia rekurencje
+                        \[
+                            T(n) = 3T(\frac{n}{2}) + \Theta(n)
+                        \]
+                        Z \textbf{Master Theorem} otrzymujemy, że algorytm ma złożoność $\Theta(n^{\log_2 3})$, a $\log_2 3 \approx 1.58$
+                \end{itemize}
+            \item Istneją jeszcze szybsze, nowsze algorytmy mnożenia liczb, takie jak algorytm Schönhage'a-Strassena bazuje ono na szybkiej transformacie Fouriera \textit{Fast Fourier Transform}, który ma złożoność $\Theta(n \log n \log \log n)$. Jednakże, trzeba wziąść pod uwagę stałą ukrytą w $\Theta$. W praktyce, dla liczb o rozmiarze do $10^6$ lepiej jest użyć standardowego algorytmu mnożenia.
+        \end{enumerate}
+\end{itemize}
+Trochę pseudo kodu dla mnożenia liczb:
+\begin{algorithm}
+    \caption{Mnożenie liczb}
+    \begin{algorithmic}[1]
+        \Procedure{Multiply}{x, y}
+        \State $n = \max\{|x|, |y|\}$
+        \If{$n = 1$}
+        \State \Return{$x \cdot y$}
+        \EndIf
+        \State $x_L, x_R = \text{LetfMost}\left\lceil\frac{n}{2}\right\rceil, \text{RightMost}\left\lceil\frac{n}{2}\right\rceil \text{bits of $x$}$
+        \State $y_L, y_R = \text{LetfMost}\left\lceil\frac{n}{2}\right\rceil, \text{RightMost}\left\lceil\frac{n}{2}\right\rceil \text{bits of $y$}$
+        \State $p_1 = \text{Multiply}(x_L, y_L)$
+        \State $p_2 = \text{Multiply}(x_R, y_R)$
+        \State $p_3 = \text{Multiply}(x_L + x_R, y_L + y_R)$
+        \State \Return{$p_1 \cdot 2^{2n} + (p_3 - p_1 - p_2) \cdot 2^n + p_2$}
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\subsubsection{Mnożenie macierzy}
+\begin{itemize}
+    \item \textbf{Input}: dwie macierze $A, B$ rozmiaru $n \times n$
+    \item \textbf{Output}: macierz $C = A \cdot B$
+    \item \textbf{Algorytmy}:
+        \begin{enumerate}
+            \item Naiwne mnożenie macierzy -- jego złożoność wynosi $\Theta(n^3)$ bo aby policzyć jedną komórkę macierzy $C$ musimy wykonać $n$ mnożeń (i $n-1$ dodawań \footnote{w sumie $n^2$ operacji}), a skoro macierz $C$ ma $n^2$ komórek to złożoność wynosi $\Theta(n^3)$
+            \item Algorytm Strassena -- \textbf{D\&C}
+                \begin{itemize}
+                    \item \textbf{Podejście}: Rozbijamy macierze na 4 równe części
+                        \[
+                            A = \begin{pmatrix}
+                                A_{11} & A_{12} \\
+                                A_{21} & A_{22}
+                            \end{pmatrix}
+                        \]
+                        \[
+                            B = \begin{pmatrix}
+                                B_{11} & B_{12} \\
+                                B_{21} & B_{22}
+                            \end{pmatrix}
+                        \]
+                        \[
+                            C = \begin{pmatrix}
+                                C_{11} & C_{12} \\
+                                C_{21} & C_{22}
+                            \end{pmatrix}
+                        \]
+                        gdzie
+                        \[
+                            C_{11} = A_{11}B_{11} + A_{12}B_{21}
+                        \]
+                        \[
+                            C_{12} = A_{11}B_{12} + A_{12}B_{22}
+                        \]
+                        \[
+                            C_{21} = A_{21}B_{11} + A_{22}B_{21}
+                        \]
+                        \[
+                            C_{22} = A_{21}B_{12} + A_{22}B_{22}
+                        \]
+                    \item \textbf{Asymptotyka}: Algorytm ten spełnia rekurencje
+                        \[
+                            T(n) = 7T(\frac{n}{2}) + \Theta(n^2)
+                        \]
+                        Z \textbf{Master Theorem} otrzymujemy, że algorytm ma złożoność $\Theta(n^{\log_2 7})$, a $\log_2 7 \approx 2.81$
+                        \footnote{Aby zejść do rekurencji $T(n) = 7T(\frac{n}{2}) + \Theta(n^2)$ trzeba wykonać pewne, bardziej wyrafinowane triki, które nie są dokładnie opisane tutaj. Z algorytmu zapisanego wyżej wynika że rekurencja to $T(n) = 8T(\frac{n}{2}) + \Theta(n^2)$, a wieć złożoność wynosi $\Theta(n^3)$}
+                \end{itemize}
+        \end{enumerate}
+\end{itemize}
+
+\subsubsection{Quick Sort}
+Algortym \textbf{Merge Sort} ociera się o minimalną granicę złożoności sortowania, która wynosi $\Theta(n \log n)$, jednaże jest z nim problem związany z pamięcia: nie sortuje w miejscu, a więc wymaga dodatkowej pamięci.
+\begin{itemize}
+    \item \textbf{Input}: tablica $A[1..n]$
+    \item \textbf{Output}: posortowana tablica $A$
+    \item \textbf{Algorytm}: \texttt{QuickSort(A, p, q)}
+        \begin{enumerate}
+            \item Podziel tablicę \texttt{A[p...q]} na dwie podtablice \texttt{A[p...k-1]} oraz \texttt{A[k+1...q]}, gdzie \texttt{A[k]} jest elementem rozdzielającym -- \textit{pivotem}\footnote{o tym jak ten \textif{pivot} jest wybierany bedziemy mówić poźniej} tak, że:
+                \[
+                    \forall i \in [p...k-1]: A[i] \leq A[k]: \forall j \in [k+1...q]: A[j] \geq A[k]
+                \]
+            \item Odpalamy rekurencyjnie \texttt{QuickSort(A, p, k-1)} oraz \texttt{QuickSort(A, k+1, q)}
+        \end{enumerate}
+    \item \textbf{Przyklad}:
+        \begin{enumerate}
+            \item mamy dane $A = [6,1,4,3,5,7,2,8]$, wybieramy \textit{pivot} jako $6$
+            \item po pierwszym kroku mamy $A = [1,4,3,5,2,6,7,8]$ odplamay rekurencyjnie \texttt{QuickSort(A, 1, 5)} oraz \texttt{QuickSort(A, 7, 8)}
+            \item otrzymujemy %TODO kurwaaaaaaaaaaaa
+
+        \end{enumerate}
+\end{itemize}
+
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
