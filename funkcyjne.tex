@@ -218,7 +218,93 @@ pitagorasTrzy n = [(x,y,z) | x <- [1..n], y <- [1..n], z <- [1..n],
 \end{itemize}
 
 
+\section{Wykład \date{18-03-2025}}
+\subsection{implementacje funkcji w Haskellu}
+\subsubsection{QuickSort}
+w tej implementacji za \textit{pivot} przyjmujemy pierwszy element listy.
+\begin{Verbatim}[frame=single]
+qS [] = []
+qs (x:xs) = (qS [y | y <- xs, y < x]) ++
+            [x] ++
+            (qS [y | y <- xs, y >= x])
+\end{Verbatim}
 
+\subsubsection{\textit{partition}}
+\begin{Verbatim}[frame=single]
+partition :: (a->Bool) -> [a] -> ([a],[a])
+partition _ [] = ([],[])
+partition p (x:xs) = if p x then (x:l,r)
+                            else (l,x:r)
+                    where (l,r) = partition p xs
+\end{Verbatim}
+
+\subsubsection{Lepsza implementacja QuickSort'a}
+\begin{Verbatim}[frame=single]
+qSort [] = []
+qSort (x:xs) = (qSort l) ++ [x] ++ (qSort r)
+               where (l,r) = partition (<x) xs
+\end{Verbatim}
+wyrażenie \texttt{(<x)} jest zastosowaniem \textit{slicingu}. Działa to następująco:
+\[
+    (<x) \equiv \lambda y \rightarrow y < x
+\]
+
+\subsubsection{InsertSort}
+\begin{Verbatim}[frame=single]
+inSort [] = []
+inSort (x:xs) = l ++ [x] ++ r
+                where sxs = inSort xs
+                      (l,r) = partition (<x) sxs
+\end{Verbatim}
+
+Aby sprawdzić prędkość wykonywania funkcji w Haskellu możemy użyć następującej funkcji
+\begin{Verbatim}[frame=single]
+>:set +s
+>take 10 (inSort [1000,999..1])
+[1,2,3,4,5,6,7,8,9,10]
+(0.02 secs, 5,499,824 bytes)
+\end{Verbatim}
+
+\subsubsection{\textit{zip}}
+Powtórka z ćwiczen \textit{Zadanie 10} \ref{zadanie10}
+\subsubsection{\textit{zipWith}}
+Podobnie znowu napisane na ćwiczeniach \ref{zadanie10}
+
+\subsubsection{funkcje wykonujące operacje na listach}
+funkcja sumująca:
+\begin{Verbatim}[frame=single]
+sumList [] = 0
+sumList (x:xs) = x + sumList xs
+
+> sumList [1..1000]
+500500
+\end{Verbatim}
+
+funkcja mnożąca:
+\begin{Verbatim}[frame=single]
+pro [] = 1
+pro (x:xs) = x * pro xs
+
+>pro [1..9]
+362880
+\end{Verbatim}
+
+teraz abstrachując ten koncept możemy napisać funkcję \textit{foldl}\footnote{jest to operacja składająca liste w nastepujący sposób $(((e \cdot x_1) \cdot x_2 ) \cdot x_3 ) \cdot \dots ) \cdot x_n$, istneje analogiczna \textit{foldr} działająca odwrotnie $x_1 \cdot (x_2 \cdot (x_3 \cdot \dots (x_n \cdot e)))$}, która działa na danym monoidzie $M=(M,\cdot,e)$
+\begin{Verbatim}[frame=single]
+foldl :: (a -> b -> a) -> a -> [b] -> a
+foldl' op e [] = e
+foldl' op e (x:xs) = op x (foldl' op e xs)
+
+ghci> foldl' (*) 1 [1..10]
+3628800
+ghci> foldl' (+) 1 [1..10]
+56
+ghci> foldl' (+) 0 [1..10]
+55
+ghci> foldl' (*) 0 [1..10]
+0
+\end{Verbatim}
+%TODO wziasc od wojtasa te drzewa na foldach
 \section{Ćwiczenia}
 W tym miejscu będa pojawiały się notatki z laboratorów (ćwiczeń)
 \subsection{Ćwiczenia 11-03-2025}
@@ -618,7 +704,7 @@ f' x = sin x * sin x + sin x + x
     \end{Verbatim}
 \end{enumerate}
 
-\subsubsection{Zadanie 10}
+\subsubsection{Zadanie 10} \label{zadanie10}
 Zaimplementuj samodzielnie następujące funkcje działające na listach z Prelude:
 \begin{enumerate}
     \item map
