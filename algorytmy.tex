@@ -1,11 +1,12 @@
 \documentclass[11pt,a4paper]{article}
-
 % Kodowanie i obsługa języka polskiego
 \usepackage[utf8]{inputenc}      % Kodowanie wejścia
 \usepackage[T1]{fontenc}         % Kodowanie fontów
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage{xcolor}
+\usepackage{bm}
 \usepackage{marginnote}
 \usepackage{tikz}
 \usetikzlibrary{trees}
@@ -352,7 +353,7 @@ Na wykładzie będziemy omawiali:
 
 \end{itemize}
 \section{Wykład \date{2025-03-17}}
-\subsection{Dzrzewo rekursji}
+\subsection{Drzewo rekursji}
 Przykład dzewa rekursji:
 \begin{itemize}
     \item $T(n) = T(\frac{n}{2})+T(\frac{n}{4}) + n^2$
@@ -385,9 +386,17 @@ Aby policzyć $T(n)$ musimy policzyć sumę wszystkich wierzchołków w drzewie
 A wiec $T(n) = O(n^2)$
 \newline
 Możemy to policzyć dokładniej dostajac mniejsze wyrazy w sumie.
-%TODO przepisac od szymiego
+\[
+    T(n) = O(\hat{T}(n)) = O(\check{T}(n))
+\]
+\[
+    T(n) = \Omega(\check{T}(n))
+\]
+\[
+    T(n) = \Theta(n^2) = \frac{16}{11}n^2 + o(n^2)
+\]
 
-\subsecton{Metoda iteracyjna}
+\subsection{Metoda iteracyjna}
 Weźmy na przykład taką rekurencję:
 \[
     T(n) = 3T(\frac{n}{4}) + n
@@ -420,26 +429,58 @@ Do przedstawienia problemu użyjemy drzewa rekursji. Rozważmy rekurencję:
     T(n) = aT(\frac{n}{b}) + \Theta(n^d)
 \]
 \begin{center}
-\begin{tikzpicture}
-    [level distance=1.5cm,
-    level 1/.style={sibling distance=4cm},
-    level 2/.style={sibling distance=2cm}]
-    \node {$c \cdot n^d$}
-        child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
-            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
-            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
-        }
-        child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
-            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
-            child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}}
-        };
-      \node[draw=none] at (-4.5,0) {$n^d$};
-      \node[draw=none] at (-4.5,-1.5) {$\frac{n^d}{b^d}$};
-      \node[draw=none] at (-4.5,-3) {$\frac{n^d}{b^{2d}}$};
-  \end{tikzpicture} %TODO zrobic lepsze drzewo...
+    \begin{tikzpicture}
+        [level distance=1.5cm,
+        level 1/.style={sibling distance=4cm},
+        level 2/.style={sibling distance=2cm},
+        level 3/.style={sibling distance=1cm}]
+        \node {$c \cdot n^d$}
+            child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
+                child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                }
+                child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                }
+            }
+            child {node {$c \cdot \left(\frac{n}{b}\right)^d$}
+                child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                }
+                child {node {$c \cdot \left(\frac{n}{b^2}\right)^d$}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                    child {node {$\dots$}}
+                }
+            };
+        %opis
+        \node[draw=none] at (-4.5,1.5) {wielkość};
+        \node[draw=none] at (0,1.5) {drzewo};
+        \node[draw=none] at (4,1.5) {liczba problemów};
+        %wielkosc 
+        \node[draw=none] at (-4.5,0) {$n^d$};
+        \node[draw=none] at (-4.5,-1.5) {$\frac{n^d}{b^d}$};
+        \node[draw=none] at (-4.5,-3) {$\frac{n^d}{b^{2d}}$};
+        %liczba problemów
+        \node[draw=none] at (4.5,0) {$1$};
+        \node[draw=none] at (4.5,-1.5) {$a$};
+        \node[draw=none] at (4.5,-3) {$a^2$};
+        %dodaj linie oddzielajaca miedzy opisem a drzewem
+        \draw[thin] (-6,1) -- (6,1);
+        %dodaj linie między wielkością a drzewem
+        \draw[thin] (-4,0.5) -- (-4,-3.5);
+        %dodaj linie między drzewem a liczbą problemów
+        \draw[thin] (4,0.5) -- (4,-3.5);
+    \end{tikzpicture} 
 \end{center}
 \begin{enumerate}
-    \item suma kosztoów w $k$--tym kroku
+    \item suma kosztów w $k$--tym kroku
         \[
             a^k c (\frac{n}{b^k})^d = c (\frac{a}{b^d})^k n^d
         \]
@@ -573,7 +614,6 @@ Na czym ona polega?
 
 \subsubsection{Obliczenie n-tej liczby Fibonacciego}
 \begin{itemize}
-    %TODO dorysowac drzewo jak u Szymiego
     \item \textbf{Problem}:
         \[
             F_n = \begin{cases}
@@ -584,7 +624,31 @@ Na czym ona polega?
         \]
     \item \textbf{Algorytmy}:
         \begin{enumerate}
-            \item Naiwna rekurencja używająca definicji. Asymptotyka wynosi $\Theta(\phi^n)$
+            \item Naiwna rekurencja używająca definicji. 
+                %drzewo rekursji dla n = 4
+                \begin{center}
+                    \begin{tikzpicture}
+                        [level distance=1.5cm,
+                        level 1/.style={sibling distance=4cm},
+                        level 2/.style={sibling distance=2cm},
+                        level 3/.style={sibling distance=1cm}]
+                        \node {$F_4$}
+                            child {node {$F_3$}
+                                child {node {$F_2$}
+                                    child {node {$F_1$}}
+                                    child {node {$F_0$}}
+                                }
+                                child {node {$F_1$}}
+                            }
+                            child {node {$F_2$}
+                                child {node {$F_1$}}
+                                child {node {$F_0$}}
+                            };
+                        %caption
+                        \node[draw=none] at (0,1) {Obliczanie $F_4$};
+                    \end{tikzpicture}
+                \end{center}
+                Kontynułując dostajemy asymptotyke rzędu $\Theta(\phi^n)$
             \item \textit{bottom up} -- iteracyjne obliczanie kolejnych liczb Fibonacciego. Asymptotyka wynosi $\Theta(n)$
             \item Kożystanie z wzoru wynikającego z rozwiązanej rekurencji:
                 \[
@@ -605,9 +669,72 @@ Na czym ona polega?
                 \]
                 \begin{proof}
                     \begin{enumerate}
-                        \item Krok indukcyjny:
+                        \item Warunek początkowy: dla $n = 0$
                             \[
-                                %TODO dowod
+                                \begin{pmatrix}
+                                    1 & 1 \\
+                                    1 & 0
+                                \end{pmatrix}^0
+                                =
+                                \begin{pmatrix}
+                                    1 & 0 \\
+                                    0 & 1
+                                \end{pmatrix}
+                                =
+                                \begin{pmatrix}
+                                    F_1 & F_0 \\
+                                    F_0 & F_{-1}
+                                \end{pmatrix}
+                            \]
+                        \item Krok indukcyjny:\\
+                            załóżmy, że dla pewnego $k$ zachodzi:
+                            \[
+                                \begin{pmatrix}
+                                    1 & 1 \\
+                                    1 & 0
+                                \end{pmatrix}^k
+                                =
+                                \begin{pmatrix}
+                                    F_{k+1} & F_k \\
+                                    F_k & F_{k-1}
+                                \end{pmatrix}
+                            \]
+                            wtedy dla $k+1$ mamy:
+                            \[
+                                \begin{pmatrix}
+                                    1 & 1 \\
+                                    1 & 0
+                                \end{pmatrix}^{k+1}
+                                =
+                                \begin{pmatrix}
+                                    F_{k+2} & F_{k+1} \\
+                                    F_{k+1} & F_k
+                                \end{pmatrix}
+                            \]
+                            \[
+                                \begin{pmatrix}
+                                    1 & 1 \\
+                                    1 & 0
+                                \end{pmatrix}^{k+1}
+                                =
+                                \begin{pmatrix}
+                                    F_{k+1} & F_k \\
+                                    F_k & F_{k-1}
+                                \end{pmatrix}
+                                \begin{pmatrix}
+                                    1 & 1 \\
+                                    1 & 0
+                                \end{pmatrix}
+                                =
+                                \begin{pmatrix}
+                                    F_{k+1} + F_k & F_{k+1} \\
+                                    F_k + F_{k-1} & F_k
+                                \end{pmatrix}
+                                =
+                                \begin{pmatrix}
+                                    F_{k+2} & F_{k+1} \\
+                                    F_{k+1} & F_k
+                                \end{pmatrix}
                             \]
                     \end{enumerate}
                 \end{proof}
@@ -633,9 +760,11 @@ Na czym ona polega?
                             y = \underbrace{y_L \cdot 2^{\frac{n}{2}}}_{\frac{n}{2} \text{bitów}} +\underbrace{y_R}_{\frac{n}{2} \text{bitów}}
                         \]
                         Proces mnożenia wygląda następująco:
-                        \[
-                            x \cdot y = (x_L \cdot 2^n) \cdot  %TODO przepisac od Szymiego ten algorytm
-                        \]
+                        \begin{equation*}\begin{split}
+                            x \cdot y &= (x_L \cdot 2^n + x_R) \cdot (y_L \cdot 2^n + y_R) \\
+                                      &= x_L y_L \cdot 2^{2n} + ((x_L + x_R)(y_L + y_R) - x_L y_L - x_R y_R) \cdot 2^n \\
+                                      &\quad + x_R y_R
+                        \end{split}\end{equation*}
                         Generalnie wszytkie wykonywane powyżej operacje są giga tanie bo opreacje takie jak mnożenie przez $2^k$ wiąże się jedynie z przesunięciem bitowym.
                     \item \textbf{Asymptotyka}: Nasz algorytm spełnia następującą rekurencje na podstawie zapisanego wyżej równania
                         \[
@@ -741,7 +870,7 @@ Algortym \textbf{Merge Sort} ociera się o minimalną granicę złożoności sor
     \item \textbf{Output}: posortowana tablica $A$
     \item \textbf{Algorytm}: \texttt{QuickSort(A, p, q)}
         \begin{enumerate}
-            \item Podziel tablicę \texttt{A[p...q]} na dwie podtablice \texttt{A[p...k-1]} oraz \texttt{A[k+1...q]}, gdzie \texttt{A[k]} jest elementem rozdzielającym -- \textit{pivotem}\footnote{o tym jak ten \textif{pivot} jest wybierany bedziemy mówić poźniej} tak, że:
+            \item Podziel tablicę \texttt{A[p...q]} na dwie podtablice \texttt{A[p...k-1]} oraz \texttt{A[k+1...q]}, gdzie \texttt{A[k]} jest elementem rozdzielającym -- \textit{pivotem}\footnote{o tym jak ten \textif{pivot} jest wybierany będziemy mówić później} tak, że:
                 \[
                     \forall i \in [p...k-1]: A[i] \leq A[k]: \forall j \in [k+1...q]: A[j] \geq A[k]
                 \]
@@ -750,10 +879,71 @@ Algortym \textbf{Merge Sort} ociera się o minimalną granicę złożoności sor
     \item \textbf{Przyklad}:
         \begin{enumerate}
             \item mamy dane $A = [6,1,4,3,5,7,2,8]$, wybieramy \textit{pivot} jako $6$
-            \item po pierwszym kroku mamy $A = [1,4,3,5,2,6,7,8]$ odplamay rekurencyjnie \texttt{QuickSort(A, 1, 5)} oraz \texttt{QuickSort(A, 7, 8)}
-            \item otrzymujemy %TODO kurwaaaaaaaaaaaa
-
+            \item Przebieg partycjonowania:
+            \[
+                A = [1,4,3,5,2,6,7,8]
+            \]
+            Elementy mniejsze niż $6$ znalazły się po lewej stronie, większe po prawej. Pozycja pivota: $A[6] = 6$.
+            \item Rekurencyjnie sortujemy dwie części:
+            \begin{itemize}
+                \item \texttt{QuickSort(A, 1, 5)} dla tablicy $[1,4,3,5,2]$, np. wybieramy pivot $1$:
+                \[
+                    A = [1,4,3,5,2]
+                \]
+                Po dalszym sortowaniu otrzymamy $[1,2,3,4,5]$
+                \item \texttt{QuickSort(A, 7, 8)} dla $[7,8]$, który już jest posortowany.
+            \end{itemize}
+            \item Finalna posortowana tablica:
+            \[
+                A = [1,2,3,4,5,6,7,8]
+            \]
         \end{enumerate}
+        Na koniec przykład w drzewie rekursji:
+        \begin{center}
+            \begin{tikzpicture}[
+                level distance=2.2cm,
+                level 1/.style={sibling distance=8cm},
+                level 2/.style={sibling distance=5cm},
+                level 3/.style={sibling distance=3cm},
+                level 4/.style={sibling distance=2cm},
+                every node/.style={align=center}
+                ]
+
+                \node {QS([\textcolor{orange}{6}, \textcolor{blue}{1,4,3,5,2}, \textcolor{red}{7,8}])}
+                    child {
+                        node {QS([\textcolor{orange}{1}, \textcolor{red}{4,3,5,2}])}
+                        child {
+                            node {QS([])}
+                        }
+                        child {
+                            node {QS([\textcolor{orange}{4}, \textcolor{blue}{3,2}, \textcolor{red}{5}])}
+                            child {
+                                node {QS([\textcolor{orange}{3}, \textcolor{blue}{2}])}
+                                child {
+                                    node {QS([2])}
+                                }
+                                child {
+                                    node {QS([])}
+                                }
+                            }
+                            child {
+                                node {QS([5])}
+                            }
+                        }
+                    }
+                    child {
+                        node {QS([\textcolor{orange}{7}, \textcolor{red}{8}])}
+                        child {
+                            node {QS([])}
+                        }
+                        child {
+                            node {QS([8])}
+                        }
+                    };
+
+            \end{tikzpicture}
+        \end{center}
+
 \end{itemize}
 
 \section{Ćwiczenia}
