@@ -756,6 +756,150 @@ Algortym \textbf{Merge Sort} ociera się o minimalną granicę złożoności sor
         \end{enumerate}
 \end{itemize}
 
+\section{Wykład \date{2025-03-24}}
+\subsection{Quick Sort}
+\subsubsection{Lemuto Partition}
+\begin{itemize}
+    \item \textbf{Input}: tablica $A[1..n]$
+    \item \textbf{Output}: posortowana tablica $A$
+    \item \textbf{Algorytm}: \texttt{Lemuto(A, p, q)}
+        \begin{algorithm}
+            \caption{Lemuto Partition}
+            \begin{algorithmic}[1]
+                \Procedure{Lemuto}{A, p, q}
+                \State $\text{pivot} = A[p]$
+                \State $i = p$
+                \For{$j = p+1$ to $q$}
+                \If{$A[j] < \text{pivot}$}
+                \State $i = i + 1$
+                \State \text{swap} $A[i] \leftrightarrow A[j]$
+                \EndIf
+                \EndFor
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item \textbf{Przykład:}
+        \begin{enumerate}
+            \item zaczynamy z nieposotowaną tablicą $A = [6,10,13,5,8,3,2,11]$
+                %TODO dokonczyć przykład? może od szymona
+        \end{enumerate}
+    \item \textbf{Asymptotyka}:
+        Algorytm ten wykonuje w głownej pętli $n-1$ porównań, natomiast wersja Lemuto Partition wymaga dodatkowo $n-1$ zamian elementów.
+
+\end{itemize}
+
+\subsubsection{Hoare Partition}
+\begin{itemize}
+    \item \textbf{Input}: Tablica $A[1..n]$
+    \item \textbf{Output}: Posortowana Tablica $A$
+    \item \textbf{Algorytm}: \texttt{Hoare(A, p, q)}
+        \begin{algorithm}
+            \caption{Hoare Partition}
+            \begin{algorithmic}[1]
+                \Procedure{Hoare}{A, p, q}
+                \State $\text{pivot} = A[\frac{p+q}{2}]$
+                \State $i = p-1$
+                \State $j = q+1$
+                \While{True}
+                \State $i = i + 1$
+                \While{$A[j] > \text{pivot}$}
+                \State $j = j - 1$
+                \If{$\geq j$}
+                \State \textbf{break}
+                \EndIf
+                \EndWhile
+                \State $\text{swap} A[i] \leftrightarrow A[j]$
+                \EndWhile
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item \textbf{Przykład:}
+        Generalnie algorytm ten działa na zasadzie zamiany elementów w tablicy względem \textit{pivotu} tak, że jeżeli jest element mniejszy od \textit{pivotu} to zamieniamy go z elementem większym od \textit{pivotu} z drugiej strony tablicy. Algorytm kończy się gdy wszytkie elementy mniejsze od \textit{pivotu} są po lewej stronie, a większe po prawej.
+        \begin{enumerate}
+            \item zaczynamy z nieposotowaną tablicą $A = [6,10,13,5,8,3,2,11]$
+                %TODO dokonczyć przykład? może od szymona
+        \end{enumerate}
+    \item \textbf{Asymptotyka}:
+        \textit{Hoare Partition} wykonue $n\pm c$ porównań -- o stałą więcej niżeli \textit{Lemuto Partition}, ale za to wykonuje mniej zamian elementów. W praktyce \textit{Hoare Partition} jest szybszy. Całościowa Asymptotyka wynosi $\Theta(n)$
+\end{itemize}
+
+\subsubsection{Analiza Worst Case}
+Algorytm sortowania Quick Sort zachowuje się najgorzej w przypadku, gdy dostaje tablicę odwrotnie posortowaną. Wszystkie elementy będą znajdowały się po złej stronie \textit{pivotu}. \\
+Zostaje spełniana rekurencja:
+\[
+    T(n) = T(n-1) + \underbrace{T(0)}_{\text{pusta lewa tablica}} + \Theta(n)
+\]
+Można zauważyć, że nie zadziała tu \textbf{Master Theorem}, trzeba rozwiązać ja na przykład drzewem rekursji:
+\begin{center} %TODO od szymona. napisać ze wysokośc to n -1 itp
+\begin{tikzpicture}
+    [level distance=1.5cm,
+    level 1/.style={sibling distance=4cm},
+    level 2/.style={sibling distance=2cm}]
+    \node {$cn$}
+        child {node {$c(n-1)$}
+            child {node {$1$}} %tutaj
+            child {node {$\Theta(1)$}}
+        }
+        child {node {$\Theta(1)$}};
+  \end{tikzpicture}
+\end{center}
+Z drzewa rekursji wynika, że powyższa rekurencja to:
+\[%TODO to też do przepisania
+    T(n) \leq \sum^{n}_{i=0} i + \Theta(n) = O(n^2)
+\]
+
+\subsubsection{Best Case Analysis}
+Algorytm sortowania Quick Sort zachowuje się najlepiej w przypadku, gdy dostaje tablicę posortowaną. Wszystkie elementy będą znajdowały się po dobrej stronie \textit{pivotu}. \\
+Zostaje spełniana rekurencja:
+\[
+    T(n) = T(\frac{n}{2}) +T(\frac{n}{2}) +\Theta(n)
+\]
+Można zauważyć, z \textbf{Master Theorem}, że asymptotyka wynosi:
+\[
+    T(n) = \Theta(n \log n)
+\]
+%TODO drzewo
+
+\subsubsection{Rozważenie przypadku mieszanego}
+Rozważmy przypadek, w którym algorytm raz wykonuje się z best casem -- dzieli się tablica na pół, a raz z worst casem -- dzieli się tablica na 1 i $n-1$ elementów. \\
+Zostaje spełniana rekurencja:
+\[
+    L(n) = 2U(\frac{n}{2}) + \Theta(n)
+\]
+\[
+    U(n) = L(n-1) + \Theta(n)
+\]
+gdzie $L$ symbolizuje best case, natomiast $U$ worst case. Rozwiązując powyższą rekurencje otrzymujemy:
+\begin{equation*} %TODO upewnic sie, ze to dobrze
+    \begin{aligned}
+        L(n)
+        &= 2(L(\frac{n}{2} -1) +\Theta(n)) + \Theta(n) \\
+        &= 2L(\frac{n}{2} -1) + \Theta(n) \\
+        &= \Theta(n \log n)
+    \end{aligned}
+\end{equation*}
+
+\subsubsection{Average Case Analysis}
+Algorytm Quick Sort da się ``zabezpieczyć'' przed złym rozkładem danych poprzez losowym wybraniem pivota i następnie swapnięcie go z naszym deterministycznym miejscem. W ten sposób bedzięmy mieli zawsze jednostajnie losowy rozkład danych.\\
+Wprowadźmy
+\[
+    T_n  \text{ -- zmienna losowa liczby porównań w Quick Sorcie sortowanej tablicy } A, |A|=n
+\]
+Do dziś nie jest znany rozkład zmiennej losowej $T_n$.
+Niech
+%TODO
+%\begin{equation*}
+%    X^{(n)}_{k} =
+%    \begin{cases}
+%        1 \text{ jeśli partition podzieli tablice n-elementową na (k,(n-k-1)) \\
+%        0 \text{w przeciwnym przypadku}
+%    \end{cases}
+%\end{equation*}
+%TODO Rownanie od szymonaaaaaa. w rownaniu z wartoscia oczekiwana zapisac ze X i T+T sa niezalezne
+
+
+
+
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
@@ -974,8 +1118,12 @@ Przykładowy algorytm mógłby wyglądać następująco:
         \For{$i = 2$ to $N$}
             \State $B[i] = B[i-1] + A[i]$
         \EndFor
-        \Procedure{Sum}{i, j}
-            \State \Return{$B[j] - B[i-1]$}
+        \Procedure{Sum}{i, j} %uwaga na edge case
+        \If {$i=1$}
+            \State \Return $B[j]$
+        \Else
+            \State \Return $B[j] - B[i-1]$
+        \EndIf
         \EndProcedure
     \end{algorithmic}
 \end{algorithm}
@@ -1000,6 +1148,19 @@ Pokaż, jak grać w grę w "10 pytań", w której wiadomo, że wybrana liczba je
 \bigskip
 
 W grze "10 pytań" możemy zadać pytania w stylu "czy liczba jest większa od $x$?". W ten sposób możemy zredukować przestrzeń poszukiwań. W pierwszym pytaniu zapytajmy, czy liczba jest większa od $1$. Jeśli tak, to zapytajmy, czy liczba jest większa od $2$. W ten sposób możemy zredukować przestrzeń poszukiwań do $2^k$ dla pewnego $k$. W ten sposób możemy znaleźć dowolną liczbę w $k$ pytaniach.
+\begin{algorithm}
+    \caption{Algorytm do zadania 6.}
+    \begin{algorithmic}[1]
+        \State{$k = 0$}
+        \While{$2^k < x$}
+            \State{$k = k + 1$}
+        \EndWhile
+        \State{$p=2^{k-1}$}
+        \State{$q=2^k$}
+        \Procedure{BinarySearch}{p, q}
+    \end{algorithmic}
+\end{algorithm}
+
 
 \subsubsection{zadanie 7}
 Używając algorytmu \textbf{divide-and-conquer} do mnożenia liczb wykonaj mnożenie dwóch liczb binarnych 11011, 1010.
@@ -1021,5 +1182,68 @@ Mnożenie dwóch liczb binarnych $11011$ i $1010$ możemy zrealizować w następ
     \item Rekurencyjnie pomnóż te części: $1101 \cdot 10 = 11010$.
     \item Połącz wyniki: $11010 + 110100 = 1000000$.
 \end{enumerate}
+
+\begin{algorithm}
+\caption{Algorytm do zadania 7 (pokazany na wykładzie)}
+    \begin{algorithmic}[1]
+        \Procedure{Mul}{x, y}
+        \State{$n = \max\{|x|, |y|\}$}
+        \If{$n = 1$}
+        \State \Return{$x \cdot y$}
+        \EndIf
+        \State{$x_L, x_R = \text{LetfMost}\left\lceil\frac{n}{2}\right\rceil, \text{RightMost}\left\lceil\frac{n}{2}\right\rceil \text{bits of $x$}$}
+        \State{$y_L, y_R = \text{LetfMost}\left\lceil\frac{n}{2}\right\rceil, \text{RightMost}\left\lceil\frac{n}{2}\right\rceil \text{bits of $y$}$}
+        \State{$p_1 = \text{Mul}(x_L, y_L)$}
+        \State{$p_2 = \text{Mul}(x_R, y_R)$}
+        \State{$p_3 = \text{Mul}(x_L + x_R, y_L + y_R)$}
+        \State \Return{$p_1 \cdot 2^{2n} + (p_3 - p_1 - p_2) \cdot 2^n + p_2$}
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Lista 3}
+robiona na zajęciach \date{2025-03-24}
+
+\subsubsection{zadanie 1}
+Podaj algorytm scalający $k$ posortowanych list tak aby powstała jedna posortowana lista $nb$ (liczba wszystkich elementów na listach to n) działający w czasie $O(n \log k)$.
+
+\bigskip
+\hrule
+\bigskip
+
+Algorytm ten można zrealizować w następujący sposób:
+\begin{algorithm}
+    \caption{Algorytm do zadania 1.}
+    \begin{algorithmic}[1]
+        \Procedure{MergeLists}{$L_1, L_2, \ldots, L_k$}
+        \State{$n = \sum_{i=1}^{k} |L_i|$}
+        \State{$B = \text{tablica} [1 \ldots n]$}
+        \State{$\text{heap} = \text{MinHeap}$}
+        \For{$i = 1$ to $k$}
+            \State{$\text{heap}.\text{insert}(L_i.\text{pop}())$}
+        \EndFor
+        \For{$i = 1$ to $n$}
+            \State{$B[i] = \text{heap}.\text{pop}()$}
+            \State{$\text{heap}.\text{insert}(L_i.\text{pop}())$}
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{zadanie 2}
+Zdefiniujmy algorytm \textit{k-MergeSort} jako uogólnienie algorytmu sortowania przez scalanie. Różni się od omawianego na wykładzie algorytmu sortowania przez scalanie tym, że dzieli sortowana tablice rekurencyjnie na k równych części (zakładamy, że liczba elementów w tablicy jest potęgą k $(n = k^l)$). \\
+Używając wyniku z zadania 1 proszę wykazać dla jakiego k algorytm ma najmniejsza asymptotyczną złożoność obliczeniową liczby porównań (górne ograniczenie $O(\cdot)$).
+
+\bigskip
+\hrule
+\bigskip
+
+Algorytm \textit{k-MergeSort} spełnia rekurencję:
+\[
+    T(n) = kT(\frac{n}{k}) + \Theta(n \log k)
+\]
+gdzie $\Theta(n \log k)$ to koszt scalania $k$ posortowanych list (zadanie 1). Z \textbf{Master Theorem} otrzymujemy, że algorytm ma złożoność:
+\[
+    T(n) = \Theta(n \log_k n)
+\]
 
 \end{document}

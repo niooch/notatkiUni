@@ -875,6 +875,10 @@ sumPhi n = sum [phi k | k <- [1..n], n `mod` k == 0]
 > sumPhi 10
 10
         \end{Verbatim}
+        Funkcja sumPhi jest identycznoscia na $\mathbb{N}^+$. Można zapisać to jako:
+        \[
+            n =N(n)= \sum_{k \mid n} \varphi(k) \cdot \underbrace{I(\frac{n}{k})}_{\equiv 1}
+        \]
 \end{enumerate}
 
 \subsubsection{Zadanie 14}
@@ -968,7 +972,7 @@ Dla \(n \in \mathbb{N}^+\) definiujemy:
     \item Przykładowa implementacja przy użyciu \textit{list comprehension}:
         \begin{Verbatim}[frame=single]
 dcp :: Int -> Double
-dcp n = 1 / (2 * fromIntegral (n^2))
+dcp n = 1 / (fromIntegral (n^2))
         * fromIntegral (length [(k, l)
                                 | k <- [1..n], l <- [1..n], gcd k l == 1])
 
@@ -978,7 +982,7 @@ dcp n = 1 / (2 * fromIntegral (n^2))
     \item Optymalizacja kodu przy użyciu rekurencji:
         \begin{Verbatim}[frame=single]
 dcp' :: Int -> Double
-dcp' n = 1 / (2 * fromIntegral (n^2)) * fromIntegral (dcp'' n 1 1)
+dcp' n = 1 / (fromIntegral (n^2)) * fromIntegral (dcp'' n 1 1)
 
 dcp'' :: Int -> Int -> Int -> Int
 dcp'' n k l
@@ -996,22 +1000,20 @@ dcpValues :: [Double]
 dcpValues = [dcp' n | n <- [100, 200..10000]]
 
 > dcpValues
-[0.30435,0.3057875,0.30441666666666667,0.304234375,0.304462,
-0.3041652777777778,0.3041173469387755,0.30429609375,0.3041055555555556,
-0.3041915,0.3042293388429752,0.30401770833333336,0.30404940828402366,
-0.30412627551020405,0.30408066666666667,0.3039966796875,
-0.3041839100346021,0.3040300925925926,0.3040048476454294,0.304146875,
-0.304041156462585,0.3039759297520661,0.30407854442344046,
-0.3040509548611111,0.3039804,0.3040543639053254,0.3040213305898491,
-0.30399381377551016,0.3040546373365042,0.30402083333333335,
-0.3040220083246618,0.304030029296875,0.3039801193755739,
-0.30399476643598616,0.30402542857142856,0.30400150462962966,
-0.30400697589481374,0.30404456371191135,0.30397827087442475,
-0.30397509375,0.3040405413444378,0.30397174036281177,
-0.30401695511087073,0.3040362345041322,0.3039997777777778,
-0.30397993856332706,0.3040101177003169,*** Exception: stack overflow
+[0.6087,0.611575,0.6088333333333333,0.60846875,0.608924,
+0.6083305555555556,0.608234693877551,0.6085921875,0.6082111111111111,
+0.608383,0.6084586776859504,0.6080354166666667,0.6080988165680473,
+0.6082525510204081,0.6081613333333333,0.607993359375,0.6083678200692042,
+0.6080601851851852,0.6080096952908588,0.60829375,0.60808231292517,
+0.6079518595041322,0.6081570888468809,0.6081019097222222,0.6079608,
+0.6081087278106508,0.6080426611796982,0.6079876275510203,
+0.6081092746730083,0.6080416666666667,0.6080440166493236,
+0.60806005859375,0.6079602387511478,0.6079895328719723,
+0.6080508571428571,0.6080030092592593,0.6080139517896275,
+...]
         \end{Verbatim}
-        Na podstawie uzyskanych wartości można postawić hipotezę, że granica funkcji \(\text{dcp}(n)\) dla \(n \to \infty\) wynosi około \(0.304\). Wartość ta może być przybliżona do wartości funkcji Eulera \(\frac{6}{\pi^2}\). \qed
+        Na podstawie uzyskanych wartości można postawić hipotezę, że granica funkcji \(\text{dcp}(n)\) dla \(n \to \infty\) wynosi około $0.608 \dots$. Wartość ta może być przybliżona do wartości funkcji Eulera \(\frac{6}{\pi^2}\). \qed \\
+        Można to interpretować jako gęstość liczb względnie pierwszych w zbiorze \(\{1, \dots, n\}\), ale jako iż bierzemy symetrie względem $0$ to wartość ta jest podwojona. Jednocześnie wynika to bezpośrednio z funkcji Zeta Riemanna $\zeta(2) = \frac{\pi^2}{6}$.
 \end{enumerate}
 
 \subsection{Listy -- część 1.}
