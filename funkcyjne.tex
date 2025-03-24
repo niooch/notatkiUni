@@ -1222,5 +1222,302 @@ Celem jest umieszczenie ośmiu hetmanów na szachownicy tak, aby żadne dwa hetm
 \hrule
 \bigskip
 
+\begin{enumerate}
+    \item Oto implementacja problemu hetmanów w języku Haskell:
+        \begin{Verbatim}[frame=single]
+queens :: Int -> [[Int]]
+queens n = filter check (permutations [1..n])
+    where
+        check xs = and [abs (xs !! i - xs !! j) /= j - i | i <- [0..n-1], j <- [i+1..n-1]]
+        \end{Verbatim}
+    \item Aby znaleźć liczbę nierównoważnych poprawnych rozstawień hetmanów, można posłużyć się funkcją \texttt{nub} z poprzedniego zadania, która usuwa duplikaty z listy. W ten sposób można znaleźć liczbę nierównoważnych poprawnych rozstawień hetmanów.
+        \begin{Verbatim}[frame=single]
+queens' :: Int -> [[Int]]
+queens' n = nub (map sort (queens n))
+        \end{Verbatim}
+\end{enumerate}
+
+\subsubsection{Zadanie 24}
+Napisz funkcję, która oblicza iloma zerami (w układzie dziesiętnym) kończy się liczba n!. \\
+\textbf{Uwaga}: taki pomysł: ``mam dane n; obliczam n!; zamieniam na łańcuch s; odwracam go; liczę ilość początkowych zer'' traktujemy jako kompletnie beznadziejny \\
+\textbf{Wskazówka}: Jak można wyznaczyć największą potęgę liczby 5 która dzieli daną liczbę n? 
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja funkcji, która oblicza ilość zer na końcu liczby \(n!\) w języku Haskell:
+\begin{Verbatim}[frame=single]
+zeros :: Int -> Int
+zeros n = sum [n `div` (5^k) | k <- [1..n], 5^k <= n]
+\end{Verbatim}
+Działa to ponieważ liczba zer na końcu liczby \(n!\) jest równa największej potędze liczby 5, która dzieli \(n!\). Dla każdej domnożonej liczby 5 występuje przynajmniej jedna liczba 2, więc liczba zer na końcu liczby \(n!\) jest równa liczbie piątek, które dzielą \(n!\).
+
+\subsubsection{Zadanie 25}
+Ulepsz następującą ``klasyczną'' implementację funkcji quick-sort:
+\begin{Verbatim}[frame=single]
+qs [] = []
+qs (x : xs) = qs [t | t <= xs , t<=x] ++ [x] ++ qs [t | t <= xs , t>x]
+\end{Verbatim}
+\textbf{Wskazówka}: Czy warto z rekursją schodzić do list jednoelementowych?
+
+\bigskip
+\hrule
+\bigskip
+
+Oto ulepszona implementacja funkcji \texttt{quickSort} w języku Haskell:
+\begin{Verbatim}[frame=single]
+qsort :: (Ord a) => [a] -> [a]
+qsort [] = []
+qsort [x]    = [x]         -- lista jednoelementowa również nie wymaga sortowania
+qsort (x:xs) = qsort [y | y <- xs, y <= x]
+             ++ [x] ++
+             qsort [y | y <- xs, y > x]
+\end{Verbatim}
+
+\subsubsection{Zadanie 26}
+Napisz funkcję \texttt{isSorted :: (Ord a) => [a] -> Bool}, która sprawdza, czy podany
+argument \\$[x_1, \dots, x_n]$ jest ciągiem niemalejącym, czyli czy $x_1 \leq x_2 \leq \dots \leq x_n$.
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja funkcji \texttt{isSorted} w języku Haskell:
+\begin{Verbatim}[frame=single]
+isSorted :: (Ord a) => [a] -> Bool
+isSorted [] = True
+isSorted [_] = True
+isSorted (x:y:xs) = x <= y && isSorted (y:xs)
+\end{Verbatim}
+Proste, iteracyjne sprawdzenie czy każdy element listy jest mniejszy lub równy następnemu.
+
+\subsubsection{Zadanie 27}
+Zaimplementuj w języku Haskell algorytm \texttt{Bubble Sort}.
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja algorytmu \texttt{Bubble Sort} w języku Haskell:
+\begin{Verbatim}[frame=single]
+bubbleSort :: (Ord a) => [a] -> [a]
+bubbleSort xs = bubbleSort' xs (length xs)
+
+bubbleSort' :: (Ord a) => [a] -> Int -> [a]
+bubbleSort' xs 0 = xs
+bubbleSort' xs n = bubbleSort' (bubble xs) (n - 1)
+
+bubble :: (Ord a) => [a] -> [a]
+bubble [x] = [x]
+bubble (x:y:xs)
+    | x > y     = y : bubble (x:xs)
+    | otherwise = x : bubble (y:xs)
+\end{Verbatim}
+
+\subsubsection{Zadanie 28}
+Typowe implementacje algorytmu \texttt{Quick Sort} sprawdzają przed wywołaniem długość listy i jeśli ma ona długość mniejszę lub równą 10, to do posortowania używają metody \texttt{Insertion Sort}. Zaimplementuj tę metodę w języku Haskell.
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja algorytmu \texttt{Insertion Sort} w języku Haskell:
+\begin{Verbatim}[frame=single]
+insertionSort :: (Ord a) => [a] -> [a]
+insertionSort xs = foldr insert [] xs
+
+insert :: (Ord a) => a -> [a] -> [a]
+insert x [] = [x]
+insert x (y:ys)
+    | x <= y    = x : y : ys
+    | otherwise = y : insert x ys
+\end{Verbatim}
+
+\subsubsection{Zadanie 29} \label{subsec:zad29}
+Oszacuj złożoność obliczeniową następującej (kiepskiej) funkcji służącej do odwracania listy:
+
+\begin{Verbatim}[frame=single]
+rev :: [a] => [a]
+rev [] = []
+rev (x: xs) = (rev xs) ++ [x]
+\end{Verbatim}
+
+\bigskip
+\hrule
+\bigskip
+
+Złożoność obliczeniowa funkcji \texttt{rev} jest kwadratowa, ponieważ dla każdego elementu listy wywoływana jest funkcja \texttt{rev} na reszcie listy, co daje złożoność \(O(n^2)\).
+
+\subsubsection{Zadanie 30}
+Funkcja \texttt{filter} może myć zdefiniowana za pomocą funkcji \texttt{map} i \texttt{concat}:
+\begin{Verbatim}[frame=single]
+filter p = concat . map box
+where box x =
+\end{Verbatim}
+Podaj definicję tej funkcji \texttt{box}.
+
+\bigskip
+\hrule
+\bigskip
+
+Funkcja \texttt{filter} może być zdefiniowana za pomocą funkcji \texttt{map} i \texttt{concat} jeżeli nałożymy na każdy element listy warunek \texttt{p} i zwrócimy listę list, a następnie połączymy wszystkie te listy w jedną listę. Zatem \texttt{box} powinno zwracać listę, która zawiera tylko elementy spełniające warunek \texttt{p}.
+
+\begin{Verbatim}[frame=single]
+filter p = concat . map box
+    where box x = if p x then [x] else []
+\end{Verbatim}
+
+\subsubsection{Zadanie 31}
+Funkcje \texttt{takeWhile} i \texttt{dropWhile} są podobne do funkcji \texttt{take} i \texttt{drop}, jednakże ich pierwszym argumentem jest funkcja boolowska zamiast liczby naturalnej. Na przykład:
+\begin{itemize}
+    \item \texttt{takeWhile even [2,4,6,7,8,9] = [2,4,6]}
+    \item \texttt{dropWhile even [2,4,6,7,8,9] = [7,8,9]}
+\end{itemize}
+Podaj rekurencyjne definicje tych funkcji
+
+\bigskip
+\hrule
+\bigskip
+
+Rekurencyjne definicje funkcji \texttt{takeWhile} i \texttt{dropWhile} w języku Haskell:
+\begin{itemize}
+    \item \texttt{takeWhile}:
+        \begin{Verbatim}[frame=single]
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs)
+    | p x       = x : takeWhile' p xs
+    | otherwise = []
+        \end{Verbatim}
+    \item \texttt{dropWhile}:
+        \begin{Verbatim}[frame=single]
+dropWhile' :: (a -> Bool) -> [a] -> [a]
+dropWhile' _ [] = []
+dropWhile' p (x:xs)
+    | p x       = dropWhile' p xs
+    | otherwise = x : xs
+        \end{Verbatim}
+\end{itemize}
+
+\subsubsection{Zadanie 32}
+Napisz funkcję która dla ciągu łańcuchów $[L1, \dots, Ln]$ wyznaczy ich najdłuższy wspólny prefix. \\
+\textbf{Wskazówka}: Możesz skorzystać z funkcji transpose z modułu \texttt{Data.List}.
+
+\bigskip
+\hrule
+\bigskip
+
+Najdłuższy wspólny prefix listy łańcuchów można wyznaczyc poprzez transpozycję listy łańcuchów i zwrócenie wspólnego prefixu pierwszego łańcucha z resztą listy.
+\begin{Verbatim}[frame=single]
+longestCommonPrefix :: [String] -> String
+longestCommonPrefix [] = []
+longestCommonPrefix xs = takeWhile allEqual (transpose xs)
+
+allEqual :: (Eq a) => [a] -> Bool
+allEqual [] = True
+allEqual [x] = True
+allEqual (x:y:xs) = x == y && allEqual (y:xs)
+\end{Verbatim}
+
+\subsubsection{Zadanie 33}
+Napisz funkcję \texttt{subCard :: Int -> [a] -> [[a]]}, która dla danych parametrów $k$ i $[x_1, \dots, x_n]$ wyznaczy wszystkie podciągi $[x_{i_1}, \dots, x_{i_k}]$ takie, że $1 \leq i_1 < i_2 < \dots < i_k \leq n$.
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja funkcji \texttt{subCard} w języku Haskell:
+\begin{Verbatim}[frame=single]
+subCard :: Int -> [a] -> [[a]]
+subCard k xs = [ys | ys <- combinations k xs]
+
+combinations :: Int -> [a] -> [[a]]
+combinations 0 _ = [[]]
+combinations _ [] = []
+combinations k (x:xs) = map (x:) (combinations (k - 1) xs) ++ combinations k xs
+
+> subCard 2 [1,2,3,4]
+[[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+\end{Verbatim}
+
+\subsection{Foldy}
+\subsubsection{Zadanie 34}
+Sprawdź typy i przetestuj działanie funkcji \texttt{sum}, \texttt{product}, \texttt{all} i \texttt{any}.
+
+\bigskip
+\hrule
+\bigskip
+
+Typy i działanie funkcji \texttt{sum}, \texttt{product}, \texttt{all} i \texttt{any} w języku Haskell:
+\begin{Verbatim}[frame=single]
+> :t sum
+sum :: (Num a) => [a] -> a
+
+> sum [1..10]
+55
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+> :t product
+product :: (Num a) => [a] -> a
+
+> product [1..10]
+3628800
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+> :t all
+all :: (a -> Bool) -> [a] -> Bool
+
+> all even [2,4,6,8,9]
+False
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+> :t any
+any :: (a -> Bool) -> [a] -> Bool
+
+> any odd [2,4,6,8,9]
+True
+\end{Verbatim}
+
+\subsubsection{Zadanie 35}
+Przetestuj działanie funkcji
+\begin{enumerate}
+    \item \texttt{foldl (+) 0 xs}, 
+    \item \texttt{foldr (+) 0 xs}, 
+    \item \texttt{foldl1 (+) xs}, 
+    \item \texttt{foldr1 (+) xs} oraz 
+    \item \texttt{sum X} na dużych listach liczb \texttt{X}.
+\end{enumerate}
+\textbf{Wskazówka}: skorzystaj z polecenia \textit{GHCi} \texttt{:set +s}; w celu usunięcia wyświetlania informacji skorzystaj z polecenia \texttt{:unset +s} \\
+Przetestuj następnie działanie funkcji \texttt{foldl’} oraz \texttt{foldr’} (znajdują się one w module \texttt{Data.List}).
+
+\bigskip
+\hrule
+\bigskip
+
+%TODO zadanie
+
+\subsubsection{Zadanie 36}
+Samodzielnie zaimplementuj (oraz przetestuj) funkcję \texttt{reverse} działającą w czasie liniowym. Porównaj jej skuteczność z algorytmem z Zadania 29 \ref{subsec:zad29}.
+
+\bigskip
+\hrule
+\bigskip
+
+%TODO zadanie
+
+\subsubsection{Zadanie 37}
+Zdefiniuj za pomocą funkcji \texttt{foldr} funkcję, które dla listy liczb $[a_1, \dots, a_n]$ oblicza ile liczb parzystych występuje w tej liście.
+
+\bigskip
+\hrule
+\bigskip
+
+%TODO zadanie
+
+\subsubsection{Zadanie 38}
+
+
+
 
 \end{document}
