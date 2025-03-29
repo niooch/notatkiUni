@@ -1086,7 +1086,7 @@ Zostaje spełniana rekurencja:
     T(n) = T(n-1) + \underbrace{T(0)}_{\text{pusta lewa tablica}} + \Theta(n)
 \]
 Można zauważyć, że nie zadziała tu \textbf{Master Theorem}, trzeba rozwiązać ja na przykład drzewem rekursji:
-\begin{center} 
+\begin{center}
 \begin{tikzpicture}
     \node {$cn$}
         child {node {$c(n-1)$}
@@ -1096,11 +1096,11 @@ Można zauważyć, że nie zadziała tu \textbf{Master Theorem}, trzeba rozwiąz
                     child {node {$\Theta(1)$}}
                 }
                 child {node {$\Theta(1)$}}
-            } 
+            }
             child {node {$\Theta(1)$}}
         }
         child {node {$\Theta(1)$}};
-    \draw [decorate,decoration={brace,mirror,raise=5pt}] 
+    \draw [decorate,decoration={brace,mirror,raise=5pt}]
     (-1,0.5) -- (-4.5,-6.5) node [black,midway,xshift=-1.5cm] {$h = n-1$};
   \end{tikzpicture}
 \end{center}
@@ -1142,21 +1142,21 @@ Rozważając drzewo rekursji możemy zauważyć, że
             child {node {$c\frac{n}{100}$}
                 child {node {$\vdots$}}
                 child {node {$\vdots$}}
-            } 
+            }
             child {node {$c\frac{9n}{100}$}
                 child {node {$\vdots$}}
                 child {node {$\vdots$}}
-            } 
+            }
         }
         child {node {$c\frac{9n}{10}$}
             child {node {$c\frac{9n}{100}$}
                 child {node {$\vdots$}}
                 child {node {$\vdots$}}
-            } 
+            }
             child {node {$c\frac{81n}{100}$}
                 child {node {$\vdots$}}
                 child {node {$\vdots$}}
-            } 
+            }
         };
 \end{tikzpicture}\end{center}
 Każdy wiersz tego drzewa sumuje się do $cn$. Wysokość drzewa wynosi $\log_{10/9} n$, zatem złożoność wynosi $\Theta(n \log_{10/9} n)$, co jest tak naprawdę równe $\Theta(n \log n)$.
@@ -1170,7 +1170,7 @@ Zostaje spełniana rekurencja:
     U(n) = L(n-1) + \Theta(n)
 \]
 gdzie $L$ symbolizuje best case, natomiast $U$ worst case. Rozwiązując powyższą rekurencje otrzymujemy:
-\begin{equation*} 
+\begin{equation*}
     \begin{aligned}
         L(n)
         &= 2(L(\frac{n}{2} -1) +\Theta(n)) + \Theta(n) \\
@@ -1179,7 +1179,7 @@ gdzie $L$ symbolizuje best case, natomiast $U$ worst case. Rozwiązując powyżs
     \end{aligned}
 \end{equation*}
 
-\subsubsection{Average Case Analysis}
+\subsubsection{Average Case Analysis} \label{sec:average_case_analysis}
 Algorytm Quick Sort da się ``zabezpieczyć'' przed złym rozkładem danych poprzez losowym wybraniem pivota i następnie swapnięcie go z naszym deterministycznym miejscem. W ten sposób bedzięmy mieli zawsze jednostajnie losowy rozkład danych.\\
 Wprowadźmy
 \[
@@ -1196,7 +1196,7 @@ Niech $X$ będzie zmienną indykatorową:
 \end{equation*}
 Teraz rozważmy zachowanie zmiennej losowej $T_n$:
 \begin{equation*}
-    T_n \stackrel{\mathclap{\normalfont\mbox{d}}}{=} 
+    T_n \stackrel{\mathclap{\normalfont\mbox{d}}}{=}
     \begin{cases}
         T_0+T_{n-1}+n-1 \text{ jeśli } (0,n-1) \text{ jest partitionem} \\
         T_1+T_{n-2}+n-1 \text{ jeśli } (1,n-2) \text{ jest partitionem} \\
@@ -1220,7 +1220,7 @@ Skoro przyjmujemy jednostajny rozkład danych wejścowych to wartość oczekiwan
 \]
 Teraz policzmy wartość oczekiwaną $T_n$
 \begin{equation*}\begin{aligned}
-    \mathbb{E}[T_n] 
+    \mathbb{E}[T_n]
     &= \mathbb{E}\left[\sum^{n-1}_{k=0} X^{(n)}_{k} (T_k + T_{n-k-1} + n-1)\right] \\
     &= \sum^{n-1}_{k=0} \mathbb{E}[X^{(n)}_{k} (T_k + T_{n-k-1} + n-1)] \\
     &= \sum^{n-1}_{k=0} \mathbb{E}[X^{(n)}_{k}] \mathbb{E}[T_k + T_{n-k-1} + n-1] \\
@@ -1230,7 +1230,7 @@ Teraz policzmy wartość oczekiwaną $T_n$
 \end{aligned}\end{equation*}
 Można zauważyć, że $\sum^{n-1}_{k=0} \mathbb{E}[T_k] = \sum^{n-1}_{k=0} \mathbb{E}[T_{n-k-1}]$ ponieważ jest to doawanie tych samych rzeczy w innej kolejności (od przodu i od tyłu). Zatem
 \begin{equation*}\begin{aligned}
-    \mathbb{E}[T_n] 
+    \mathbb{E}[T_n]
     &= \frac{2}{n} \sum^{n-1}_{k=0} \mathbb{E}[T_k] + \frac{1}{n} \sum^{n-1}_{k=0} n-1 \\
     &= \frac{2}{n} \sum^{n-1}_{k=0} \mathbb{E}[T_k] + n-1
 \end{aligned}\end{equation*}
@@ -1238,13 +1238,13 @@ Przyjmijmy oznaczenie $\mathbb{E}[T_n] = t_n$, wtedy
 \[
     t_n = \frac{2}{n} \sum^{n-1}_{k=0} t_k + n-1
 \]
-Jest to rekurencja %TODO sprawdzic jaka to rekurencja 
+Jest to rekurencja %TODO sprawdzic jaka to rekurencja
 Można ją rozwiązać w następujący sposób:
 \[
-    t_n = \frac{2}{n} \sum^{n-1}_{k=0} t_k + n-1 \quad | \cdot n 
+    t_n = \frac{2}{n} \sum^{n-1}_{k=0} t_k + n-1 \quad | \cdot n
 \]
 \[
-    nt_n = 2 \sum^{n-1}_{k=0} t_k + n(n-1) 
+    nt_n = 2 \sum^{n-1}_{k=0} t_k + n(n-1)
 \]
 Podstawmy za $n \rightarrow n-1$
 \[
@@ -1259,7 +1259,7 @@ Odejmując stronami równanie otrzymujemy:
 \]
 Przekształcając otrzymujemy:
 \[
-    nt_n = (n+1)t_{n-1} + 2(n-1) \quad | : n(n+1) 
+    nt_n = (n+1)t_{n-1} + 2(n-1) \quad | : n(n+1)
 \]
 \[
     \frac{t_n}{n+1} = \frac{t_{n-1}}{n} + \frac{2(n-1)}{n(n+1)}
@@ -1270,7 +1270,7 @@ Przyjmijmy kolejne oznaczenie $s_n = \frac{t_n}{n+1}$, wtedy
 \]
 jest już prostą rekurencją, którą można łatwo rozwiązać iteracyjnie.
 \begin{equation*}\begin{aligned}
-    s_n 
+    s_n
     &= 2 \sum^n_{k=1} \frac{k-1}{k(k+1)} \\
     &= 2 \sum^n_{k=1} \left( \frac{2}{k+1} - \frac{1}{k} \right) \\
     &= 4 \sum^n_{k=1} \frac{1}{k+1} - 2 \sum^n_{k=1} \frac{1}{k} \\
@@ -1286,6 +1286,169 @@ Kożystając z faktu, że $H_n = \ln n + \gamma + O(\frac{1}{n})$ otrzymujemy
 \[
     \mathbb{E}[T_n] = 2n \log n + 2 \gamma n + \Theta(n)
 \]
+
+\section{Wykład \date{2025-03-25}}
+\subsection{Dual Pivot Quick Sort}
+W roku 1975 Sedgewick pokazał, że
+\[
+    \mathbb{E}\left[\text{\#porównań w dual pivot partition}\right] \approx \frac{16}{9}n \implies
+\]
+\[
+    \implies \mathbb{E}\left[\text{\#porównań w dual pivot Quick Sortcie Sedgwick}\right] \approx \frac{32}{15}n \log n
+\]
+
+Jak się to liczy? \\
+Niech $T_n$ - \#porównań w dual pivot Quick Sortcie Sedgwick oraz $P_n$ - \#porównań w dual pivot partition. Rekurencja spełnia takie równanie:
+\[
+    \mathbb{E}\left[T_n\right] = \mathbb{E}\left[P_n\right] + \frac{1}{\binom{n}{2}} \sum_{1 \leq p \leq q \leq n} \left(\mathbb{E}[T_{p-1}] + \mathbb{E}[T_{q-p-1}] + \mathbb[T_{n-q}]\left)
+\]
+Poźniej rozwiązuje się to analogicznie jak na poprzednim wykładzie rozwiązywana była rekurencja dla $T_n$ \ref{sec:average_case_analysis}
+
+Natomiast w roku 2009 pan Yaroslavsky, Bentley, Blach opracował poprzez testowanie w Javie (nie miał backgroundu matematycznego) lepszy algortytm Quick Sort.
+Poźniej w 2012 Sebastian Wild, Nedel pokazali, że
+\[
+    \mathbb{E}\left[\text{\#porównań w Dual Pivot Quick Sorcie Yaroslavskiego}\right] \approx 1.9n \log n
+\]
+2015, Aufmüller, Dietzfelbinger zaprojektowali \textit{Strategie Count} oraz pokazali jej optymalność
+\[
+    \mathbb{E}\left[\text{\#porównań w Count Partition}\right] \approx \frac{3}{2}n \implies
+\]
+\[
+    \implies \mathbb{E}\left[\text{\#porównań w Dual Pivot z Count Partition}\right] \approx 1.8n \log n
+\]
+Wartość oczekiwana pojawia się w tych asymptotykach ponieważ jest element losowści zwiazany z porównaniami elementu z pivotami. Nie zawsze trzeba bedzię go porównywać z jednym i drugim pivotem.
+\subsubsection{Strategia Count Partition}
+\begin{itemize}
+    \item Zakładamy $p<q$
+        %TODO tablica do przepisana od szymona
+    \item rozpatrzmy $i$-ty element tablicy
+    \item jeśli $s_{i-1} \geq l_{i-1}$ to porównujemy $A[i]$ najpierw z $p$ jeżeli jest potrzeba to z $q$
+    \item jesli $s_{i-1} \leq l_{i-1}$ to porównujemy $A[i]$ najpierw z $q$ jeżeli jest potrzeba to z $p$\footnote{jest to swoiste przewidywanie przeszłości na podstawie ilości elementów, które są już posortowane}
+\end{itemize}
+
+\subsection{Comparison Model}
+\subsubsection{Drzewo decyzyjne}
+Jak wygląda to na przykładzie? Mamy daną tablice $[a_1, a_2, a_3]$ i chcemy ją posortować. W drzewie decyzyjnym każdy węzeł to porównanie dwóch elementów. W liściu znajduje się permutacja elementów.
+\begin{center}\begin{tikzpicture} %TODO zajebac drzewo od szymiego
+
+    \node {$a_1 < a_3$}
+        child {node {$a_1 < a_2$}
+            child {node {$a_2 < a_3$}
+                child {node {$[1,2,3]$}}
+                child {node {$[1,3,2]$}}
+            }
+            child {node {$[3,1,2]$}}
+        }
+        child {node {$a_2 < a_3$}
+            child {node {$a_1 < a_3$}
+                child {node {$[2,1,3]$}}
+                child {node {$[2,3,1]$}}
+            }
+            child {node {$[3,2,1]$}}
+        };
+\end{tikzpicture}\end{center}
+\begin{itemize}
+    \item dla dowolnego algorytmu sortowania w \textit{Comparison Model} można znaleść drogę na drzewie decyzyjnym
+    \item W tym drzewie występuje $n!$ liści będacych permutacjami tablicy
+    \item \textit{Worst Case} odpowiada najdłuższej ścieżce w drzewie decyzyjnym
+    \item drzewo binarne pełne odpowiada najlepszemu algorytmowi sortowania
+    \item drzewo binarne pełne o wysokości $h$ ma conajwyżej $2^h$ liści, ale liści w drzewie decyzyjnym powinno być przynajmniej $n!$ zatem
+        \[
+            2^h \geq n! \implies h \geq \log_2 n!
+        \]
+\end{itemize}
+\subsubsection{Twierdzenie}
+Dolne ograniczenie na liczbę porównań w problemie sortowania w \textit{Comparison Model} wynosi $\Omega(n \log n)$
+\begin{proof}
+    Rozważmy drzewo decyzyjne dla sortowania $n$ elementów. Każda ścieżka w drzewie decyzyjnym odpowiada jednej permutacji. Zatem drzewo decyzyjne ma przynajmniej $n!$ liści. Trzeba pokazać, że wysokość drzewa decyzyjnego jest przynajmniej $\log_2 n!$.
+    \[
+        2^h \geq n! \implies h \geq \log n!
+    \]
+    Używając wzoru Stirlinga
+    \[ %TODO zajebac wzor od szymiego
+        h \geq \log n! = \log \left( \sqrt{2\pi n} \left( \frac{n}{e} \right)^n \left(1+ o(1)\right) \right) = \log \left(\frac{n}{e}\right)^n + \log \left(
+    \]
+\end{proof}
+
+\subsubsection{Counting Sort}
+\begin{itemize}
+    \item \textbf{Input}: Tablica $A, |A|=n, \forall i A[i] \in \{0,1,2,...,k\}$, $k$ - stała
+    \item \textbf{Output}: Posortowana tablica $A$
+    \item \textbf{Algorytm}:
+        \begin{algorithm}
+            \caption{Counting Sort}
+            \begin{algorithmic}[1]
+                \Procedure{CountingSort}{A, n, k}
+                \For{$i = 1$ to $k$} \Comment{$\Theta(k)$}
+                    \State $C[i] = 0$
+                \EndFor
+                \For{$j = 1$ to $n$} \Comment{$\Theta(n)$}
+                    \State $C[A[j]] = C[A[j]] + 1$
+                \EndFor
+                \For{$i = 2$ to $k$} \Comment{$\Theta(k)$}
+                    \State $C[i] = C[i] + C[i-1]$
+                \State $C[i] = C[i] + C[i-1]$ \Comment{liczba elementów mniejszych lub równych $i$}
+                \EndFor
+                \For{$j = n$ downto $1$} \Comment{$\Theta(n)$}
+                    \State $B[C[A[j]]] = A[j]$
+                    \State $C[A[j]] = C[A[j]] - 1$
+                \EndFor
+                \State \textbf{return} $B$ \Comment{$\Theta(1)$}
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item \textbf{Przykład}:
+        \begin{enumerate}
+            \item $A = [4,1,3,4,3]$, $C=[0,0,0,0]$, $B=[0,0,0,0,0]$ (tablice indeksowane od $1$)
+            \item $A = [4,1,3,4,3]$, $C=[1,0,2,2]$, $B=[0,0,0,0,0]$
+            \item $A = [4,1,3,4,3]$, $C=[1,1,3,5]$, $B=[0,0,0,0,0]$
+            \item Ostatnia pętla, skupmy się na tablicy $B$:
+                \begin{enumerate}
+                    \item $j = 5$: $B[5] = A[5] = 3$, $C[3] = 4$
+                    \item $j = 4$: $B[4] = A[4] = 4$, $C[4] = 3$
+                    \item $j = 3$: $B[3] = A[3] = 3$, $C[3] = 3$
+                    \item $j = 2$: $B[3] = A[2] = 1$, $C[1] = 1$
+                    \item $j = 1$: $B[1] = A[1] = 4$, $C[4] = 2$
+                \end{enumerate}
+                $B = [1,3,3,4,4]$ - posortowana tablica
+        \end{enumerate}
+    \item \textbf{Asymptotyka}: $\Theta(n+k)$, gdzie $k = O(n)$
+\end{itemize}
+
+\subsection{Stable Sorting Property}
+Algorytm zachowuje kolejność równych sobie elementów z tablicy wejściowej
+
+\subsubsection{Radix Sort}
+\begin{itemize}
+    \item \textbf{Input}: Tablica $A, |A|=n, \forall i A[i] \in \{0,1,2,...,k\}$, $k$ - stała
+    \item \textbf{Output}: Posortowana tablica $A$
+    \item \textbf{Algorytm}: Zastosuj \textif{Counting Sort} dla każdej cyfry liczby
+    \item \textbf{Przykład}:%TODO poprawić
+        \[
+            %Zapisz A jako macierz 7x1
+            A = \begin{bmatrix}
+                329 \\
+                457 \\
+                657 \\
+                839 \\
+                436 \\
+                720 \\
+                355
+            \end{bmatrix} \implies^{\text{Counting Sort}} \begin{bmatrix}
+                720 \\
+                329 \\
+                839 \\
+                355 \\
+                436 \\
+                457 \\
+                657
+                \end{bmatrix} \implies^{\text{Counting Sort}} \begin{bmatrix}
+
+        \]
+\end{itemize}
+
+
+
 
 
 

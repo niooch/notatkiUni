@@ -6,6 +6,8 @@
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage{tikz}
+\usetikzlibrary{automata, positioning}
 \usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
 \usepackage{graphicx}                  % Obsługa grafiki
 \usepackage{hyperref}                  % Linki i spis treści
@@ -305,6 +307,63 @@ ghci> foldl' (*) 0 [1..10]
 0
 \end{Verbatim}
 %TODO wziasc od wojtasa te drzewa na foldach
+\section{Wykład \date{25-03-2025}}
+\subsection{Krótki wstęp o automatach}
+\subsubsection{Deterministyczne, skończone automaty}
+Jak działają automaty? Automat składa się z:
+\[
+    \mathbb{A} = (Q,\Sigma,\delta,q_0,F), \Sigma
+\]
+gdzie $Q$ to zbiór stanów, $\Sigma$ to alfabet, $\delta$ to funkcja przejścia, $q_0$ to stan początkowy, a $F$ to zbiór stanów końcowych.
+\[
+    \delta:Q \times \Sigma \rightarrow Q
+\]
+\[
+    q_0 \in Q, F \subseteq Q
+\]
+Jak wygląda to w Haskellu:
+\begin{Verbatim}[frame=single]
+delta :: s -> c -> s
+acc :: s -> Bool
+
+runDFA :: (s -> c -> s) -> s -> [c] -> s -- run Deterministic Finite Automat
+runDFA delta start cs = foldl delta start cs
+runDFA = foldl -- pożądniejsza definicja
+\end{Verbatim}
+Zobaczmy działanie na prostym przykładzie automatu sprawdzającego parzystość liczby binarnej:
+%stwórz diagram automatu nie w kodzie tylko obrazek
+\begin{center}\begin{tikzpicture}[shorten >=1pt, node distance=2cm, on grid, auto]
+  % Stan q0: parzyste wystąpienia (akceptujący)
+  \node[state, initial, accepting] (q0) {$q_0$};
+  % Stan q1: nieparzyste wystąpienia
+  \node[state] (q1) [right=of q0] {$q_1$};
+  % Przejścia w automacie
+  \path[->]
+    (q0) edge [bend left] node {1} (q1)
+    (q1) edge [bend left] node {1} (q0)
+    (q0) edge [loop above] node {0} ()
+    (q1) edge [loop above] node {0} ();
+\end{tikzpicture}\end{center}
+Można odpalić ten automat w następujący sposób:
+\begin{Verbatim}[frame=single]
+>runDFA delta q0 "10101"
+False
+>runDFA delta q0 "101010"
+True
+\end{Verbatim}
+
+\subsubsection{Niedeterministyczne, skończone automaty}
+Automat niedeterministyczny składa się z:
+\[
+    \mathbb{A} = (S, \delta, s_0, F)
+\]
+gdzie $S$ to zbiór stanów, $\delta$ to funkcja przejścia, $s_0$ to stan początkowy, a $F$ to zbiór stanów końcowych.
+\[
+    \delta: S \times \Sigma \rightarrow \mathcal{P}(S)
+\]
+
+
+
 \section{Ćwiczenia}
 W tym miejscu będa pojawiały się notatki z laboratorów (ćwiczeń)
 \subsection{Ćwiczenia 11-03-2025}
@@ -1228,19 +1287,24 @@ Celem jest umieszczenie ośmiu hetmanów na szachownicy tak, aby żadne dwa hetm
 queens :: Int -> [[Int]]
 queens n = filter check (permutations [1..n])
     where
-        check xs = and [abs (xs !! i - xs !! j) /= j - i | i <- [0..n-1], j <- [i+1..n-1]]
+        check xs = and [abs (xs !! i - xs !! j)
+                    /= j - i | i <- [0..n-1], j <- [i+1..n-1]]
         \end{Verbatim}
     \item Aby znaleźć liczbę nierównoważnych poprawnych rozstawień hetmanów, można posłużyć się funkcją \texttt{nub} z poprzedniego zadania, która usuwa duplikaty z listy. W ten sposób można znaleźć liczbę nierównoważnych poprawnych rozstawień hetmanów.
         \begin{Verbatim}[frame=single]
-queens' :: Int -> [[Int]]
-queens' n = nub (map sort (queens n))
+unique[]=[]
+unique(x:xs)=
+            if reverse x `elem` xs then unique xs
+            else if map (\y -> 9-y) x `elem` xs then unique xs
+            else if reverse x `elem` map (\y -> 9-y) xs then unique xs
+            else x:unique xs
         \end{Verbatim}
 \end{enumerate}
 
 \subsubsection{Zadanie 24}
 Napisz funkcję, która oblicza iloma zerami (w układzie dziesiętnym) kończy się liczba n!. \\
 \textbf{Uwaga}: taki pomysł: ``mam dane n; obliczam n!; zamieniam na łańcuch s; odwracam go; liczę ilość początkowych zer'' traktujemy jako kompletnie beznadziejny \\
-\textbf{Wskazówka}: Jak można wyznaczyć największą potęgę liczby 5 która dzieli daną liczbę n? 
+\textbf{Wskazówka}: Jak można wyznaczyć największą potęgę liczby 5 która dzieli daną liczbę n?
 
 \bigskip
 \hrule
@@ -1401,7 +1465,7 @@ dropWhile' p (x:xs)
 \end{itemize}
 
 \subsubsection{Zadanie 32}
-Napisz funkcję która dla ciągu łańcuchów $[L1, \dots, Ln]$ wyznaczy ich najdłuższy wspólny prefix. \\
+Napisz funkcję która dla ciągu łańcuchów $[L_1, \dots, L_n]$ wyznaczy ich najdłuższy wspólny prefix. \\
 \textbf{Wskazówka}: Możesz skorzystać z funkcji transpose z modułu \texttt{Data.List}.
 
 \bigskip
@@ -1440,6 +1504,7 @@ combinations k (x:xs) = map (x:) (combinations (k - 1) xs) ++ combinations k xs
 > subCard 2 [1,2,3,4]
 [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
 \end{Verbatim}
+Jak działa funkcja \texttt{combinations}? Funkcja \texttt{combinations} zwraca wszystkie kombinacje \(k\)-elementowe listy \(xs\). Jeśli \(k = 0\) to zwraca listę jednoelementową, której jedynym elementem jest pusta lista. Jeśli \(k = 0\) to zwraca pustą listę. W przeciwnym przypadku zwraca listę, której elementami są wszystkie możliwe kombinacje \(k\)-elementowe listy bez pierwszego elementu, do których dodano pierwszy element listy, oraz wszystkie kombinacje \(k\)-elementowe listy bez pierwszego elementu.
 
 \subsection{Foldy}
 \subsubsection{Zadanie 34}
@@ -1482,10 +1547,10 @@ True
 \subsubsection{Zadanie 35}
 Przetestuj działanie funkcji
 \begin{enumerate}
-    \item \texttt{foldl (+) 0 xs}, 
-    \item \texttt{foldr (+) 0 xs}, 
-    \item \texttt{foldl1 (+) xs}, 
-    \item \texttt{foldr1 (+) xs} oraz 
+    \item \texttt{foldl (+) 0 xs},
+    \item \texttt{foldr (+) 0 xs},
+    \item \texttt{foldl1 (+) xs},
+    \item \texttt{foldr1 (+) xs} oraz
     \item \texttt{sum X} na dużych listach liczb \texttt{X}.
 \end{enumerate}
 \textbf{Wskazówka}: skorzystaj z polecenia \textit{GHCi} \texttt{:set +s}; w celu usunięcia wyświetlania informacji skorzystaj z polecenia \texttt{:unset +s} \\
