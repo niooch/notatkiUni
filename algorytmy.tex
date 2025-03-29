@@ -1320,7 +1320,15 @@ Wartość oczekiwana pojawia się w tych asymptotykach ponieważ jest element lo
 \subsubsection{Strategia Count Partition}
 \begin{itemize}
     \item Zakładamy $p<q$
-        %TODO tablica do przepisana od szymona
+        \[
+            \left[ \,
+                a \,\middle|\, 
+                \underbrace{\cdots}_{S_{i-1}} \, p \,\middle|\, 
+                \cdots \, q \,\middle|\, 
+                \underbrace{\cdots}_{L_{i-1}} \, \boxed{i} \,\middle|\, 
+                b 
+            \,\right]
+        \]
     \item rozpatrzmy $i$-ty element tablicy
     \item jeśli $s_{i-1} \geq l_{i-1}$ to porównujemy $A[i]$ najpierw z $p$ jeżeli jest potrzeba to z $q$
     \item jesli $s_{i-1} \leq l_{i-1}$ to porównujemy $A[i]$ najpierw z $q$ jeżeli jest potrzeba to z $p$\footnote{jest to swoiste przewidywanie przeszłości na podstawie ilości elementów, które są już posortowane}
@@ -1329,24 +1337,42 @@ Wartość oczekiwana pojawia się w tych asymptotykach ponieważ jest element lo
 \subsection{Comparison Model}
 \subsubsection{Drzewo decyzyjne}
 Jak wygląda to na przykładzie? Mamy daną tablice $[a_1, a_2, a_3]$ i chcemy ją posortować. W drzewie decyzyjnym każdy węzeł to porównanie dwóch elementów. W liściu znajduje się permutacja elementów.
-\begin{center}\begin{tikzpicture} %TODO zajebac drzewo od szymiego
-
-    \node {$a_1 < a_3$}
-        child {node {$a_1 < a_2$}
-            child {node {$a_2 < a_3$}
-                child {node {$[1,2,3]$}}
-                child {node {$[1,3,2]$}}
+\begin{center}
+    \begin{tikzpicture}[
+        level 1/.style={sibling distance=70mm, level distance=40mm},
+        level 2/.style={sibling distance=40mm, level distance=40mm},
+        level 3/.style={sibling distance=20mm, level distance=40mm},
+        root/.style={fill=orange!30},
+        internal/.style={fill=blue!20},
+        leaf/.style={fill=green!20, draw, ellipse}
+        ]
+        \node[root] {$a_1 < a_3$}
+            child {node[internal] {$a_1 < a_2$}
+                child {node[internal] {$a_2 < a_3$}
+                    child {node[leaf] {$[a_1,a_2,a_3]$}
+                    edge from parent node[engine, sloped] {$T$}}
+                    child {node[leaf] {$[a_1,a_3,a_2]$}
+                    edge from parent node[engine, sloped] {$F$}}
+                    edge from parent node[engine, sloped] {$T$}
+                }
+                child {node[leaf] {$[a_3,a_1,a_2]$}
+                edge from parent node[engine, sloped] {$F$}}
+                edge from parent node[engine, sloped] {$T$}
             }
-            child {node {$[3,1,2]$}}
-        }
-        child {node {$a_2 < a_3$}
-            child {node {$a_1 < a_3$}
-                child {node {$[2,1,3]$}}
-                child {node {$[2,3,1]$}}
-            }
-            child {node {$[3,2,1]$}}
-        };
-\end{tikzpicture}\end{center}
+            child {node[internal] {$a_2 < a_3$}
+                child {node[internal] {$a_1 < a_3$}
+                    child {node[leaf] {$[a_2,a_1,a_3]$}
+                    edge from parent node[engine, sloped] {$T$}}
+                    child {node[leaf] {$[a_2,a_3,a_1]$}
+                    edge from parent node[engine, sloped] {$F$}}
+                    edge from parent node[engine, sloped] {$T$}
+                }
+                child {node[leaf] {$[a_3,a_2,a_1]$}
+                edge from parent node[engine, sloped] {$F$}}
+                edge from parent node[engine, sloped] {$F$}
+            };
+    \end{tikzpicture}
+\end{center}
 \begin{itemize}
     \item dla dowolnego algorytmu sortowania w \textit{Comparison Model} można znaleść drogę na drzewie decyzyjnym
     \item W tym drzewie występuje $n!$ liści będacych permutacjami tablicy
@@ -1365,9 +1391,13 @@ Dolne ograniczenie na liczbę porównań w problemie sortowania w \textit{Compar
         2^h \geq n! \implies h \geq \log n!
     \]
     Używając wzoru Stirlinga
-    \[ %TODO zajebac wzor od szymiego
-        h \geq \log n! = \log \left( \sqrt{2\pi n} \left( \frac{n}{e} \right)^n \left(1+ o(1)\right) \right) = \log \left(\frac{n}{e}\right)^n + \log \left(
-    \]
+    \begin{equation*}\begin{aligned}
+        h \geq \log n! &= \log \left( \sqrt{2\pi n} \left( \frac{n}{e} \right)^n \left(1+ O(1)\right) \right)\\
+                       &= \log \left(\frac{n}{e}\right)^n + \log \left(\sqrt{2\pi n}(1+O(1))\right) \\
+                       &= \underbrace{n \log n}_{\Theta(n \log n)} - \underbrace{n \log e}_{\Theta(n)} + \underbrace{\log \sqrt{2\pi n}}_{\Theta(\log n)} + \underbrace{\log (1+O(1))}_{\Theta(1)} \\
+                       &= \Omega(n \log n)
+    \end{aligned}\end{equation*}
+    Zatem dolne ograniczenie na liczbę porównań w problemie sortowania w \textit{Comparison Model} wynosi $\Omega(n \log n)$ \\
 \end{proof}
 
 \subsubsection{Counting Sort}
@@ -1423,28 +1453,36 @@ Algorytm zachowuje kolejność równych sobie elementów z tablicy wejściowej
     \item \textbf{Input}: Tablica $A, |A|=n, \forall i A[i] \in \{0,1,2,...,k\}$, $k$ - stała
     \item \textbf{Output}: Posortowana tablica $A$
     \item \textbf{Algorytm}: Zastosuj \textif{Counting Sort} dla każdej cyfry liczby
-    \item \textbf{Przykład}:%TODO poprawić
+    \item \textbf{Przykład}:
         \[
             %Zapisz A jako macierz 7x1
             A = \begin{bmatrix}
-                329 \\
-                457 \\
-                657 \\
-                839 \\
-                436 \\
-                720 \\
-                355
-            \end{bmatrix} \implies^{\text{Counting Sort}} \begin{bmatrix}
-                720 \\
-                329 \\
-                839 \\
-                355 \\
-                436 \\
-                457 \\
-                657
-                \end{bmatrix} \implies^{\text{Counting Sort}} \begin{bmatrix}
-
+                32\textcolor{red}{9} \\
+                45\textcolor{red}{7} \\
+                65\textcolor{red}{7} \\
+                83\textcolor{red}{9} \\
+                43\textcolor{red}{6} \\
+                72\textcolor{red}{0} \\
+                35\textcolor{red}{5}
+                \end{bmatrix} \xrightarrow{\text{Counting Sort}} \begin{bmatrix}
+                7\textcolor{red}{2}0 \\
+                3\textcolor{red}{5}5 \\
+                4\textcolor{red}{3}6 \\
+                4\textcolor{red}{5}7 \\
+                6\textcolor{red}{5}7 \\
+                3\textcolor{red}{2}9 \\
+                8\textcolor{red}{3}9
+                \end{bmatrix} \xrightarrow{\text{Counting Sort}} \begin{bmatrix}
+                \textcolor{red}{3}29 \\
+                \textcolor{red}{3}55 \\
+                \textcolor{red}{4}36 \\
+                \textcolor{red}{4}57 \\
+                \textcolor{red}{6}57 \\
+                \textcolor{red}{7}20 \\
+                \textcolor{red}{8}39
+            \end{bmatrix}
         \]
+        Algorytm zachowuje kolejność równych sobie elementów z tablicy wejściowej -- \textit{Stable Sorting Property}, co umożliwia sortowanie po kolejnych cyfrach.
 \end{itemize}
 
 
