@@ -1560,14 +1560,97 @@ $k$-tą statystyką pozycyjną nazywamy $k$-tą najmniejszą wartością z zadna
                 \EndProcedure
             \end{algorithmic}
         \end{algorithm}
-        %TODO jebnac co sie tu dzieje w tablicy za pomoca undeline overline i \quad
     \item \textbf{Przykład}: $A = [6,10,13,5,8,3,2,11]$, RandomSelect($A,1,8,4$)
-        \begin{itemize}
-            \item
-            \item
-            \item
-        \end{itemize}
-        %TODO zajebac od szymiego
+        Dla tablicy
+        \[
+            A = \begin{array}{|c|c|c|c|c|c|c|c|}
+                \hline
+                6 & 10 & 13 & 5 & 8 & 3 & 2 & 11 \\ \hline
+            \end{array}
+        \]
+        wywołujemy procedurę \texttt{RandomSelect(A, 1, 8, 4)} aby znaleźć 4-ty najmniejszy element.
+
+        \bigskip
+
+        \textbf{Krok 1.}\\
+        Zakładamy, że procedura \texttt{RandomPartition} wybiera pivot $8$.\\
+        Po partycjonowaniu tablica wygląda następująco:
+        \[
+            A = \begin{array}{cccccccc}
+                6 \quad & 5 \quad & 3 \quad & 2 \quad & \underline{8} \quad & 13 \quad & 10 \quad & 11
+            \end{array}
+        \]
+        Pivot znajduje się na pozycji $r=5$, a $k = r - p + 1 = 5 - 1 + 1 = 5$. Ponieważ poszukiwany rząd $i=4$ jest mniejszy od $k=5$, następuje wywołanie rekurencyjne:
+        \[
+            \texttt{RandomSelect}(A,1,4,4)
+        \]
+        dla lewego podzbioru
+        \[
+            \begin{array}{|c|c|c|c|}
+                \hline
+                6 & 5 & 3 & 2 \\ \hline
+            \end{array}.
+        \]
+
+        \bigskip
+
+        \textbf{Krok 2.} \\
+        Dla podtablicy
+        \[
+            B = \begin{array}{|c|c|c|c|}
+                \hline
+                6 & 5 & 3 & 2 \\ \hline
+            \end{array},
+        \]
+        zakładamy, że pivot został wybrany jako $2$.\\
+        Po partycjonowaniu otrzymujemy:
+        \[
+            B = \begin{array}{|c|c|c|c|}
+                \hline
+                \underline{2} \quad & 5 \quad & 3 \quad & 6 \\ \hline
+            \end{array}
+        \]
+        gdzie pivot $2$ znajduje się teraz na pozycji $r=1$. Obliczamy $k = r - p + 1 = 1 - 1 + 1 = 1$.\\
+        Ponieważ $i=4 > 1$, odejmujemy $k$ od $i$, czyli nowa wartość to $i = 4 - 1 = 3$, i wywołujemy:
+        \[
+            \texttt{RandomSelect}(B,2,4,3)
+        \]
+        dla podtablicy
+        \[
+            B' = \begin{array}{|c|c|c|}
+                \hline
+                5 & 3 & 6 \\ \hline
+            \end{array}.
+        \]
+
+        \bigskip
+
+        \textbf{Krok 3.} \\
+        Dla podtablicy
+        \[
+            C = \begin{array}{|c|c|c|}
+                \hline
+                5 & 3 & 6 \\ \hline
+            \end{array},
+        \]
+        zakładamy, że pivotem jest $6$.\\
+        Po partycjonowaniu otrzymujemy:
+        \[
+            C = \begin{array}{|c|c|c|}
+                \hline
+                5 & 3 & \underline{6} \\ \hline
+            \end{array}
+        \]
+        gdzie pivot $6$ znajduje się na pozycji $r=3$ (przyjmując indeksowanie od 1). Wówczas $k = r - p + 1 = 3 - 1 + 1 = 3$.\\
+        Skoro $i=3$ jest równe $k$, zwracamy pivot:
+        \[
+            \texttt{RandomSelect}(C,1,3,3)=6.
+        \]
+
+        \bigskip
+
+        \textbf{Wniosek:}\\
+        Procedura zwraca wartość $\boxed{6}$, czyli 4-ty najmniejszy element w tablicy $A$.
     \item \textbf{Złożoność obliczeniowa}:
         \begin{itemize}
             \item \textit{Best Case}:
@@ -1595,9 +1678,47 @@ $k$-tą statystyką pozycyjną nazywamy $k$-tą najmniejszą wartością z zadna
                         T_{n-1} + n-1: (0, n-1) \\
                         T_{n-2} + n-1: (1, n-2) \\
                         \vdots \\
-                        %TODO dopisac i policzyc powinna wyjsc E(Tn) = n+1 2/n sum from n-1 to k sufit n/2 E(Tk) co przez indukcje mozna udowodnic ze T(n)= \theta(n)
+                        T_1 + n-1: (n-2, 1) \\
                     \end{cases}
                 \]
+                Aby formalizować analizę, wprowadzamy zmienną indykatorową:
+                \[
+                    X^{(n)}_k =
+                    \begin{cases}
+                        1, & \text{jeśli przy partycjonowaniu tablicy $n$-elementowej nastąpiło rozbicie na } \\
+                           & \quad (k, n-k-1) \text{ oraz dalsze wywołanie rekurencyjne odbywa się na} \\
+                           & \quad \text{podtablicy zawierającej szukany element,} \\
+                        0, & \text{w przeciwnym przypadku.}
+                    \end{cases}
+                \]
+                Wówczas możemy zapisać:
+                \[
+                    T_n = \sum_{k=0}^{n-1} X^{(n)}_k \left( T\Bigl(\max(k,\, n-k-1)\Bigr) + n-1 \right).
+                \]
+
+                Przyjmując, że wybór pivotu jest jednostajny, mamy:
+                \[
+                    \mathbb{E}\Bigl[X^{(n)}_k\Bigr] = \frac{1}{n} \quad \text{dla } k=0,1,\dots,n-1.
+                \]
+                Zatem, stosując wartość oczekiwaną i liniowość tej wartości, otrzymujemy:
+                \[
+                    \mathbb{E}[T_n] = \frac{1}{n} \sum_{k=0}^{n-1} \left( \mathbb{E}\Bigl[T\bigl(\max(k,\, n-k-1)\bigr)\Bigr] + n-1 \right).
+                \]
+
+                Ponieważ gdy pivot jest szukanym elementem (dla $k=0$ lub $k=n-1$, w sensie odpowiedniego ustawienia) nie następuje rekurencja, przyjmujemy $T_0 = 0$. Dla pozostałych przypadków (czyli dla $1 \le k \le n-2$) dalsze wywołanie odbywa się na jednej z podtablic o rozmiarze nie większym niż $\lceil n/2 \rceil$ (ze względu na symetrię rozbicia). Możemy więc oszacować:
+                \[
+                    t_n = \mathbb{E}[T_n] \le n-1 + \frac{n-2}{n}\, t_{\lceil n/2 \rceil}.
+                \]
+
+                Łatwo (przez indukcję) pokazać, że taka rekurencja implikuje, iż
+                \[
+                    t_n = O(n).
+                \]
+
+                \bigskip
+
+                \textbf{Wniosek:} Średnia liczba porównań w algorytmie RandomSelect wynosi $\Theta(n)$, czyli algorytm działa w czasie liniowym w średnim przypadku.
+
         \end{itemize}
 \end{itemize}
 
@@ -1617,9 +1738,6 @@ Algorytm zwany jest także algorytmem \textit{Magicznych Piątek}
             \item Ustaw $X$ jako pivot w Partition
         \end{enumerate}
 \end{itemize}
-
-
-
 
 
 
@@ -2041,9 +2159,56 @@ bedzie funkcja indykatorową. Wtedy
     T_n = \sum_{k=0}^{n-1} X_k \cdot \left(T_k + T_{n-l} + n-1 \right)
 \]
 Przyjmimy oznaczenie $\mathbb{E}[T_n]=t_n$, wtedy
+\begin{equation*}\begin{aligned}
+    t_n &= \sum_{k=0}^{n-1} \mathbb{E}[X_k] \cdot \left(t_k + t_{n-k} + n-1 \right) \\
+        &= \sum_{k=0}^{n-1} \frac{1}{n} \cdot \left(t_k + t_{n-k} + n-1 \right) \\
+        &= \frac{1}{n} \sum_{k=0}^{n-1} \left(t_k + t_{n-k} + n-1 \right) \\
+        &= \frac{1}{n} \sum_{k=0}^{n-1} t_k + \frac{1}{n} \sum_{k=0}^{n-1} t_{n-k} + \frac{1}{n} \sum_{k=0}^{n-1} n-1 \\
+        &= \frac{2}{n} \sum_{k=0}^{n-1} t_k + n-1
+\end{aligned}\end{equation*} 
+Mnożąc obie strony równania przez $n$ otrzymujemy
 \[
-    t_n = \sum_{k=0}^{n-1} \mathbb{E}[X_k] \cdot \left(t_k + t_{n-k} + n-1 \right)
-\] %TODO poprawic ta ostatnia linijke i dokonczyc tak jak przy tablicy było, podobnie jak na wykladzie ma wyjsc nH_n -nH_p+nSUMA
+    n t_n = 2 \sum_{k=0}^{n-1} t_k + n^2 - n
+\]
+Zamieniając $n \rightarrow n-1$ otrzymujemy
+\[
+    (n-1) t_{n-1} = 2 \sum_{k=0}^{n-2} t_k + n^2 - 3n + 2
+\]
+Odejmując stronami otrzymujemy
+\[
+    n t_n - (n-1) t_{n-1} = 2t_{n-1} + 2n - 2
+\]
+Upraszczając:
+\[
+    n t_n = (n+1) t_{n-1} + 2(n - 1)
+\]
+Dzieląc obie strony przez $n(n+1)$ otrzymujemy
+\[
+    \frac{t_n}{n+1} = \frac{t_{n-1}}{n} + \frac{2(n-1)}{n(n+1)}
+\]
+teraz przyjmujemy oznaczenie $\varphi_n = \frac{t_n}{n+1}$, wtedy
+\[
+    \varphi_n = \varphi_{n-1} + \frac{2(n-1)}{n(n+1)}
+\]
+należy rozwiązać powyższą rekurencję itracyjnie, biorąc pod uwagę, że w pewnym momencie następuje zmiana z algorytmu \textit{QuickSort} na \textit{InsertionSort}, niech $k$ tym momentem, wtedy
+\begin{equation*}\begin{aligned}
+    \varphi_n &= \varphi_{n-1} + \frac{2(n-1)}{n(n+1)} =\\
+              &= \sum_{i=k+1}^{n} \frac{2(i-1)}{i(i+1)} + \frac{k(k-1)}{4(k+1)} \\
+              &= \sum_{i=k+1}^{n} \left(\frac{2}{i+1} - \frac{1}{i}\right) + \frac{k(k-1)}{4(k+1)} =\\
+              &= 2\sum_{i=k+1}^{n} \frac{1}{i+1} - \sum_{i=k+1}^{n} \frac{1}{i} + \frac{k(k-1)}{4(k+1)} =\\
+              &= 2\left( H_{n+1} - H_{k} \right) - \left( H_{n} - H_{k} \right) + \frac{k(k-1)}{4(k+1)} =\\
+              &= H_{n} + \frac{2}{n+1} -  H_{k} - \frac{k(k-1)}{4(k+1)}
+\end{aligned}\end{equation*}
+Podstawiając $t_n = (n+1) \varphi_n$ otrzymujemy
+\begin{equation*}\begin{aligned}
+    t_n &= (n+1) \left( H_{n} + \frac{2}{n+1} -  H_{k} - \frac{k(k-1)}{4(k+1)} \right) = \\
+        &= (n+1) H_{n} + 2 - (n+1) H_{k} - \frac{k(k-1)}{4(k+1)}(n+1) 
+\end{aligned}\end{equation*}
+Ostatecznie prowadzi to do asymptotycznego wzoru na liczbę porównań
+\[
+    \mathbb{E}[T_n] = \Theta\left(nk + n \log \frac{n}{k}\right)
+\]
+\qed
 
 
 
@@ -2068,7 +2233,37 @@ Jaka jest złożoność obliczeniowa tych algorytmów? Który z nich byś wybra�
             T(n) = 5T\left(\frac{n}{2}\right) + \Theta(n\log n)
         \]
         Ograniczmy ją sobie z dołu i z góry:
-        %TODO wziasc od michala
+        \[
+            T(n) = \Omega(n\log n)
+        \]
+        \[
+            T(n) = O(n\log n)
+        \]
+        Zatem z \textbf{Master Theorem} otrzymujemy, że złożoność obliczeniowa algorytmu A wynosi \\$\Theta(n\log n)$.
+    \item Spełniona zostaje rekurencja:
+        \[
+            T(n) = 2T(n-1) + \Theta(1)
+        \]
+        Ograniczmy ją sobie z dołu i z góry:
+        \[
+            T(n) = \Omega(n)
+        \]
+        \[
+            T(n) = O(n)
+        \]
+        Zatem z \textbf{Master Theorem} otrzymujemy, że złożoność obliczeniowa algorytmu B wynosi $\Theta(n)$.
+    \item Spełniona zostaje rekurencja:
+        \[
+            T(n) = 9T\left(\frac{n}{3}\right) + \Theta(n^2)
+        \]
+        Ograniczmy ją sobie z dołu i z góry:
+        \[
+            T(n) = \Omega(n^2)
+        \]
+        \[
+            T(n) = O(n^2)
+        \]
+        Zatem z \textbf{Master Theorem} otrzymujemy, że złożoność obliczeniowa algorytmu C wynosi $\Theta(n^2)$.
 \end{enumerate}
 
 \subsubsection{zadanie 6}
@@ -2105,9 +2300,49 @@ Możemy przyjąć, że mamy tablicę $T=[t_1, t_2, \ldots, t_n]$ z czasami trwan
         Rozważmy teraz ogólny problem:
         \begin{itemize}
             \item \textbf{Input}: tablica z długoścami trwania wykonywania zadań $T=[t_1, t_2, \dots, t_n]$
-            \item \textbf{Output}: pewna permutacja tablicy $T$, która minimalizuje średni czas zakończenia zadania -- $T'$
-            \item %TODO to ta moja wersja
+            \item \textbf{Output}: pewna permutacja tablicy $T$, która minimalizuje średni czas zakończenia zadania -- $\sigma(T)$
+            \item \textbf{Problem}: należy znaleść pewne minimum:
+                \[
+                    \min \left\{ f(\sigma(T)): \sigma \in S_n \right\}
+                \]
+                gdzie $f: \mathcal{P}\left(\mathbb{N}\right) \rightarrow \mathbb{R}$ jest funkcją postaci:
+            \[
+                f(T) = \frac{1}{n} \sum_{i=1}^{n} \sum_{j=1}^{i} t_j
+            \]
+            można to zapisać jako:
+            \[
+                f(T) = \frac{nt_1 + (n-1)t_2 + \dots + 2t_{n-1} + t_n}{n}
+            \]
+        \item \textbf{Rozwiązanie}: minimalizacja funkcji $f$ polega na posortowaniu tablicy $T$ rosnąco, nalezy jednak udowodnić, że permutacja $\sigma$ sortująca tablicę $T$ jest optymalna.
+            %należy wziąść dowolną permutację $\tau$ i biorac permutacje $\tau'$, ktora rozni sie od tau tylko miejscami i i j, i < j, tak, ze t_i > t_j, to mozemy pokazac, ze f(tau') > f(tau), co oznacza i iterujac ten proces dojdziemy do permutacji optymalnej -- sortujacej
+            \textbf{Dowód:} \\[1mm]
+            Załóżmy, że istnieje optymalna permutacja $\tau$, w której występuje para indeksów $i < j$ taka, że $t_i > t_j$. Rozważmy nową permutację $\tau'$, otrzymaną przez zamianę miejscami zadań $i$ oraz $j$, czyli:
+            \[
+                \tau' = (\dots, t_j, \dots, t_i, \dots)
+            \]
+            Przyjrzyjmy się wpływowi tej zamiany na funkcję celu
+            \[
+                f(T) = \frac{1}{n}\sum_{k=1}^{n} \sum_{l=1}^{k} t_{\tau(l)}.
+            \]
+            W wyniku zamiany, zadania $t_i$ i $t_j$ pojawiają się na pozycjach $i$ oraz $j$, odpowiednio, co wpływa na sumy częściowe w następujący sposób:
+            \[
+                \Delta = f(\tau') - f(\tau) = (t_i - t_j)(j-i).
+            \]
+            Skoro $j-i > 0$ oraz przy założeniu $t_i > t_j$, mamy
+            \[
+                \Delta > 0.
+            \]
+            Oznacza to, że funkcja celu $f$ jest mniejsza dla permutacji $\tau'$ niż dla $\tau$, czyli:
+            \[
+                f(\tau') < f(\tau).
+            \]
+            Sprzeczność z założeniem, że $\tau$ była optymalna, wynika z faktu, iż zawsze można dokonać zamiany pary, gdzie wcześniejsze zadanie trwa dłużej niż późniejsze, co zmniejsza średni czas zakończenia. \\[1mm]
+            W związku z tym, aby nie istniały żadne takie "inwersje", permutacja optymalna musi spełniać warunek
+            \[
+                t_{\tau(1)} \le t_{\tau(2)} \le \dots \le t_{\tau(n)},
+            \]
+            czyli musi być uporządkowana rosnąco. \\[1mm]
+            \textbf{Wniosek:} Minimalizacja średniego czasu zakończenia zadań jest osiągana przez sortowanie tablicy $T$ w porządku rosnącym.
         \end{itemize}
-
 \end{itemize}
 \end{document}

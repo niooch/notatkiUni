@@ -1560,7 +1560,46 @@ Przetestuj następnie działanie funkcji \texttt{foldl’} oraz \texttt{foldr’
 \hrule
 \bigskip
 
-%TODO zadanie
+\begin{enumerate}
+    \item \texttt{foldl (+) 0 xs}:
+        \begin{Verbatim}[frame=single]
+> foldl (+) 0 [1..10]
+55
+        \end{Verbatim}
+    \item \texttt{foldr (+) 0 xs}:
+        \begin{Verbatim}[frame=single]
+> foldr (+) 0 [1..10]
+55
+        \end{Verbatim}
+    \item \texttt{foldl1 (+) xs}:
+        \begin{Verbatim}[frame=single]
+> foldl1 (+) [1..10]
+55
+        \end{Verbatim}
+    \item \texttt{foldr1 (+) xs}:
+        \begin{Verbatim}[frame=single]
+> foldr1 (+) [1..10]
+55
+        \end{Verbatim}
+    \item \texttt{sum X} na dużych listach liczb \texttt{X}:
+        \begin{Verbatim}[frame=single]
+> :set +s
+> sum [1..1000000]
+500000500000
+(0.03 secs, 88,077,128 bytes)
+        \end{Verbatim}
+    \item \texttt{foldl'} oraz \texttt{foldr'}:
+        \begin{Verbatim}[frame=single]
+> :module Data.List
+> :set +s
+> foldl' (+) 0 [1..1000000]
+500000500000
+(0.03 secs, 88,077,144 bytes)
+> foldr' (+) 0 [1..1000000]
+500000500000
+        \end{Verbatim}
+\end{enumerate}
+
 
 \subsubsection{Zadanie 36}
 Samodzielnie zaimplementuj (oraz przetestuj) funkcję \texttt{reverse} działającą w czasie liniowym. Porównaj jej skuteczność z algorytmem z Zadania 29 \ref{subsec:zad29}.
@@ -1569,7 +1608,11 @@ Samodzielnie zaimplementuj (oraz przetestuj) funkcję \texttt{reverse} działaj�
 \hrule
 \bigskip
 
-%TODO zadanie
+Implementacja funkcji \texttt{reverse} działającej w czasie liniowym w języku Haskell:
+\begin{Verbatim}[frame=single]
+reverse' :: [a] -> [a]
+reverse' = foldl (flip (:)) []
+\end{Verbatim}
 
 \subsubsection{Zadanie 37}
 Zdefiniuj za pomocą funkcji \texttt{foldr} funkcję, które dla listy liczb $[a_1, \dots, a_n]$ oblicza ile liczb parzystych występuje w tej liście.
