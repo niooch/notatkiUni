@@ -5,6 +5,7 @@
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage[makeroom]{cancel}
 \usepackage{xcolor}
 \usepackage{bm}
 \usepackage{marginnote}
@@ -1322,11 +1323,11 @@ Wartość oczekiwana pojawia się w tych asymptotykach ponieważ jest element lo
     \item Zakładamy $p<q$
         \[
             \left[ \,
-                a \,\middle|\, 
-                \underbrace{\cdots}_{S_{i-1}} \, p \,\middle|\, 
-                \cdots \, q \,\middle|\, 
-                \underbrace{\cdots}_{L_{i-1}} \, \boxed{i} \,\middle|\, 
-                b 
+                a \,\middle|\,
+                \underbrace{\cdots}_{S_{i-1}} \, p \,\middle|\,
+                \cdots \, q \,\middle|\,
+                \underbrace{\cdots}_{L_{i-1}} \, \boxed{i} \,\middle|\,
+                b
             \,\right]
         \]
     \item rozpatrzmy $i$-ty element tablicy
@@ -1483,8 +1484,139 @@ Algorytm zachowuje kolejność równych sobie elementów z tablicy wejściowej
             \end{bmatrix}
         \]
         Algorytm zachowuje kolejność równych sobie elementów z tablicy wejściowej -- \textit{Stable Sorting Property}, co umożliwia sortowanie po kolejnych cyfrach.
+    \item \textbf{Poprawność}: Indukcja po $t$ -- numer cyfry
+        \begin{enumerate}
+            \item jeśli $t=1$ to poprawność \textit{Counting Sort} jest trywialna
+            \item załóżmy, że \textif{Counting Sort} jest poprawny dla $t-1$ -- cyfrowej liczby
+            \item Krok indukcyjny:
+                \begin{enumerate}
+                    \item $t$-ta cyfra ... liczby jest ...:
+                        to z założenia indukcyjnego oraz \textit{stable counting property Counting Sorta} liczby do $t$--tej cyfty dajej poprawnie posortowane
+                    \item $t$-ta cyfra różna: z poprawności \textit{Counting Sort} ok.
+                \end{enumerate}
+        \end{enumerate}
+    \item \textbf{Złożoność obliczeniowa}:
+        \begin{itemize}
+            \item $n$ $b$-bitowych liczb
+            \item liczba $b$-bitowa dzielę na $r$-bitowych cyfr ($\frac{b}{r}$ takich liczb):
+            %daj reprezentacje w postaci tablicy
+                \[
+                    \underbrace{\underline{\mid \quad \quad \mid} \underline{\quad \quad \mid} \underline{ \quad \dots \quad \mid} \overbrace{\underline{\quad \quad \mid}}^{r\text{-bitów}}}_{b\text{-bitów}}
+                \]
+            \item cyfry są z $\mid \left\{ 0,\dots,2^r -1\right\} \mid = 2^r$
+            \item \textit{Counting Sort} sortujemy $\underline{n}$ liczb względem jednej liczby. A więc wykonujemy
+                \[
+                    \Theta(n+2^r)
+                \]
+                operacji.
+        \end{itemize}
+        Zatem \textit{Radix Sort} będzie miał złożoność obliczeniową
+        \[
+            \Theta\left(\frac{b}{r}(n+2^r)\right)
+        \]
+        machając trochę rękoma wybieramy $r$ jako $r=\log n$, wtedy
+        \[
+            \Theta\left(\frac{b}{\log n} \left( n +2^{\log n}\right)\right) = \Theta\left(\frac{bn}{\log n}\right)
+        \]
+        Jeśli $\{0, \dots, n^d-1\}$ - zakres sortowanych liczb, wtedy $b=\log n^d = d \log n$, a więc
+        \[
+            \Theta\left(\frac{d\log n \space n}{ \log n} \right) = \Theta\left(\frac{\cancel{\log n} n}{\cancel{\log n}}\right) = \Theta(d \cdot n)
+        \]
+\end{itemize}
+%TO KONIEC PROBLEMU SORTOWANIA!!!!!!!!!!!!!!111
+
+\section{Wykład \date{2025-03-31}}
+Problem którym się teraz zajmiemy to tak zwany \textbf{Statystyka Pozycyjna}
+\subsection{Definicja Statystyki Pozycyjnej}
+\subsubsection{Definicja}
+$k$-tą statystyką pozycyjną nazywamy $k$-tą najmniejszą wartością z zadnaego zbioru.
+\subsubsection{Przykład}
+\begin{itemize}
+    \item $k=1 \rightarrow O(n)$
+    \item $k=n \rightarrow O(n)$
+    \item $k=\left\lfloor\frac{n-1}{2}\right\rfloor \or k=\left\lfloor\frac{n+1}{2}\right\rfloor \rightarrow \text{ sortowanie } O(n \log n)$
+\end{itemize}
+\subsection{Algorytm Random Select}
+\begin{itemize}
+    \item \textbf{Input}: Tablica $A, |A|=n$, liczba $k$
+    \item \textbf{Output}: $k$-ta statystyka pozycyjna
+    \item \textbf{Algorytm}:
+        \begin{algorithm}
+            \caption{Random Select}
+            \begin{algorithmic}[1]
+                \Procedure{RandomSelect}{A, p, q, i}
+                \If{$p=q$}
+                    \State \textbf{return} $A[p]$
+                \EndIf
+                \State $r = \text{RandomPartition}(A,p,q)$ \Comment{losowa partycja}
+                \State $k = r-p+1$
+                \If{$i=k$}
+                \State \textbf{return} $A[r]$ \Comment{$A[r]$ jest $i$-tą statystyką pozycyjną}
+                \ElsIf{$i<k$}
+                \State \textbf{return} $\text{RandomSelect}(A,p,r-1,i)$
+                \Else
+                \State \textbf{return} $\text{RandomSelect}(A,r+1,q,i-k)$
+                \EndIf
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        %TODO jebnac co sie tu dzieje w tablicy za pomoca undeline overline i \quad
+    \item \textbf{Przykład}: $A = [6,10,13,5,8,3,2,11]$, RandomSelect($A,1,8,4$)
+        \begin{itemize}
+            \item
+            \item
+            \item
+        \end{itemize}
+        %TODO zajebac od szymiego
+    \item \textbf{Złożoność obliczeniowa}:
+        \begin{itemize}
+            \item \textit{Best Case}:
+                W najlepszym przypadku dzielimy tablicę na dwie równe części, zatem
+                \[
+                    T(n) = T\left(\frac{n}{2}\right) + \Theta(n)
+                \]
+                Używając \textit{Master Theorem} otrzymujemy
+                \[
+                    T(n) = \Theta(n)
+                \]
+            \item \textit{Worst Case}:
+                W najgorszym przypadku dzielimy tablicę na $n-1$ i $1$ elementów (-- pivot wybrany przez partition), a więc
+                \[
+                    T(n) = T(n-1) + \Theta(n)
+                \]
+                Używając \textit{Master Theorem} otrzymujemy
+                \[
+                    T(n) = \Theta(n^2)
+                \]
+            \item \textit{Average Case}:
+                W średnim przypadku musimy policzyć wartość oczekiwaną takiej zmiennej losowej:
+                \[
+                    T_n = \begin{cases}
+                        T_{n-1} + n-1: (0, n-1) \\
+                        T_{n-2} + n-1: (1, n-2) \\
+                        \vdots \\
+                        %TODO dopisac i policzyc powinna wyjsc E(Tn) = n+1 2/n sum from n-1 to k sufit n/2 E(Tk) co przez indukcje mozna udowodnic ze T(n)= \theta(n)
+                    \end{cases}
+                \]
+        \end{itemize}
 \end{itemize}
 
+\subsection{Algorytm Select}
+Algorytm zwany jest także algorytmem \textit{Magicznych Piątek}
+\begin{itemize}
+    \item \textbf{Input}: Tablica $A, |A|=n$, liczba $k$
+    \item \textbf{Output}: $k$-ta statystyka pozycyjna
+    \item \textbf{Algorytm}:
+        \begin{enumerate}
+            \item dzielimy $A[p \dots q]$ na $\left\lfloor\frac{n}{5}\right\rfloor$ pięcio elementowe częsci oraz ostatnią część z resztą
+            \item Sortujemy każdą pięcio elementową część i wybieramy z nich mediany:
+                \[
+                    M = \left\{ m_1, m_2, \dots, m_{\left\lfloor\frac{n}{5}\right\rfloor} \right\}
+                \]
+            \item Znaleść medianę z tablicy $M$: wywołujemy Select($M, 1, \left\lceil\frac{n}{5}\right\rceil, \left\lfloor\frac{\left\lceil\frac{n}{10}\right\rceil}{2}\right\rfloor$) i oznaczmy ją jako $X$\footnote{nazywana też mediana median}
+            \item Ustaw $X$ jako pivot w Partition
+        \end{enumerate}
+\end{itemize}
 
 
 
@@ -1837,5 +1969,145 @@ gdzie $\Theta(n \log k)$ to koszt scalania $k$ posortowanych list (zadanie 1). Z
     T(n) = \Theta(n \log_k n)
 \]
 
+\subsubsection{zadanie 3}
+Załóżmy że tablica $A = [a_1, \dots, a_n]$ jest do pewnego momentu $k$ posortowana malejąco i dalej rosnąco (tzn. dla $\forall i < k: a_i > a_{i+1}$ oraz $\forall i \geq k: a_i < a_{i+1}$). Zaprojektuj algorytm znajdujący minimalny element w tablicy $A$, którego złożoność obliczeniowa będzie wynosić $O(\log n)$. Udowodnij poprawność działania zaproponowanego algorytmu.
 
+\bigskip
+\hrule
+\bigskip
+
+\begin{itemize}
+    \item Algorytm ten można zrealizować w następujący sposób:
+        \begin{algorithm}
+            \caption{Algorytm do zadania 3.}
+            \begin{algorithmic}[1]
+                \Procedure{FindMin}{$A, p, q$}
+                \If{$p = q$}
+                \State \Return{$A[p]$}
+                \EndIf
+                \State{$m = \left\lfloor\frac{p+q}{2}\right\rfloor$}
+                \If{$A[m] > A[m+1]$}
+                \State \Return{$\text{FindMin}(A, m+1, q)$}
+                \Else
+                \State \Return{$\text{FindMin}(A, p, m)$}
+                \EndIf
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item Przykład:
+        \begin{itemize}
+            \item $A = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]$
+            \item $m = 5$
+            \item $A[m] = 5$, $A[m+1] = 4$
+            \item $\text{FindMin}(A, 6, 10)$
+            \item $m = 8$
+            \item $A[m] = 2$, $A[m+1] = 1$
+            \item $\text{FindMin}(A, 9, 10)$
+            \item $m = 9$
+            \item $A[m] = 1$, $A[m+1] = 1$
+            \item \textbf{Zwracamy} $A[m] = 1$
+        \end{itemize}
+    \item Złożoność obliczeniowa: Algorytm spełnia rekurencję:
+        \[
+            T(n) = T\left(\frac{n}{2}\right) + \Theta(1)
+        \]
+        Z \textbf{Master Theorem} otrzymujemy, że algorytm ma złożoność:
+        \[
+            T(n) = \Theta(\log n)
+        \]
+        \qed
+\end{itemize}
+
+\subsubsection{zadanie 4}
+Zastąpienie użycia QuickSort'a, dla tablic małych rozmiarów, algorytmem InsertionSort jest częstym sposobem na zwiększenie efektywności algorytmu rozwiązującego problem sortowania. Pokaż, że jeśli zmodyfikujesz bazowy przypadek rekurencji w algorytmie QuickSort w taki sposób, że dla tablic o $\leq k$ elementach wywoływany będzie InsertionSort (zamiast rekurencyjnego wywołania QuickSort'a), to wartość oczekiwana liczby porównań będzie wynosić $\Theta\left(nk + n \log \frac{n}{k}\right)$. Jakie $k$ należy wybrać, aby zminimalizować tę złożoność?
+
+\bigskip
+\hrule
+\bigskip
+
+Należy rozważyć wartość oczekiwaną zmiennej losowej $\text{compInsertSort}_n \equiv R_n$
+\[
+    \mathbb{E}[R_n]=\frac{n(n-1)}{4}
+\]
+Niech $T_n$ -- liczba porównan w \textit{Hybrid Sorcie} oraz
+\[
+    X_k^n = \begin{cases}
+        1 \impliedby \text{partition podzielił tablice na} \mid k \mid n-k \text{split($k,n-k$)}\\
+        0 \impliedby \text{w przeciwnym przypadku}
+    \end{cases}
+\]
+bedzie funkcja indykatorową. Wtedy
+\[
+    T_n = \sum_{k=0}^{n-1} X_k \cdot \left(T_k + T_{n-l} + n-1 \right)
+\]
+Przyjmimy oznaczenie $\mathbb{E}[T_n]=t_n$, wtedy
+\[
+    t_n = \sum_{k=0}^{n-1} \mathbb{E}[X_k] \cdot \left(t_k + t_{n-k} + n-1 \right)
+\] %TODO poprawic ta ostatnia linijke i dokonczyc tak jak przy tablicy było, podobnie jak na wykladzie ma wyjsc nH_n -nH_p+nSUMA
+
+
+
+\subsubsection{zadanie 5}
+Załóżmy, że masz do wyboru jeden z trzech algorytmów rozwiązujących postawiony Ci problem wielkości $n$:
+\begin{enumerate}
+  \item \textbf{Algorytm A}: rozwiązuje problem dzieląc go rekurencyjnie na 5 pod-problemów o połowę mniejszych i scalając ich rozwiązania w czasie $\Theta(n \log n)$.
+  \item \textbf{Algorytm B}: rozwiązuje problem dzieląc go rekurencyjnie na 2 pod-problemy rozmiaru $n - 1$ i scala ich rozwiązania w czasie stałym.
+  \item \textbf{Algorytm C}: rozwiązuje problem dzieląc go rekurencyjnie na 9 pod-problemów rozmiaru $n/3$ i scalając ich rozwiązania w czasie $\Theta(n^2)$.
+\end{enumerate}
+
+Jaka jest złożoność obliczeniowa tych algorytmów? Który z nich byś wybrał? Odpowiedź uzasadnij.
+
+\bigskip
+\hrule
+\bigskip
+
+
+\begin{enumerate}
+    \item Spełniona zostaje rekurencja:
+        \[
+            T(n) = 5T\left(\frac{n}{2}\right) + \Theta(n\log n)
+        \]
+        Ograniczmy ją sobie z dołu i z góry:
+        %TODO wziasc od michala
+\end{enumerate}
+
+\subsubsection{zadanie 6}
+Powiedzmy, że masz do wykonania $n$ zadań, gdzie każde z nich wymaga $t_j$ minut pracy. Chcesz wykonać wszystkie zadania maksymalizując zadowolenie przełożonego poprzez minimalizację średniego czasu zakończenia każdego zadania. Uzasadnij, w jakiej kolejności powinieneś wykonywać zadania.
+
+\bigskip
+\hrule
+\bigskip
+
+Możemy przyjąć, że mamy tablicę $T=[t_1, t_2, \ldots, t_n]$ z czasami trwania zadań. Możemy zrealizować algorytm w następujący sposób:
+\begin{itemize}
+    \item Zadania powinny być wykonywane w kolejności rosnącej czasu pracy. Posortować tablicę $T$ rosnąco i wykonywać zadania pokoleji.
+    \item Dla każdego zadania $j$ zakończenie zadania $j$ w czasie $t_j$ minimalizuje średni czas zakończenia każdego zadania. Dlaczego się tak dzieje?\\
+        Rozpatrzmy najpierw mały przykład: \\
+        Mamy 3 zadania
+        \[
+            T= [t_1=3, t_2=5, t_3=4].
+        \]
+        Posortowane zadania to
+        \[
+            T= [t_1=3, t_3=4, t_2=5].
+        \]
+        teraz czasy zakonczenia wykonywania zadań, to
+        \[
+            t= [t_1, t_1+t_3, t_1+t_3+t_2]
+        \]
+        \[
+            t=[3, 3+4, 3+4+5]
+        \]
+        Średni czas zakończenia zadania to
+        \[
+            \frac{3+7+12}{3}=7\frac{1}{3}
+        \]
+        Rozważmy teraz ogólny problem:
+        \begin{itemize}
+            \item \textbf{Input}: tablica z długoścami trwania wykonywania zadań $T=[t_1, t_2, \dots, t_n]$
+            \item \textbf{Output}: pewna permutacja tablicy $T$, która minimalizuje średni czas zakończenia zadania -- $T'$
+            \item %TODO to ta moja wersja
+        \end{itemize}
+
+\end{itemize}
 \end{document}
