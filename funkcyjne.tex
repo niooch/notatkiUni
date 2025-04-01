@@ -1833,7 +1833,6 @@ Przetestuj następnie działanie funkcji \texttt{foldl’} oraz \texttt{foldr’
         \end{Verbatim}
 \end{enumerate}
 
-
 \subsubsection{Zadanie 36}
 Samodzielnie zaimplementuj (oraz przetestuj) funkcję \texttt{reverse} działającą w czasie liniowym. Porównaj jej skuteczność z algorytmem z Zadania 29 \ref{subsec:zad29}.
 
@@ -1854,11 +1853,183 @@ Zdefiniuj za pomocą funkcji \texttt{foldr} funkcję, które dla listy liczb $[a
 \hrule
 \bigskip
 
-%TODO zadanie
+To tak może wyglądać:
+\begin{Verbatim}[frame=single]
+countEven :: [Int] -> Int
+countEven = foldr (\x acc -> if even x then acc + 1 else acc) 0
+countEven = foldr ((+) . (\x -> if even x then 1 else 0)) 0
+\end{Verbatim}
 
 \subsubsection{Zadanie 38}
+Korzystając z funkcji \texttt{foldl} napisz funkcję \texttt{dec2Int} która konwertuje ciąg cyfr na liczbę całkowita, np. \texttt{dec2Int [1,2,1] = 121}.
 
+\bigskip
+\hrule
+\bigskip
 
+Implementacja funkcji \texttt{dec2Int} w języku Haskell:
+\begin{Verbatim}[frame=single]
+dec2Int :: [Int] -> Int
+dec2Int xs = foldl (\acc x -> acc * 10 + x) 0 xs
 
+> dec2Int [1,2,1]
+121
+\end{Verbatim}
+Alternetywnie można coś ciekawego napisać przy pomocy funkcji \texttt{afib}
+\begin{Verbatim}[frame=single]
+afib = 1:zipWith (-) 0:afib
+...
+\end{Verbatim}
 
+\subsubsection{Zadanie 39}
+Która z następujących równości jest prawdziwa?
+\begin{enumerate}
+    \item \texttt{foldl (-) e xs = e - sum xs}
+    \item \texttt{foldr (-) e xs = e - sum xs}
+\end{enumerate}
+
+\bigskip
+\hrule
+\bigskip
+
+Prawdziwa jest równość:
+\begin{enumerate}
+    \item \texttt{foldl (-) e xs = e - sum xs}
+\end{enumerate}
+Ponieważ \texttt{foldl (-) e xs} to \texttt{e - x1 - x2 - ... - xn}, a \texttt{sum xs} to \texttt{x1 + x2 + ... + xn}.
+
+\subsubsection{Zadanie 40}
+Dla danej listy \texttt{$x_s = [x_1, \ldots, x_n]$} funkcja \texttt{lmss xs} wyznacza najdłuższą listę \texttt{$[x_{j_1}, \ldots, x_{j_k}]$} taką, że \texttt{$j_1 = 1$} oraz \texttt{$x_{j_a} < x_{j_{a+1}}$} dla wszystkich \texttt{$a = 1, \ldots, k - 1$}.\\
+Na przykład, dla ciągu \texttt{xs = [3,2,1,5,3,2,6,2,3,8]} mamy \texttt{lmss xs = [3,5,6,8]}.
+
+\bigskip
+\hrule
+\bigskip
+\texttt{lmss} to skrót od \textit{longest monotonically increasing subsequence}. Oto implementacja funkcji \texttt{lmss} w języku Haskell:
+\begin{Verbatim}[frame=single]
+addWhenSmaller xs n = xs ++ map (++[n]) (filter (\x -> if (x==[])
+    then True else last x < n) xs)
+
+longest [x] = x
+longest (x:xs) =
+    if (length x > length l) then x
+    else l
+    where l = longest xs
+\end{Verbatim}
+
+\subsubsection{Zadanie 41}
+Funkcja \texttt{remdupl} usuwa z listy przylegające duplikaty, np. \\ \texttt{remdupl [1,1,2,1,1,3,3,4,4] = [1,2,1,3,4]}. Oprogramuj tę funkcję za pomocą \texttt{foldr} lub \texttt{foldl}.
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{Verbatim}[frame=single]
+remdupl :: (Eq a) => [a] -> [a]
+remdupl = foldr (\x acc -> if null acc
+    || x /= head acc then x:acc else acc) []
+\end{Verbatim}
+
+\subsubsection{Zadanie 42}
+Korzystając z funkcji \texttt{foldl} i \texttt{foldr} napisz funkcję \texttt{approx n} zdefiniowaną następująco
+\[
+\texttt{approx}(n) = \sum_{k=1}^{n} \frac{1}{k!}
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+Implementacja funkcji \texttt{approx} w języku Haskell:
+\begin{Verbatim}[frame=single]
+approx :: Int -> Double
+approx n = foldl (\acc k -> acc + 1 / fromIntegral (product [1..k])) 0 [1..n]
+
+ghci> approx 100
+1.7182818284590455
+(0.01 secs, 774,656 bytes)
+ghci> approx 1000
+1.7182818284590455
+(0.08 secs, 211,092,144 bytes)
+ghci> approx 10000
+1.7182818284590455
+(34.83 secs, 227,568,464,200 bytes)
+\end{Verbatim}
+
+\subsubsection{Zadanie 43}
+Napisz, korzystając z funkcji \texttt{foldl}, funkcję która dla ciągu liczb $[a_1,\dots, a_n]$
+\[
+    \sum^n_{k=1} (-1)^{k+1} \cdot a_k
+\]
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{Verbatim}[frame=single]
+altSum :: (Num a) => [a] -> a
+altSum xs = foldl (\acc (k, x) -> acc + (-1)^(k+1) * x) 0 (zip [1..] xs)
+\end{Verbatim}
+
+\subsubsection{Zadanie 44}
+Napisz funkcję która dla zadanej listy $[a_1,\dots, a_n]$ elementu typu \texttt{[Fractional a]} wyznaczy średnią arytmetyczną oraz wariancję ciągu $(a_1, \dots , a_n)$. Skorzystaj tylko raz z funkcji fold.
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{Verbatim}[frame=single]
+meanVar :: (Fractional a) => [a] -> (a, a)
+meanVar xs = (mean, var)
+    where
+        (mean, var, n) = foldl (\(m, v, n) x -> (m + x, v + x^2, n + 1)) (0, 0, 0) xs
+        mean = mean / fromIntegral n
+        var = (var - mean^2 * fromIntegral n) / fromIntegral (n - 1)
+\end{Verbatim}
+
+\subsubsection{Zadanie 45}
+Zaimplementuj deterministyczny automat skończony który rozpoznaje język tych zero-jedynkowych ciągów która zaczynają się od \texttt{01} i zawierają parzystą liczbę jedynek.
+
+\bigskip
+\hrule
+\bigskip
+
+Rozrysujmy najpierw ten automat:
+\begin{center}\begin{tikzpicture}[shorten >=1pt, node distance=2.5cm, on grid, auto]
+    % Definicja stanów
+    \node[state, initial] (q0) {$q_0$};
+    \node[state] (q1) [right=of q0] {$q_1$};
+    \node[state] (q2) [right=of q1] {$q_2$};
+    \node[state, accepting] (q3) [right=of q2] {$q_3$};
+    \node[state] (sink) [below=of q1] {$\mathsf{sink}$};
+
+    % Przejścia między stanami
+    \path[->]
+        (q0) edge node {0} (q1)
+        (q0) edge node {1} (sink)
+        (q1) edge node {1} (q2)
+        (q1) edge node {0} (sink)
+        (q2) edge[bend left] node {1} (q3)
+        (q2) edge[loop above] node {0} ()
+        (q3) edge[bend left] node {1} (q2)
+        (q3) edge[loop above] node {0} ()
+        (sink) edge[loop below] node {0,1} ();
+\end{tikzpicture}\end{center}
+gdzie stan \texttt{sink} jest stanem z którego nie ma wyjścia, a stan \texttt{q3} jest stanem akceptującym.
+\begin{Verbatim}[frame=single]
+dfa :: String -> Bool
+dfa xs = (foldl f 0 xs) == 3
+
+f :: Int -> Int -> Int
+f _ _ = -1
+f 0 0 = 1
+f 0 1 = -1
+f 1 0 = -1
+f 1 1 = 2
+f 2 0 = 2
+f 2 1 = 3
+f 3 0 = 3
+f 3 1 = 2
+\end{Verbatim}
+I es
 \end{document}
