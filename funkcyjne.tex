@@ -362,6 +362,239 @@ gdzie $S$ to zbiór stanów, $\delta$ to funkcja przejścia, $s_0$ to stan pocz�
     \delta: S \times \Sigma \rightarrow \mathcal{P}(S)
 \]
 
+\section{Wykład \date{2025-04-01}}
+Dzisiaj będziemy omawiać strukturę rekordów w języku Haskell
+\subsection{Struktura}
+Weźmy na przykład strukturę reprezentującą osobę:
+\begin{Verbatim}[frame=single]
+dataOsoba = {
+    idO :: Int,
+    imie :: String,
+    nazwisko :: String,
+    rokUrodzenia :: Int,
+    miesiacUrodzenia :: Int,
+    dzienUrodzenia :: Int
+} deriving (Show)
+\end{Verbatim}
+deklaracja rekordu w Haskellu wygląda następująco:
+\begin{Verbatim}[frame=single]
+aaa = Osoba {
+    idO = 1,
+    imie = "Jan",
+    nazwisko = "Kowalski",
+    rokUrodzenia = 2000,
+    miesiacUrodzenia = 1,
+    dzienUrodzenia = 1
+}
+\end{Verbatim}
+Poprzez \textit{deriving (Show)} mówimy, że chcemy aby nasz rekord mógł być wyświetlany w konsoli. Haskel automatycznie tworzy te funkcje dla nas.
+\begin{Verbatim}[frame=single]
+>dzienUrodzenia aaa
+1
+>aaa {dzienUrodzenia = 2}
+Osoba {idO = 1, imie = "Jan", nazwisko = "Kowalski", rokUrodzenia = 2000, miesiacUrodzenia = 1, dzienUrodzenia = 2}
+\end{Verbatim}
+
+Ale jest to nie elegancki sposób deklaracji rekordu, jeżeli chodzi o typ daty. Możemy zaciągnąć z jakiegoś modułu gotowy typ danych:
+\begin{Verbatim}[frame=single]
+import Data.Time
+data Osoba = {
+    idO :: Int,
+    imie :: String,
+    nazwisko :: String,
+    dataUrodzenia :: Date
+} deriving (Show)
+\end{Verbatim}
+Napiszmy teraz funkcję zmienająca rok urodzin, kożystając z tego co zostało napisane do tej pory
+\begin{Verbatim}[frame=single]
+zmienRok :: Osoba -> Int -> Osoba
+zmienRok osoba nowyRok =
+    osoba {dataUrodzenia = (dataUrodzenia osoba) {year = nowyRok}}
+\end{Verbatim}
+
+Poźniej w ramach tego typu problemów omówimy typ \textit{lenses}.
+\subsection{Typy parametryzowalne}
+Zobaczmy najpierw jak wygląda zapis pary w jezyku matematyki:
+\[
+    P(X) = X \times X
+\]
+\[
+    f: \text{Int} \rightarrow \text{String}
+\]
+\[
+    \tilde{f}: \text{Int} \times \text{Int} \rightarrow \text{String} \times \text{String}
+\]
+\[
+    \tilde{f}(x,y) = (f(x),f(y))
+\]
+
+
+
+\subsection{Funkturo Maybe}
+Myślimy o takim przekształceniu  $MB$ od słowa Mayby:
+\[
+    MB(X) = X \cup \{ \uparrow_X \}
+\]
+gdzie $\uparrow_X$ to symbol oznaczający brak wartości \textit{Nothing}, definujemy to tak:
+\[
+    \uparrow_X \notin X
+\]
+\[
+    \uparrow_X \notin \text{Maybe}(X)
+\]
+\[
+    \uparrow_X \notin \text{Maybe}(X) \setminus X
+\]
+\[
+    X \noteq Y \implies \uparrow_X \neq \uparrow_Y
+\]
+Możemy wykożystać tą konstrukcje w Haskellu:
+\begin{Verbatim}[frame=single]
+safeHead :: [a] -> Maybe a
+safeHead [] = Nothing
+safeHead (x:_) = Just x
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+safeSqrt :: Double -> Maybe Double
+safeSqrt x
+    | x < 0 = Nothing
+    | otherwise = Just (sqrt x)
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+safeLog :: Double -> Maybe Double
+safeLog x
+    | x <= 0 = Nothing
+    | otherwise = Just (log x)
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+safeDiv x 0 = Nothing
+safeDiv x y = Just (x/y)
+\end{Verbatim}
+Teraz zaczynamy partyzanthe z \textit{Maybe}:
+\begin{Verbatim}[frame=single]
+composeMB :: (a -> Maybe b) -> (b -> Maybe c) -> (a -> Maybe c)
+composeMB f g x = case f x of
+    Nothing -> Nothing
+    Just y -> g y
+\end{Verbatim}
+Zobaczmy to teraz na przykładzie
+\begin{Verbatim}[frame=single]
+expr1 = composeMB safeLog safeSqrt
+
+>expr1 (exp 1)
+Just 1.0
+>expr1 ((expr 1)^4)
+Just 2.0
+>expr1 0.5
+Nothing
+\end{Verbatim}
+Inny przykład:
+\begin{Verbatim}[frame=single]
+composeMB2 :: (a -> b -> Maybe c) -> Maybe a -> Maybe b -> Maybe c
+composeMB2 _ Nothing _ = Nothing
+composeMB2 _ _ Nothing = Nothing
+composeMB2 f (Just x) (Just y) = f x y
+\end{Verbatim}
+I na przykładzie
+\begin{Verbatim}[frame=single]
+expr2 x = let sn = safeSqrt x
+              ln = safeLog (x^2-4)
+          in composeMB2 safeDiv sn ln
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+>expr2 5
+Just 0.7344560676556667
+>expr2 2
+Nothing
+\end{Verbatim}
+Fachowo mówi się, że zanurzamy te funkcje w konstruktor \textit{Maybe}.
+
+\subsection{Funktor}
+Zastanówmy się nad konstruktorem typów $F: \text{Set} \rightarrow \text{Set}$. Kilka przykładów takich konstruktorów:
+\[
+    \mathcal{P}(X) = X \times X
+\]
+\[
+    MB(X) = X \cup \{ \uparrow_X \}
+\]
+\[
+    L(X) = [X]
+\]
+
+Funktor: taki konstruktor typów $F$, że dla każdego $f: X \rightarrow Y$ istneje funkcja $F[f]: F(X) \rightarrow F(Y)$, która spełnia następujące warunki:
+\begin{itemize}
+    \item $F[\text{id}_X] = \text{id}_{F(X)}$
+    \item $F[f \circ g] = F[f] \circ F[g]$
+\end{itemize}
+Przykłady funktorów:
+\begin{itemize}
+    \item
+        \[
+            f: X \rightarrow Y
+        \]
+        \[
+            \tilde{\mathcal{P}}[f](x_1, x_2) = (f(x_1), f(x_2))
+        \]
+        jak to działa?
+        \[
+            \tilde{\mathcal{P}}(X) \xrightarrow{\tilde{\mathcal{P}}[f]} \tilde{\mathcal{P}}(Y)
+        \]
+    \item
+        \[
+            f: X \rightarrow Y
+        \]
+        \[
+            MB[f]
+        \]
+        jak to działa?
+        \[
+        \]
+
+\end{itemize}
+
+zastąpmy \texttt{pmap} bardziej ogólnym pojęciem \textit{funktor}:
+\begin{Verbatim}[frame=single]
+instance Functor Para where
+    fmap f (Para (x,y)) = Para (f x, f y)
+\end{Verbatim}
+
+\subsection{Big Data -- ``Hello World''}
+Rozważmy problem policzenia najczęściej występujących słów w tekście. Mamy podany tekst, który interpretujemy jako \textit{String}. Napiszmy taki program i po drodzę zastanawiajmy się co bedzie potrzebne
+\begin{Verbatim}[frame=single]
+module HelloBDWorld where
+
+import Data.List (words, group, sort, sortBy)
+import Data.Char (toLower)
+import SWEng -- StopWordsEnglish
+import Control.Monad
+\end{Verbatim}
+należy usunąć z tekstu coś co nazywa się \textit{stop-words} np to, anything itp., oraz inne śmieci np znaki interpunkcyjne oraz w pewnym momencie jednoliterówki\\
+Rownież należy zamienić wszystkie wielkie litery na małe.
+\begin{Verbatim}[frame=single]
+oczyscTxt :: String [String]
+oczyscTxt = map (map toLower) . filter (not . flip elem stopWords) . words
+\end{Verbatim}
+podziel słowa na grupy i posortuj je
+\begin{Verbatim}[frame=single]
+grupuj :: [String] -> [(String, Int)]
+grupuj = map (\xs -> (head xs, length xs)) . group . sort
+\end{Verbatim}
+posortuj słowa według ilości ich wystąpień
+\begin{Verbatim}[frame=single]
+sortuj :: [(String, Int)] -> [(String, Int)]
+sortuj = sortBy (\(_,n1) (_,n2) -> compare n2 n1)
+\end{Verbatim}
+i na koniec podaj liste najczestrzych słow
+\begin{Verbatim}[frame=single]
+najczestsze :: String -> [(String, Int)]
+najczestsze = sortuj . grupuj . oczyscTxt
+\end{Verbatim}
+\begin{Verbatim}[frame=single]
+> najczestsze "Hello World! Hello Haskell!"
+[("hello",2),("world",1),("haskell",1)]
+\end{Verbatim}
+
+\subsection{Jak wczytywać pliki do programu w Haskellu -- IO}
 
 
 \section{Ćwiczenia}

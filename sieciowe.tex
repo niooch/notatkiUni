@@ -74,6 +74,21 @@ Każda wiadomość przesyłana przez sieć opakowana jest w \textbf{ramkę Ether
     \item TCP/UDP -- Transmiton Control Protocol/User Datagram Protocol
 \end{enumerate}
 
+\section{\date{2025-04-31}}
+Kilka słów o 2. liscie na laboratoria: jej termin został przesunięty o 2 tygodnie oraz aby przyspieszyć sprawdzanie mamy 2 zadania z niej wykonać w 3 osobowych grupach.
+\subsection{Sieci Lokalne}
+W sieciach lokalnych występują generalnie jeden kanał komuniakcyjny, który jest współdzielony przez wszystkie urządzenia. Stacje bazowe ``rywalizują'' o przesył/dostęp do kanału. Jest to tak zwany \textbf{Kanał typu rozsiewczego}. Jednakże, w takich topologiach występują zagłuszenia, co wymuszało stosowanie ``\textit{wzmacniaków}'' sygnału. Są to urządzenia analogowe, które wzmacniają sygnał, ale również szum. Współcześnie stosuje się \textbf{przełączniki} \textit{Switch}, które są urządzeniami cyfrowymi, które przesyłają dane tylko do odpowiednich stacji, co eliminuje zagłuszenia. Standardy określają ile może być \textbf{segmentów} w sieci lokalnej. Każda maszyna w takiej sieci jest równie ważna.
+W tego typu topologiach występują kolizje powodowane jednoczesnym przesyłem sygnału. Jeśli odbiornik znajduje się w miejscu interferencji dwóch fal to odbierze sygnał zniekształcony, szum.
+\subsection{Intra--sieć}
+Chodzi tu o \textit{internet}. Jest ona odpowiedzialna za \textbf{trasowanie} (\textit{routing}), również za abstrakcje warstwy sieciowej, aby umożliwić niezależność sieci lokalnych podłączonych do chmury.\\
+Jak reprezentować sieć? Robimy to za pomocą grafu, w którym wierzchołkami są routery, a krawędziami łącza między nimi. Wierzchołki te są połączone z innymi wierzchołkami, które reprezentują inne sieci. Wierzchołki te nazywamy \textbf{bramkami} (\textit{gateways}). Edge w grafie reprezentuje łącze między dwoma sieciami, są to tzw \textbf{duplexy}, ponieważ komunikacja zachodzi w obie strony. Krawędzie możemy charakteryzować liczbami -- \textbf{wagami}, są to pewne funkcje oznaczające np. przepustowość łącza.
+\subsubsection{Chararakterystyki sieci}
+\begin{itemize}
+    \item \textbf{Przepustowość} -- ilość danych, którą można przesłać w jednostce czasu. Oznaczana przez $c$.
+    \item \textbf{Niezawodność} -- prawdopodobieństwo, że sieć działa poprawnie. Oznaczana przez $p$. Wartość $1-p$ to prawdopodobieństwo, że sieć nie działa.
+    \item \textbf{Opóźnienie} -- czas, jaki upływa od wysłania pakietu do jego odbioru
+    \item \textbf{Szerokość pasma} -- szerokość zakresu częstotliwości, który jest wykorzystywany przez nadawane lub odbierane sygnały w danym medium transmisyjnym. Szerokość pasma jest wyrażana w różnicy pomiędzy najwyższą a najniższą częstotliwością składnika transmitowanego sygnału
+\end{itemize}
 \section{Podsumowanie}
 
 \end{document}
