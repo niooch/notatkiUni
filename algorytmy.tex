@@ -2537,4 +2537,117 @@ Możemy przyjąć, że mamy tablicę $T=[t_1, t_2, \ldots, t_n]$ z czasami trwan
             \textbf{Wniosek:} Minimalizacja średniego czasu zakończenia zadań jest osiągana przez sortowanie tablicy $T$ w porządku rosnącym.
         \end{itemize}
 \end{itemize}
+
+\subsubsection{zadanie 7}
+Stwórz algorytm znajdujący najczęściej powtarzający się element w $n$ elementowej tablicy (unikając sortowania tablicy), mający złożoność $O(n \log n)$ (zakładamy, że ten element powtarza się ponad $\frac{n}{2}$ razy).
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{algorithm}[H]
+    \caption{Algorytm do zadania 7.}
+    \begin{algorithmic}[1]
+        \Procedure{Dominat}{$A, p, q$}
+        \If{$p = q$}
+        \State \Return{$A[p]$}
+        \EndIf
+        \State{$dom_L = \text{Dominat}(A, p, \left\lfloor\frac{p+q}{2}\right\rfloor)$}
+        \State{$dom_R = \text{Dominat}(A, \left\lfloor\frac{p+q}{2}\right\rfloor + 1, q)$}
+        \If{$dom_L = dom_R$}
+        \State \Return{$dom_L$}
+        \EndIf
+        \State{$count_L = \text{count}(A, p, q, dom_L)$}
+        \State{$count_R = \text{count}(A, p, q, dom_R)$}
+        \If{$count_L > count_R$}
+        \State \Return{$dom_L$}
+        \Else
+        \State \Return{$dom_R$}
+        \EndIf
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+Złożoność obliczeniowa algorytmu:
+\[
+    T(n) = 2T\left(\frac{n}{2}\right) + \Theta(n)
+\]
+Z \textbf{Master Theorem} otrzymujemy, że złożoność obliczeniowa algorytmu wynosi $\Theta(n \log n)$.\\
+Jest to problem z kategorii \textit{Majority element}.
+
+Algorytm działający w czasie liniowym:
+\begin{algorithm}[H]
+    \caption{Algorytm do zadania 7. działajcy w czasie liniowym.}
+    \begin{algorithmic}[1]
+        \Procedure{Majority}{$A$}
+        \State{$count = 0$}
+        \State{$candidate = None$}
+        \For{$i = 0$ to $n-1$}
+            \If{$count = 0$}
+                \State{$candidate = A[i]$}
+            \EndIf
+            \If{$A[i] = candidate$}
+                \State{$count = count + 1$}
+            \Else
+                \State{$count = count - 1$}
+            \EndIf
+        \EndFor
+        \State \Return{$candidate$}
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\subsubsection{zadanie 8}
+Doktor Freud ma wahania nastrojów, które zapisuje sobie ilustrując nastrój danego dnia nieujemną liczbą całkowitą. Po $n$ dniach zgromadził tablice $n$ liczb opisujących swój nastrój i postanowił znaleść (spójny) przedział czasu (dni), w których był najszczęśliwszy. Doktor Freud zdefiniował sobie szczęśliwość przedziału czasu jako sumę wartości występujących w dniach tego przedziału przemnożony przez najmniejszą wartość występującą w zadanym przedziale. Stwórz algorytm D\&C znajdujący najszczęśliwszy przedział w złożoności $O(n \log n)$
+
+\bigskip
+\hrule
+\bigskip
+
+%TODO sprobowac zrobic samemu
+
+\subsubsection{zadanie 9}
+Wykaż, że nie istnieje algorytm sortujący, który działa w czasie liniowym dla co najmniej połowy z $n!$ możliwych danych wejściowych długości $n$. Czy odpowiedź ulegnie zmianie jeśli zapytamy o ułamek $\frac{1}{n}$ lub $\frac{1}{n^2}$ wszystkich permutacji?
+
+\bigskip
+\hrule
+\bigskip
+
+Do pokazania tego faktu skożystamy z drzewa decyzyjnego, podobnie jak na wykładzie. Rozważmy nierówność gdzie $h$-wysokość drzewa, $l$-# liści
+\begin{enumerate}
+    \item
+        \[
+            \frac{n!}{2} \leq l \leq 2^h \implies 2^{h+1} \geq n! \implies h \geq \log_2 n! -1
+        \]
+        zatem $h = \Omega (n \log n)$
+    \item
+        \[
+            \frac{n!}{n} \leq 2^h \implies h \geq \log_2 n! - \log_2 n \implies h = \Omega(n \log n)
+        \]
+    \item
+        \[
+            \frac{n!}{2^n} \leq 2^h \implies h+n \geq \log_2 n! \implies h \geq log_2 n! - n \implies h = \Omega(n \log n)
+        \]
+\end{enumerate}
+
+\subsubsection{zadanie 10}
+Zaprojektuj algorytm, który sortuje $n$ liczb całkowitych z przedziału od $1$ do $n^2$ w czasie $O(n)$.
+
+\bigskip
+\hrule
+\bigskip
+
+\begin{algorithm}[H]
+    \caption{Algorytm do zadania 10.}
+    \begin{algorithmic}[1]
+        \Procedure{Sort}{$A, n$}
+        \For{$i = 1$ to $n$}
+        \State{$B[i][1] = (A[i]-1) \text{div} n$}
+        \State{$B[i][2] = (A[i]-1) \text{mod} n$}
+        \EndFor
+        \EndProcedure
+    \end{algotithmic}
+\end{algorithm}
+
+
 \end{document}
