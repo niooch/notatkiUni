@@ -1729,15 +1729,207 @@ Algorytm zwany jest także algorytmem \textit{Magicznych Piątek}
     \item \textbf{Output}: $k$-ta statystyka pozycyjna
     \item \textbf{Algorytm}:
         \begin{enumerate}
-            \item dzielimy $A[p \dots q]$ na $\left\lfloor\frac{n}{5}\right\rfloor$ pięcio elementowe częsci oraz ostatnią część z resztą
-            \item Sortujemy każdą pięcio elementową część i wybieramy z nich mediany:
+            \item dzielimy $A[p \dots q]$ na $\left\lfloor\frac{n}{5}\right\rfloor$ pięcio elementowe częsci oraz ostatnią część z resztą \marginnote{$\Theta(n)$}
+        \item Sortujemy każdą pięcio elementową część i wybieramy z nich mediany: \marginnote{$T(\frac{\left\lceil n \right\rceil}{5}\right)$}
                 \[
                     M = \left\{ m_1, m_2, \dots, m_{\left\lfloor\frac{n}{5}\right\rfloor} \right\}
                 \]
             \item Znaleść medianę z tablicy $M$: wywołujemy Select($M, 1, \left\lceil\frac{n}{5}\right\rceil, \left\lfloor\frac{\left\lceil\frac{n}{10}\right\rceil}{2}\right\rfloor$) i oznaczmy ją jako $X$\footnote{nazywana też mediana median}
-            \item Ustaw $X$ jako pivot w Partition
+            \item Ustaw $X$ jako pivot w Partition \marginnote{$\Theta(n)$}
+                %TODO przepisac od wojtasa
+            \item idz do lewej albo prawej podtablicy ... od ... pivota i szukamy ... \marginnote{$T(?)$}
         \end{enumerate}
+    \item \textbf{Asymptotyka}:
+        Algorytm spełnia rekurencję:
+        \[
+            T(n) = T\left(\frac{n}{5}\right) + T\left(?\right) + \Theta(n)
+        \]
+        Gdzie $T(?)$ oznacza czas rekurynceyjnego wywołania algorytmu Select dla reszty tablicy (pozotałych elementów niżeli napewno mniejsze/większe od $X$). Rozmiar \textit{?} jest zależny od dystrybucji elementów w tablicy. W najgorszym przypadku ograniczenie dolne na \textit{pewną część} jest rzędu:
+        \[
+            \geq \left( \frac{1}{2} \frac{\left\lceil n \right\rceil}{5} \right) -1 -1\right) \cdot 3 \geq \frac{3n}{10} - 6
+        \]
+        Zatem górne ograniczenie na \textit{?} jest rzędu:
+        \[
+            n - \left(\frac{3n}{10} - 6\right)-1 \leq \frac{7n}{10} + 5
+        \]
+        A więc Algorytm \textit{Select} spełnia rekurencję:
+        \[
+            T(n) = T\left(\frac{n}{5}\right) + T\left(\frac{7n}{10} + 5\right) + \Theta(n)
+        \]
+        Dla uproszczenia możemy przyjąć $T\left(\frac{7n}{10} + 5\right) = T\left(\frac{3n}{4}\right)$, ponieważ $\frac{3}{4}n \geq \frac{7}{10}n + 5$ dla $n \geq 20$. Przyjmujemy, że dla n<20 algorytm działa w czasie stałym. Reukrencja algorytmu \textit{Select} jest teraz następująca:
+        \[
+            T(n) = T\left(\frac{n}{5}\right) + T\left(\frac{3n}{4}\right) + \Theta(n)
+        \]
+        Rozwiążemy ją stosując indukcję:
+        \begin{itemize}
+            \item Base case: $T(n) = \Theta(1)$ dla $n < 20$
+            \item Założenie indukcyjne:
+                \[
+                    \forall k \leq n: T(k) \leq c k
+                \]
+            \item Krok indukcyjny:
+                %TODO przejrzec czy ten dowod jest poprawny, od szymiego
+                \begin{equation*}\begin{aligned}
+                    T(n) &\leq T\left(\frac{n}{5}\right) + T\left(\frac{3n}{4}\right) + cn \\
+                         &\leq c \cdot \frac{n}{5} + c \cdot \frac{3n}{4} + cn \\
+                         &= \frac{c}{5}n + \frac{3c}{4}n + cn \\
+                         &= \left(1+\frac{3}{4}+\frac{1}{5}\right)cn \\
+                         &= \left(\frac{20+15+12}{20}\right)cn = \frac{47}{20}cn
+                \end{aligned}\end{equation*}
+        \end{itemize}
 \end{itemize}
+
+\section{Wykład \date{2025-04-07}}
+\subsection{Set Interface}
+Zakładamy, że każda struktura ma pole nazwane kluczem $a \in A \rightarrow \exists 1 \geq a.key \geq \text{length()}$ , które jest unikalne dla każdego elementu. Klucz jest liczbą całkowitą, a jego wartość jest niezmienna. Wartości kluczy są różne dla różnych elementów, a więc $a.key \neq b.key$ dla $a \neq b$.\\
+Do budowy zbiorów używamy \textit{Set Interface}, który definiuje następujące operacje:
+\begin{itemize}
+    \item build($A$) - buduje ``set'' z danych zawartych w tablicy $A$
+    \item find($k$) - zwraca element o kluczu $k$ z ``setu''
+    \item length() - zwraca liczbę elementów w ``secie''
+    \item insert($a$) - dodaje element $a$ do ``setu''
+    \item delete($a$) - usuwa element $a$ z ``setu''
+    \item find\_min() - zwraca element o najmniejszym kluczu
+    \item find\_max() - zwraca element o największym kluczu
+    \item find\_next($k$) - zwraca element o kluczu większym od $k$
+    \item find\_prev($k$) - zwraca element o kluczu mniejszym od $k$
+    \item order() - zwraca elementy w ``secie'' w kolejności rosnącej kluczy
+\end{itemize}
+Zobaczmy sobie kilka przykładow asymptotyki operacji dla różnych struktur danych:
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+        \hline
+        \textbf{Struktura} & \textbf{build} & \textbf{find} & \textbf{input, delete} & \textbf{find\_max find\_min} & \textbf{find\_next find\_prev} & \textbf{order()} \\ \hline
+        unsorted array & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n)\footnote{nie $\Theta(1)$ ponieważ potrzeba czasu na realokacje pamięci itp.}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
+        sorted array & $\Theta(n \log n)$ & $\Theta(\log n)$ & $\Theta(n)$ & $\Theta(1)$ & $\Theta(\log n)$ & $\Theta(n)$ \\ \hline
+        unsorted linked list & $\Theta(n)$ & $\Theta(n)$ & $\Theta(1), \Theta(n)\footnote{należy znaleść element do usunięcia, samo usuwanie $\Theta(1)$}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
+        BST
+
+    \end{tabular}
+\end{center}
+
+\subsubsection{Binary Search Tree -- BST}
+Po polsku drzewo przeszukiwań binarnych. Struktura ta zawiera następujące pola:
+\begin{itemize}
+    \item parent -- wskaźnik na rodzica
+    \item left -- wskaźnik na lewe dziecko
+    \item right -- wskaźnik na prawe dziecko
+    \item key -- klucz
+    \item ... -- inne pola
+\end{itemize}
+Drzewa BST mają następujące właściwości, niech $T$ będzie drzewem BST, $x \in T$ -- $x$ jest węzłem drzewa T
+\begin{itemize}
+    \item każdy $y \in x.left$ ma klucz mniejszy od klucza $x$
+    \item każdy $y \in x.right$ ma klucz większy od klucza $x$
+\end{itemize}
+
+Przykład drzewa BST:
+\begin{center}
+    \begin{tikzpicture}[
+        level distance=1.5cm,
+        every node/.style={circle, draw},
+        level 1/.style={sibling distance=2cm},
+        level 2/.style={sibling distance=1cm},
+        level 3/.style={sibling distance=0.5cm}
+        ]
+        \node {10}
+            child {node {5}
+                child {node {3}}
+            child {node {7}}}
+            child {node {15}
+                child {node {12}}
+            child {node {20}}};
+    \end{tikzpicture}
+\end{center}
+\subsubsection{Operacje na BST}
+\begin{itemize}
+    \item \textbf{InorderTreeWalk}: operacja do wypisania wszystkich elementów w drzewie w kolejności rosnącej kluczy. Algorytm działa rekurencyjnie, odwiedzając najpierw lewe poddrzewo, następnie węzeł, a na końcu prawe poddrzewo. \\
+        \begin{algorithm}
+            \caption{InorderTreeWalk}
+            \begin{algorithmic}[1]
+                \Procedure{InorderTreeWalk}{x}
+                \If{$x \neq NIL$}
+                    \State InorderTreeWalk($x.left$)
+                    \State print($x.key$)
+                    \State InorderTreeWalk($x.right$)
+                \EndIf
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        Na powyższym przykładzie wywołanie \texttt{InorderTreeWalk($T$)} wypisze 3, 5, 7, 10, 12, 15, 20. \\
+        \textbf{Asymptotyka}: w zależności od rozmiaru lewego poddrzewa -- $k$, algorytm spełnia rekurencję:
+        \[
+            T(n) = T(k) + \Theta(1) + T(n-1-k)
+        \]
+        Rozwiążemy to rekurencyjnie:
+        \begin{itemize}
+            \item założenie indukcyjne: $\forall k < n: T(k) \leq ck$
+            \item krok indykcyjny:
+                \begin{equation*}\begin{aligned}
+                    T(n) &= T(j) + \Theta(1) + T(n-1-j)\\
+                         &\leq cj + \Theta(1) +c(n-1-j) \\
+                         &= cn -c +\Theta(1) \\
+                         &\leq cn
+                \end{aligned}\end{equation*}
+                Zatem asymptotyka algorytmu to $T(n) = \Theta(n)$
+        \end{itemize}
+
+    \item \textbf{TreeSearch}: operacja do wyszukiwania elementu w drzewie. Algorytm działa rekurencyjnie, porównując klucz szukanego elementu z kluczem węzła. Jeśli klucz jest mniejszy, algorytm przeszukuje lewe poddrzewo, jeśli większy -- prawe poddrzewo. \\
+        \begin{algorithm}
+            \caption{TreeSearch}
+            \begin{algorithmic}[1]
+                \Procedure{TreeSearch}{x, k}
+                \If{$x = null$ or $k = x.key$}
+                    \State \textbf{return} $x$
+                \ElsIf{$k < x.key$}
+                    \State \textbf{return} TreeSearch($x.left$, $k$)
+                \Else
+                    \State \textbf{return} TreeSearch($x.right$, $k$)
+                \EndIf
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        Na powyższym przykładzie wywołanie \texttt{TreeSearch($T$, 12)} zwróci węzeł o kluczu 12.\\
+        \textbf{Asymptotyka}: złożoność algorytmu jest zależna jedynie od wysokości drzewa, a więc:
+        \[
+            T(n) = O(h)
+        \]
+    \item \textbf{TreeMin, TreeMax} operacje proste idące jedynie w lewo lub w prawo, odpowiednio. Na przykład
+        \begin{algorithm}
+            \caption{TreeMin}
+            \begin{algorithmic}[1]
+                \Procedure{TreeMin}{x}
+                \While{$x.left \neq null$}
+                    \State $x = x.left$
+                \EndWhile
+                \State \textbf{return} $x$
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        Algorytm działa iteracyjnie, przeszukując lewe poddrzewo.\\
+        Złożoność algorytmu to $\Theta(h)$, analogicznie jak w przypadku \texttt{TreeMax}.
+    \item \textbf{TreeSuccessor} zwraca następnika węzła $x$ w drzewie BST. Algorytm działa rekurencyjnie, porównując klucz węzła z kluczem $x$. Jeśli klucz jest mniejszy, algorytm przeszukuje lewe poddrzewo, jeśli większy -- prawe poddrzewo. \\
+        \begin{algorithm}
+            \caption{TreeSuccessor}
+            \begin{algorithmic}[1]
+                \Procedure{TreeSuccessor}{x}
+                \If{$x.right \neq null$}
+                    \State \textbf{return} TreeMin($x.right$)
+                \Else
+                    \State $y = x.parent$
+                    \While{$y \neq null$ and $x = y.right$}
+                        \State $x = y$
+                        \State $y = y.parent$
+                    \EndWhile
+                    \State \textbf{return} $y$
+                \EndIf
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        Złożoność algorytmu to $\Theta(h)$.
+\end{itemize}
+
+
 
 
 
@@ -2165,7 +2357,7 @@ Przyjmimy oznaczenie $\mathbb{E}[T_n]=t_n$, wtedy
         &= \frac{1}{n} \sum_{k=0}^{n-1} \left(t_k + t_{n-k} + n-1 \right) \\
         &= \frac{1}{n} \sum_{k=0}^{n-1} t_k + \frac{1}{n} \sum_{k=0}^{n-1} t_{n-k} + \frac{1}{n} \sum_{k=0}^{n-1} n-1 \\
         &= \frac{2}{n} \sum_{k=0}^{n-1} t_k + n-1
-\end{aligned}\end{equation*} 
+\end{aligned}\end{equation*}
 Mnożąc obie strony równania przez $n$ otrzymujemy
 \[
     n t_n = 2 \sum_{k=0}^{n-1} t_k + n^2 - n
@@ -2202,7 +2394,7 @@ należy rozwiązać powyższą rekurencję itracyjnie, biorąc pod uwagę, że w
 Podstawiając $t_n = (n+1) \varphi_n$ otrzymujemy
 \begin{equation*}\begin{aligned}
     t_n &= (n+1) \left( H_{n} + \frac{2}{n+1} -  H_{k} - \frac{k(k-1)}{4(k+1)} \right) = \\
-        &= (n+1) H_{n} + 2 - (n+1) H_{k} - \frac{k(k-1)}{4(k+1)}(n+1) 
+        &= (n+1) H_{n} + 2 - (n+1) H_{k} - \frac{k(k-1)}{4(k+1)}(n+1)
 \end{aligned}\end{equation*}
 Ostatecznie prowadzi to do asymptotycznego wzoru na liczbę porównań
 \[
