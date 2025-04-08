@@ -1803,7 +1803,7 @@ Zobaczmy sobie kilka przykładow asymptotyki operacji dla różnych struktur dan
         unsorted array & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n)\footnote{nie $\Theta(1)$ ponieważ potrzeba czasu na realokacje pamięci itp.}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
         sorted array & $\Theta(n \log n)$ & $\Theta(\log n)$ & $\Theta(n)$ & $\Theta(1)$ & $\Theta(\log n)$ & $\Theta(n)$ \\ \hline
         unsorted linked list & $\Theta(n)$ & $\Theta(n)$ & $\Theta(1), \Theta(n)\footnote{należy znaleść element do usunięcia, samo usuwanie $\Theta(1)$}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
-        BST
+        BST & $\Theta(n)$ &
 
     \end{tabular}
 \end{center}
@@ -1910,25 +1910,267 @@ Przykład drzewa BST:
         Złożoność algorytmu to $\Theta(h)$, analogicznie jak w przypadku \texttt{TreeMax}.
     \item \textbf{TreeSuccessor} zwraca następnika węzła $x$ w drzewie BST. Algorytm działa rekurencyjnie, porównując klucz węzła z kluczem $x$. Jeśli klucz jest mniejszy, algorytm przeszukuje lewe poddrzewo, jeśli większy -- prawe poddrzewo. \\
         \begin{algorithm}
-            \caption{TreeSuccessor}
+           \caption{TreeSuccessor}
+           \begin{algorithmic}[1]
+               \Procedure{TreeSuccessor}{x}
+               \If{$x.right \neq null$}
+               \State \textbf{return} TreeMin($x.right$)
+               \Else
+               \State $y = x.parent$
+               \While{$y \neq null$ and $x = y.right$}
+               \State $x = y$
+               \State $y = y.parent$
+               \EndWhile
+               \State \textbf{return} $y$
+               \EndIf
+               \EndProcedure
+           \end{algorithmic}
+        \end{algorithm}
+        Złożoność algorytmu to $\Theta(h)$.
+    \item \textbf{BST-Inset}: operacja do dodawania elementu do drzewa BST. Algorytm działa rekurencyjnie, porównując klucz nowego elementu z kluczem węzła. Jeśli klucz jest mniejszy, algorytm przeszukuje lewe poddrzewo, jeśli większy -- prawe poddrzewo. \\
+        \begin{algorithm}
+            \caption{BST-Insert}
             \begin{algorithmic}[1]
-                \Procedure{TreeSuccessor}{x}
-                \If{$x.right \neq null$}
-                    \State \textbf{return} TreeMin($x.right$)
+                \Procedure{BST-Insert}{T, z}
+                \State $y = null$
+                \State $x = T.root$
+                \While{$x \neq null$}
+                    \State $y = x$
+                    \If{$z.key < x.key$}
+                        \State $x = x.left$
+                    \Else
+                        \State $x = x.right$
+                    \EndIf
+                \EndWhile
+                $z.parent = y$
+                \If{$y = null$}
+                    $T.root = z$
+                \ElsIf{$z.key < y.key$}
+                    $y.left = z$
                 \Else
-                    \State $y = x.parent$
-                    \While{$y \neq null$ and $x = y.right$}
-                        \State $x = y$
-                        \State $y = y.parent$
-                    \EndWhile
-                    \State \textbf{return} $y$
+                    $y.right = z$
+                \EndIf
+                $z.left = null$
+                $z.right = null$
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \item \textbf{BST-Delete}: operacja do usuwania elementu z drzewa BST. Algorytm działa rekurencyjnie, porównując klucz usuwanego elementu z kluczem węzła. Jeśli klucz jest mniejszy, algorytm przeszukuje lewe poddrzewo, jeśli większy -- prawe poddrzewo.
+        \begin{enumerate}
+            \item $x$ jest liściem $\rightarrow$ zwolnij pamięć zajmowaną przez $x$, ustaw wskaźnik jego ojca na null
+            \item $x$ ma jedno poddrzewo $\rightarrow$, czyli ma jednego syna $v$, to zamienić pamięć z $x$ na $v$, ustawić wskaźnik ojca $x$ na $v$, a wskaźnik ojca $v.p$ na $x.p$
+            \item $x$ ma dwa poddrzewa $\rightarrow$ znajdź następnika $x$ -- $y$ za pomocą \texttt{TreeSuccessor}, zamień pamięć z $x$ na $y$, a następnie usuń $y$ z drzewa.
+        \end{enumerate}
+        Algorytm:
+        \begin{algorithm}
+            \caption{BST-Delete}
+            \begin{algorithmic}[1]
+                \Procedure{BST-Delete}{T, z}
+                \If{$z.left = null$}
+                    $y = z.right$
+                \ElsIf{$z.right = null$}
+                    $y = z.left$
+                \Else
+                    $y = TreeSuccessor(z)$
+                    $z.key = y.key$
+                    $y = y.right$
+                \EndIf
+                $y.parent = z.parent$
+                \If{$z.parent = null$}
+                    $T.root = y$
+                \ElsIf{$z = z.parent.left$}
+                    $z.parent.left = y$
+                \Else
+                    $z.parent.right = y$
                 \EndIf
                 \EndProcedure
             \end{algorithmic}
         \end{algorithm}
         Złożoność algorytmu to $\Theta(h)$.
+    \item \textbf{BST-Sort}: operacja do sortowania elementów w drzewie BST. Algorytm działa rekurencyjnie, odwiedzając najpierw lewe poddrzewo, następnie węzeł, a na końcu prawe poddrzewo. \\
+        %TODO dokonczyc przyklad budowania drzewa przy uzyciu bst sort
+        \begin{algorithm}
+            \caption{BST-Sort}
+            \begin{algorithmic}[1]
+                \Procedure{BST-Sort}{T}
+                \State InorderTreeWalk($T.root$)
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+        Złożoność algorytmu to $\Theta(n)$. \\
+        Na przykładzie wygląda to następująco: \\
+        \begin{center}
+        \begin{tabular}
+            {c|c|c|c|c|c|c}
+            \hline
+            \textcolor{red}{3} & 7 & 5 & 6 & 8 & 1 & 2 \\ \hline
+        \end{tabular}\\
+        \begin{tikzpicture}[
+            every node/.style={circle, draw}]
+            \node {3};
+        \end{tikzpicture}
+    \end{center}
+    Porównując algorytm \texttt{BST-Sort} z \texttt{QuickSort} można zauważyć, że
+    \[
+        \mathbb{E}\left[\text{Time}(\text{BST-Sort})\right] = \mathbb{E}\left[\text{Time}(\text{QuickSort})\right] = \Theta(n \log n)
+    \]
+    Gdzie:
+    \[
+        \text{Time}(\text{BST-Sort}) = \sum_{x \in T} \text{depth}(x)
+    \]
+    A więc:
+    \[
+        \mathbb{E}\left[\sum_{x \in T} \text{depth}(x)\right] = \sum_{x \in T} \mathbb{E}\left[\text{depth}(x)\right] = \Theta(n \log n)
+    \]
+    Dzieląc obustronnie przez $n$ otrzymujemy:
+    \[
+    \mathbb{E}\underbrace{\left[\frac{1}{n} \sum_{x \in T} \text{depth}(x)\right]}_{\text{średnia głębokość węzła w losowym drzewie BST}} = \Theta(\log n)
+    \]
 \end{itemize}
 
+\subsubsection{Wysokość drzewa BST}
+\begin{itemize}
+    \item \textbf{Worst Case}: W najgorszym przypadku każdy węzeł drzewa ma tylko jedno dziecko, co prowadzi do powstania struktury liniowej (podobnej do listy). W takim przypadku wysokość drzewa wynosi $h = O(n)$. Przykład:
+        \begin{center}
+            \begin{tikzpicture}[
+                level distance=1.5cm,
+                every node/.style={circle, draw},
+                level 1/.style={sibling distance=2cm},
+                level 2/.style={sibling distance=1cm},
+                level 3/.style={sibling distance=0.5cm}
+                ]
+                \node {10}
+                    child {node {5}
+                        child {node {3}
+                            child {node {2}}
+                        }
+                    };
+            \end{tikzpicture}
+        \end{center}
+    \item \textbf{Best Case}: Mówimy, że drzewo jest zbalansowane jeśli jego wysokość jest rzędu $O(\log n)$. W takim przypadku każdy węzeł ma co najwyżej dwóch potomków, a drzewo jest zbalansowane. Przykład:
+        \begin{center}
+            \begin{tikzpicture}[
+                level distance=1.5cm,
+                every node/.style={circle, draw},
+                level 1/.style={sibling distance=2cm},
+                level 2/.style={sibling distance=1cm},
+                level 3/.style={sibling distance=0.5cm}
+                ]
+                \node {10}
+                    child {node {5}
+                        child {node {3}}
+                        child {node {7}}}
+                    child {node {15}
+                        child {node {12}}
+                        child {node {20}}};
+            \end{tikzpicture}
+        \end{center}
+\end{itemize}
+
+\subsubsection*{Twierdzenie}
+Niech $T$ będzie losowym drzewem BST o $n$ węzłach. Wtedy:
+\[
+    \mathbb{E}\left[h(T)\right] \leq 3\log_2 n + o(\log n)
+\]
+\begin{proof}
+    \begin{enumerate}
+        \item \textbf{Nierówność Jensena}: Niech $f$-wypukła funkcja, wtedy
+            \[
+                f\left(\mathbb{E}\left[X\right]\right) \leq \mathbb{E}\left[f(X)\right]
+            \]
+            %TODO zarys dowodu nierowniscu Jensena, zrobic wykres w inkscape
+        \item Zamiast analizować zmienną losową $h(T)$ (oznaczmy $H_n$ jako wysokość drzewa BST o n węzłach) będziemy się zajmować zmienną $Y_n = 2^{H_n}$.
+        \item Pokażemy, że $\mathbb{E}[Y_n] = O(n^3)$\\
+            %TODO zrobic rysunek
+            Warunkująć, że korzeń $r$ tworzy $(k-1, n-k)$-split mamy
+            \[
+                H_n = 1 + \max\{H_{k-1}, H_{n-k}\}
+            \]
+            Zatem
+            \[
+                Y_n = 2\max\{Y_{k-1}, Y_{n-k}\}
+            \]
+            Niech $Z$ będzie zmienną indykatorową, zdefiniowaną w następujący sposób:
+            \[
+                Z_{n,k} = \begin{cases}
+                    1, & \text{jeżeli $r$ wykonuje } (k-1, n-k)\text{-split} \\
+                    0, & \text{w przeciwnym przypadku}
+                \end{cases}
+            \]
+            Wtedy
+            \[
+                Y_n = \sum_{k=1}^n Z_{n,k} \cdot 2 \max\{Y_{k-1}, Y_{n-k}\}
+            \]
+            Nakładając wartość oczekiwaną na obie strony, mamy:
+            \[
+                \mathbb{E}[Y_n] = \mathbb{E}\left[ \sum_{k=1}^n Z_{n,k} \cdot 2 \max\{Y_{k-1}, Y_{n-k}\} \right]
+            \]
+            Zmienne $Z_{n,k}$ oraz $max\{Y_{k-1}, Y_{n-k}\}$ są niezależne na podstawie podobnego argumentu, jak przy QuickSorcie, a więc
+            \[
+                \mathbb{E}[Y_n] = 2 \sum_{k=1}^n \mathbb{E}[Z_{n,k}] \cdot \mathbb{E}\left[\max\{Y_{k-1}, Y_{n-k}\}\right]
+            \]
+            Rozważmy teraz wartość oczekiwaną $Z_{n,k}$:
+            \[
+                \mathbb{E}[Z_{n,k}] = 1 \cdot P(Z_{n,k} = 1) + 0 \cdot P(Z_{n,k} = 0) = P(Z_{n,k} = 1) = \frac{(n-1)!}{n!} = \frac{1}{n}
+            \]
+            A więc
+            \[
+                \mathbb{E}[Y_n] = \frac{2}{n} \sum_{k=1}^n \mathbb{E}\left[\max\{Y_{k-1}, Y_{n-k}\}\right]
+            \]
+            Można to ograniczyć z góry przez (tracimy zdecydowanie mniej, rzędu stałej, jeżeli robimy to ograniczenie na $Y_n$, nie na $H_n$):
+            \[
+                \mathbb{E}[Y_n] \leq \frac{2}{n} \sum_{k=1}^n \left(\mathbb{E}[Y_{k-1}] + \mathbb{E}[Y_{n-k}]\right) =
+            \]
+            \[
+                = \frac{2}{n} \sum_{k=1}^n \mathbb{E}[Y_{k-1}] + \frac{2}{n} \sum_{k=1}^n \mathbb{E}[Y_{n-k}]
+            \]
+            Zauwazmy, że są to te same sumy liczone w przeciwnej kolejności:
+            \[
+                \mathbb{E}[Y_n] \leq \frac{4}{n} \sum_{k=0}^{n-1} \mathbb{E}[Y_k]
+            \]
+            Przyjmijmy oznaczenie $y_n = \mathbb{E}[Y_n]$.
+            \[
+                y_n \leq \frac{4}{n} \sum_{k=0}^{n-1} y_k
+            \]
+            Udowodnimy powyższe przy użyciu indukcji:
+            \begin{itemize}
+                \item Base Case: $y_0=y_1=0$
+                \item założenie indukcyjne:
+                    \[
+                        \forall k < n: y_k \leq cn^3
+                    \]
+                \item krok indukcyjny:
+                    \[
+                        y_n \leq \frac{4}{n} \sum_{k=0}^{n-1} y_k \leq \frac{4}{n} \sum_{k=0}^{n-1} c k^3 = \frac{4c}{n} \sum_{k=0}^{n-1} k^3
+                    \]
+                    Ograniczmy to z góry przez całkę:
+                    \[
+                        y_n \leq \frac{4c}{n} \int_0^{n} x^3 dx = \frac{4c}{n} \cdot \frac{n^4}{4} = cn^3
+                    \]
+            \end{itemize}
+            Zatem z definicji mamy:
+            \[
+                y_n = O(n^3)
+            \]
+            A więc cofając nasze oznaczenie:
+            \[
+                \mathbb{E}[Y_n] = O(n^3)
+            \]
+        \item Zauważmy, że
+            \[
+                2^{\mathbb{E}[H_n]} \leq \mathbb{E}[2^{H_n}] = \mathbb{E}[Y_n] = O(n^3)
+            \]
+            Jeżeli weźmiemy logarytm z obu stron to:
+            \[
+                E[H_n] = 3 \log_2 n + o(\log n)
+            \]
+\end{enumerate}
+\end{proof}
+Dokładny wynik pokazany przez Luc Devroye w 1986 roku:
+\[
+    \mathbb{E}[H_n] = 2.9882 \log_2 n
+\]
+Czyli ograniczając maksimum z góry przy użyciu sumy tracimy nie wiele.
 
 
 
@@ -2637,17 +2879,18 @@ Zaprojektuj algorytm, który sortuje $n$ liczb całkowitych z przedziału od $1$
 \hrule
 \bigskip
 
-\begin{algorithm}[H]
-    \caption{Algorytm do zadania 10.}
-    \begin{algorithmic}[1]
-        \Procedure{Sort}{$A, n$}
-        \For{$i = 1$ to $n$}
-        \State{$B[i][1] = (A[i]-1) \text{div} n$}
-        \State{$B[i][2] = (A[i]-1) \text{mod} n$}
-        \EndFor
-        \EndProcedure
-    \end{algotithmic}
-\end{algorithm}
+%TODO
+%\begin{algorithm}[H]
+%    \caption{Algorytm do zadania 10.}
+%    \begin{algorithmic}[1]
+%        \Procedure{Sort}{$A, n$}
+%        \For{$i = 1$ to $n$}
+%        \State{$B[i][1] = (A[i]-1) \text{div} n$}
+%        \State{$B[i][2] = (A[i]-1) \text{mod} n$}
+%        \EndFor
+%        \EndProcedure
+%    \end{algotithmic}
+%\end{algorithm}
 
 
 \end{document}

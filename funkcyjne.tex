@@ -594,7 +594,98 @@ najczestsze = sortuj . grupuj . oczyscTxt
 [("hello",2),("world",1),("haskell",1)]
 \end{Verbatim}
 
-\subsection{Jak wczytywać pliki do programu w Haskellu -- IO}
+\section{Wykład \date{2025-04-08}}
+\subsection{Elementy teorii kategorii}
+\subsubsection{Definicja Kategorii}
+Kategoria $\mathcal{C}$ składa się z:
+\begin{itemize}
+    \item obiekty $ob(\mathcal{C})$
+    \item morfizmy $mor(\mathcal{C})$:
+        \[
+            f \in mor(\mathcal{C}) \implies dom(f), codom(f) \in ob(\mathcal{C})
+        \]
+        zapisujemy to jako:
+        \[
+            \mathcal{C} \models (f: A \rightarrow B)
+        \]
+        albo
+        \[
+            \mathcal{C} \models (A \xrightarrow{f} B)
+        \]
+    \item złożenie morfizmów:
+        \[
+            \mathcal{C} \models (f: A \rightarrow B) \wedge (g: B \rightarrow C) \implies g \circ f: A \rightarrow C
+        \]
+        Przy założeniu, że złożenie $\circ$ jest łączne
+    \item identyczność morfizmu:
+        \[
+            \forall X \in ob(\mathcal{C}): \exists id_X: X \rightarrow X
+        \]
+        jest dokładnie jeden morfizm, który jest identycznością. Spełnia on warunki:
+        \begin{itemize}
+            \item \[
+                \forall f: A \rightarrow B \implies id_B \circ f = f
+            \]
+            \item \[
+                \forall f: A \rightarrow B \implies f \circ id_A = f
+            \]
+        \end{itemize}
+\end{itemize}
+\begin{itemize}
+    \item \textit{Set}:
+        \begin{itemize}
+            \item obiekty $\equiv$ zbiory
+            \item morfizmy $\equiv (A, f, B)$, gdzie $f: A \rightarrow B$ jest funkcją
+        \end{itemize}
+    \item \textit{Grp}:
+        \begin{itemize}
+            \item obiekty $\equiv$ grupy
+            \item morfizmy $\equiv (\mathcal{G}_1, \varphi, \mathcal{G}_2)$, gdzie $\varphi: \mathcal{G}_1 \xrightarrow{homomorfizm} \mathcal{G}_2$ jest homomorfizmem grup
+        \end{itemize}
+    \item \textit{Cat$(\mathcal{X})$}:
+        \begin{itemize}
+            \item obiekty $\equiv$ elementy $\mathcal{X}$
+            \item morfizmy $\equiv \left(\left(x \xrightarrow{\alpha} y\right) \equiv x \leq y \right)$ oraz $\left(x \xrightarrow{\beta} y, y \xrightarrow{\beta} z \right) \equiv \left(x \xrightarrow{\alpha \circ \beta} z\right)$
+        \end{itemize}
+\end{itemize}
+
+\subsubsection*{Def}
+Obiekt $c$ jest końcowy w $\mathcal{C}$ wtedy i tylko wtedy, gdy
+\[
+    \forall X \in ob(\mathcal{C}): \exists ! f: X \rightarrow c
+\]
+\subsubsection*{Def}
+$d$ jest początkowy w $\mathcal{C}$ wtedy i tylko wtedy, gdy
+\[
+    \forall X \in ob(\mathcal{C}): \exists ! f: d \rightarrow X
+\]
+W \textit{Set} jeśli element jest początkowym, to jest to $\emptyset$
+\subsubsection*{Def}
+Kategornia dualna\\
+Niech $\mathcal{C}$--kategoria, wtedy $\mathcal{C}^{op}$, gdzie
+\[
+    \mathcal{C}^{op} \models (x \xrightarrow{f} y) \equiv \mathcal{C} \models (y \xrightarrow{f} x)
+\]
+Inaczej
+\[
+    f \circ^{op} g \equiv g \circ f
+\]
+
+\subsection{Typy parametryzowalne}
+\subsubsection*{Def}
+Mamy
+\[
+    F: ob(\mathcal{C}) \rightarrow ob(\mathcal{D})
+\]
+\[
+    F: mor(\mathcal{C}) \rightarrow mor(\mathcal{D})
+\]
+$F$ jest funktorem, jeśli spełnia następujące warunki:
+\begin{itemize}
+    \item $\mathcal{C} \models X \xrightarrow{f} Y \implies \mathcal{D} \models F(X) \xrightarrow{F(f)} F(Y)$
+    \item $F(f \circ g) = F(f) \circ F(g)$
+    \item $F(id_X) = id_{F(X)}$
+\end{itemize}
 
 
 \section{Ćwiczenia}
