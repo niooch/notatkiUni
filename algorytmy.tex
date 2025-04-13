@@ -5,6 +5,9 @@
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage{tabularx}
+\usepackage{array} % for centering in p-columns
+\usepackage{calc}
 \usepackage[makeroom]{cancel}
 \usepackage{xcolor}
 \usepackage{bm}
@@ -21,6 +24,7 @@
 \geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
 
 % Dodatkowe ustawienia
+\newlength{\exprwidth}
 \hypersetup{
     colorlinks=true,
     linkcolor=blue,
@@ -1736,8 +1740,7 @@ Algorytm zwany jest także algorytmem \textit{Magicznych Piątek}
                 \]
             \item Znaleść medianę z tablicy $M$: wywołujemy Select($M, 1, \left\lceil\frac{n}{5}\right\rceil, \left\lfloor\frac{\left\lceil\frac{n}{10}\right\rceil}{2}\right\rfloor$) i oznaczmy ją jako $X$\footnote{nazywana też mediana median}
             \item Ustaw $X$ jako pivot w Partition \marginnote{$\Theta(n)$}
-                %TODO przepisac od wojtasa
-            \item idz do lewej albo prawej podtablicy ... od ... pivota i szukamy ... \marginnote{$T(?)$}
+            \item idz do lewej albo prawej podtablicy w zależności od indeksu pivota i szukaj statystykju pozycyjnej \marginnote{$T(?)$}
         \end{enumerate}
     \item \textbf{Asymptotyka}:
         Algorytm spełnia rekurencję:
@@ -1768,14 +1771,19 @@ Algorytm zwany jest także algorytmem \textit{Magicznych Piątek}
                     \forall k \leq n: T(k) \leq c k
                 \]
             \item Krok indukcyjny:
-                %TODO przejrzec czy ten dowod jest poprawny, od szymiego
                 \begin{equation*}\begin{aligned}
-                    T(n) &\leq T\left(\frac{n}{5}\right) + T\left(\frac{3n}{4}\right) + cn \\
-                         &\leq c \cdot \frac{n}{5} + c \cdot \frac{3n}{4} + cn \\
-                         &= \frac{c}{5}n + \frac{3c}{4}n + cn \\
-                         &= \left(1+\frac{3}{4}+\frac{1}{5}\right)cn \\
-                         &= \left(\frac{20+15+12}{20}\right)cn = \frac{47}{20}cn
+                    T(n) &\leq T\left(\frac{n}{5}\right) + T\left(\frac{3n}{4}\right) + \Theta(n) \\
+                         &\leq c \cdot \frac{n}{5} + c \cdot \frac{3n}{4} + \Theta(n) \\
+                         &= \frac{c}{5}n + \frac{3c}{4}n + \Theta(n) \\
+                         &\leq \left(\frac{c}{5} + \frac{3c}{4} + \Theta(1)\right)n \\
+                         &= \left(\frac{4c + 15c}{20} + \Theta(1)\right)n \\
+                         &= \left(\frac{19c}{20} + \Theta(1)\right)n \\
                 \end{aligned}\end{equation*}
+                Dla naszego wybranego, dużego $c$ możemy przyjąć, że $\frac{19c}{20} + \Theta(1) \leq c$, zatem
+                \[
+                    T(n) \leq c n
+                \]
+                \qed
         \end{itemize}
 \end{itemize}
 
@@ -1796,18 +1804,23 @@ Do budowy zbiorów używamy \textit{Set Interface}, który definiuje następują
     \item order() - zwraca elementy w ``secie'' w kolejności rosnącej kluczy
 \end{itemize}
 Zobaczmy sobie kilka przykładow asymptotyki operacji dla różnych struktur danych:
+
 \begin{center}
-    \begin{tabular}{|c|c|c|c|c|c|c|}
-        \hline
-        \textbf{Struktura} & \textbf{build} & \textbf{find} & \textbf{input, delete} & \textbf{find\_max find\_min} & \textbf{find\_next find\_prev} & \textbf{order()} \\ \hline
-        unsorted array & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n)\footnote{nie $\Theta(1)$ ponieważ potrzeba czasu na realokacje pamięci itp.}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
-        sorted array & $\Theta(n \log n)$ & $\Theta(\log n)$ & $\Theta(n)$ & $\Theta(1)$ & $\Theta(\log n)$ & $\Theta(n)$ \\ \hline
-        unsorted linked list & $\Theta(n)$ & $\Theta(n)$ & $\Theta(1), \Theta(n)\footnote{należy znaleść element do usunięcia, samo usuwanie $\Theta(1)$}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
-        BST & $\Theta(n)$ &
-
-    \end{tabular}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|%
+                                >{\centering\arraybackslash}X|}
+    \hline
+    \textbf{Struktura} & \textbf{build} & \textbf{find} & \textbf{input, delete} & \textbf{find\_max find\_min} & \textbf{find\_next find\_prev} & \textbf{order()} \\ \hline
+    unsorted array & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n)\footnote{nie $\Theta(1)$ ponieważ potrzeba czasu na realokacje pamięci itp.}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
+    sorted array & $\Theta(n \log n)$ & $\Theta(\log n)$ & $\Theta(n)$ & $\Theta(1)$ & $\Theta(\log n)$ & $\Theta(n)$ \\ \hline
+    unsorted linked list & $\Theta(n)$ & $\Theta(n)$ & $\Theta(1), \Theta(n)\footnote{należy znaleść element do usunięcia, samo usuwanie $\Theta(1)$}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
+    BST & $\Theta(n)$ & -- & -- & -- & -- & -- \\ \hline
+\end{tabularx}
 \end{center}
-
 \subsubsection{Binary Search Tree -- BST}
 Po polsku drzewo przeszukiwań binarnych. Struktura ta zawiera następujące pola:
 \begin{itemize}
@@ -1961,7 +1974,6 @@ Przykład drzewa BST:
             \item $x$ ma jedno poddrzewo $\rightarrow$, czyli ma jednego syna $v$, to zamienić pamięć z $x$ na $v$, ustawić wskaźnik ojca $x$ na $v$, a wskaźnik ojca $v.p$ na $x.p$
             \item $x$ ma dwa poddrzewa $\rightarrow$ znajdź następnika $x$ -- $y$ za pomocą \texttt{TreeSuccessor}, zamień pamięć z $x$ na $y$, a następnie usuń $y$ z drzewa.
         \end{enumerate}
-        Algorytm:
         \begin{algorithm}
             \caption{BST-Delete}
             \begin{algorithmic}[1]
@@ -1982,38 +1994,151 @@ Przykład drzewa BST:
                     $z.parent.left = y$
                 \Else
                     $z.parent.right = y$
-                \EndIf
-                \EndProcedure
-            \end{algorithmic}
-        \end{algorithm}
-        Złożoność algorytmu to $\Theta(h)$.
-    \item \textbf{BST-Sort}: operacja do sortowania elementów w drzewie BST. Algorytm działa rekurencyjnie, odwiedzając najpierw lewe poddrzewo, następnie węzeł, a na końcu prawe poddrzewo. \\
-        %TODO dokonczyc przyklad budowania drzewa przy uzyciu bst sort
-        \begin{algorithm}
-            \caption{BST-Sort}
-            \begin{algorithmic}[1]
-                \Procedure{BST-Sort}{T}
-                \State InorderTreeWalk($T.root$)
-                \EndProcedure
-            \end{algorithmic}
-        \end{algorithm}
-        Złożoność algorytmu to $\Theta(n)$. \\
-        Na przykładzie wygląda to następująco: \\
+                    \EndIf
+                    \EndProcedure
+                \end{algorithmic}
+            \end{algorithm}
+            Złożoność algorytmu to $\Theta(h)$.
+        \item \textbf{BST-Sort}: operacja do sortowania elementów w drzewie BST. Algorytm działa rekurencyjnie, odwiedzając najpierw lewe poddrzewo, następnie węzeł, a na końcu prawe poddrzewo.
+
+            \begin{algorithm}
+                \caption{BST-Sort}
+                \begin{algorithmic}[1]
+                    \Procedure{BST-Sort}{T}
+                    \State InorderTreeWalk($T.root$)
+                    \EndProcedure
+                \end{algorithmic}
+            \end{algorithm}
+
+            Złożoność algorytmu to $\Theta(n)$.
+
+            Na przykładzie wygląda to następująco:
+
+            Teraz przedstawiamy drzewo BST krok po kroku przy wstawianiu elementów z tablicy:
         \begin{center}
-        \begin{tabular}
-            {c|c|c|c|c|c|c}
-            \hline
-            \textcolor{red}{3} & 7 & 5 & 6 & 8 & 1 & 2 \\ \hline
-        \end{tabular}\\
-        \begin{tikzpicture}[
-            every node/.style={circle, draw}]
-            \node {3};
-        \end{tikzpicture}
-    \end{center}
-    Porównując algorytm \texttt{BST-Sort} z \texttt{QuickSort} można zauważyć, że
-    \[
-        \mathbb{E}\left[\text{Time}(\text{BST-Sort})\right] = \mathbb{E}\left[\text{Time}(\text{QuickSort})\right] = \Theta(n \log n)
-    \]
+            \textbf{Krok 1: Wstawienie 3}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3};
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 2: Wstawienie 7}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child[missing] % brak lewego potomka
+                    child { node {7} };
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 3: Wstawienie 5}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child[missing]
+                    child { node {7}
+                        child { node {5} }
+                        child[missing]
+                    };
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 4: Wstawienie 6}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child[missing]
+                    child { node {7}
+                        child { 
+                            node {5}
+                            child[missing]
+                            child { node {6} }
+                        }
+                        child[missing]
+                    };
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 5: Wstawienie 8}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child[missing]
+                    child { node {7}
+                        child { 
+                            node {5}
+                            child[missing]
+                            child { node {6} }
+                        }
+                        child { node {8} }
+                    };
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 6: Wstawienie 1}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child { node {1} }
+                    child { node {7}
+                        child { 
+                            node {5}
+                            child[missing]
+                            child { node {6} }
+                        }
+                        child { node {8} }
+                    };
+            \end{tikzpicture}
+            \bigskip
+
+            \textbf{Krok 7: Wstawienie 2}\\[0.5ex]
+            \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                \node {3}
+                    child { node {1}
+                        child[missing]
+                        child { node {2} }
+                    }
+                    child { node {7}
+                        child { 
+                            node {5}
+                            child[missing]
+                            child { node {6} }
+                        }
+                        child { node {8} }
+                    };
+            \end{tikzpicture}
+        \end{center}
+
+        W powyższych diagramach:
+        \begin{itemize}
+            \item \textbf{Krok 1:} Początkowy węzeł, w którym wstawiono 3.
+            \item \textbf{Krok 2:} 7 zostaje wstawione jako prawy syn węzła 3.
+            \item \textbf{Krok 3:} 5 wstawiono jako lewy syn węzła 7.
+            \item \textbf{Krok 4:} 6 wstawiono jako prawy syn węzła 5.
+            \item \textbf{Krok 5:} 8 zostaje dodane jako prawy syn węzła 7.
+            \item \textbf{Krok 6:} 1 wstawione jako lewy syn węzła 3.
+            \item \textbf{Krok 7:} 2 wstawiono jako prawy syn węzła 1.
+        \end{itemize}
+
+        Tak powstaje ostatecznie drzewo BST:
+        \[
+            \begin{array}{c}
+                \begin{tikzpicture}[every node/.style={circle, draw}, level distance=1.5cm, sibling distance=2cm]
+                    \node {3}
+                    child { node {1}
+                        child[missing]
+                        child { node {2} }
+                    }
+                    child { node {7}
+                        child { 
+                            node {5}
+                            child[missing]
+                            child { node {6} }
+                        }
+                        child { node {8} }
+                    };
+                \end{tikzpicture}
+            \end{array}
+        \]
+        Porównując algorytm \texttt{BST-Sort} z \texttt{QuickSort} można zauważyć, że
+        \[
+            \mathbb{E}\left[\text{Time}(\text{BST-Sort})\right] = \mathbb{E}\left[\text{Time}(\text{QuickSort})\right] = \Theta(n \log n)
+        \]
     Gdzie:
     \[
         \text{Time}(\text{BST-Sort}) = \sum_{x \in T} \text{depth}(x)
@@ -2023,8 +2148,11 @@ Przykład drzewa BST:
         \mathbb{E}\left[\sum_{x \in T} \text{depth}(x)\right] = \sum_{x \in T} \mathbb{E}\left[\text{depth}(x)\right] = \Theta(n \log n)
     \]
     Dzieląc obustronnie przez $n$ otrzymujemy:
+    \settowidth{\exprwidth}{$\left[\frac{1}{n} \sum_{x \in T} \text{depth}(x)\right]$}
+
     \[
-    \mathbb{E}\underbrace{\left[\frac{1}{n} \sum_{x \in T} \text{depth}(x)\right]}_{\text{średnia głębokość węzła w losowym drzewie BST}} = \Theta(\log n)
+        \mathbb{E}\underbrace{\left[\frac{1}{n} \sum_{x \in T} \text{depth}(x)\right]}
+        _{\parbox{\exprwidth}{\centering \scriptsize średnia głębokość\\ węzła w losowym drzewie BST}} = \Theta(\log n)
     \]
 \end{itemize}
 
@@ -2078,10 +2206,39 @@ Niech $T$ będzie losowym drzewem BST o $n$ węzłach. Wtedy:
             \[
                 f\left(\mathbb{E}\left[X\right]\right) \leq \mathbb{E}\left[f(X)\right]
             \]
-            %TODO zarys dowodu nierowniscu Jensena, zrobic wykres w inkscape
         \item Zamiast analizować zmienną losową $h(T)$ (oznaczmy $H_n$ jako wysokość drzewa BST o n węzłach) będziemy się zajmować zmienną $Y_n = 2^{H_n}$.
-        \item Pokażemy, że $\mathbb{E}[Y_n] = O(n^3)$\\
-            %TODO zrobic rysunek
+        \item Pokażemy, że $\mathbb{E}[Y_n] = O(n^3)$
+
+            \begin{center}
+                \begin{tikzpicture}[scale=1.2]
+   % Draw x and y axes
+                    \draw[->] (-0.5, 0) -- (2.7, 0) node[right] {$x$};
+                    \draw[->] (0, -0.5) -- (0,5) node[above] {$f(x)$};
+
+   % Plot the convex function f(x)=x^2 in blue
+                    \draw[domain=-0.5:2.5, smooth, variable=\x, blue, thick] plot (\x, {\x*\x});
+
+   % Draw the chord connecting the points f(0)=0 and f(2)=4 in red
+                    \draw[red, thick] (0,0) -- (2,4);
+
+   % Mark points on the function:
+                    \filldraw [black] (0,0) circle (2pt) node[below left] {$(x_1, f(x_1))$};
+                    \filldraw [black] (2,4) circle (2pt) node[above right] {$(x_2, f(x_2))$};
+
+   % Mark the midpoint corresponding to ( (x1+x2)/2, f((x1+x2)/2) ):
+                    \filldraw [black] (1,1) circle (2pt) node[below right] {$f\Big(\frac{x_1+x_2}{2}\Big)$};
+
+   % Draw a dashed vertical line from the graph point at (1,1) upward to the chord:
+                    \draw[dashed] (1,1) -- (1,2);
+
+   % Mark the corresponding point on the chord, which is (1, (f(x1)+f(x2))/2):
+                    \filldraw [black] (1,2) circle (2pt) node[right] {$(\frac{x_1+x_2}{2},\,\frac{f(x_1)+f(x_2)}{2})$};
+
+   % Add a label for Jensen's inequality on the right side
+                    \node at (2.8,2.5) {$f\Big(\frac{x_1+x_2}{2}\Big) \leq \frac{f(x_1)+f(x_2)}{2}$};
+                \end{tikzpicture}
+            \end{center}
+            \\
             Warunkująć, że korzeń $r$ tworzy $(k-1, n-k)$-split mamy
             \[
                 H_n = 1 + \max\{H_{k-1}, H_{n-k}\}
@@ -2891,6 +3048,5 @@ Zaprojektuj algorytm, który sortuje $n$ liczb całkowitych z przedziału od $1$
 %        \EndProcedure
 %    \end{algotithmic}
 %\end{algorithm}
-
 
 \end{document}
