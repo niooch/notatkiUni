@@ -687,6 +687,37 @@ $F$ jest funktorem, jeśli spełnia następujące warunki:
     \item $F(id_X) = id_{F(X)}$
 \end{itemize}
 
+\section{Wykład \date{2025-04-15}}
+\subsection{Podstawowe konstrkorów typów danych}
+\begin{center}
+    \begin{tabular}{| c | c |}
+        \hline
+        \textbf{teoria mnogości} & \textbf{Haskell} \\
+        \hline
+        $A\times B$\footnote{$A+B = \left(\{o\}\timesA\right) \cup \left(\{1\}\timesB\right)$} & $(a,b)$ &
+        \hline 
+        $A+B$ & $La|Rb$ \\
+        \hline
+        $B^A$ & $a \rightarrow b$ \\
+        \hline
+    \end{tabular}
+\end{center}
+\subsubsection*{Przykład}
+\begin{Verbatim}[frame=single]
+data R a b = Reader(a -> b)
+\end{Verbatim}
+Możemy tutaj pomyśleć o takim funktorze:
+\[
+    F_A(X) = X^A \leftarrow \text{funktor}
+\]
+\begin{Verbatim}[frame=single]
+data CR a b  = Reader(b -> a)
+\end{Verbatim}
+Jest to w żargonie haskellowskim nazywane predykatem
+Czyli:
+\[
+    CR_A(X) = A^X
+\]
 
 \section{Ćwiczenia}
 W tym miejscu będa pojawiały się notatki z laboratorów (ćwiczeń)
