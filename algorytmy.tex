@@ -1820,6 +1820,7 @@ Zobaczmy sobie kilka przykładow asymptotyki operacji dla różnych struktur dan
     sorted array & $\Theta(n \log n)$ & $\Theta(\log n)$ & $\Theta(n)$ & $\Theta(1)$ & $\Theta(\log n)$ & $\Theta(n)$ \\ \hline
     unsorted linked list & $\Theta(n)$ & $\Theta(n)$ & $\Theta(1), \Theta(n)\footnote{należy znaleść element do usunięcia, samo usuwanie $\Theta(1)$}$ & $\Theta(n)$ & $\Theta(n)$ & $\Theta(n \log n)$ \\ \hline
     BST & $\Theta(n)$ & -- & -- & -- & -- & -- \\ \hline
+    Direct Access Array & $\Theta(K)$ & $\Theta(1)$ & $\Theta(1)$ & $\Theta(K)$ & $\Theta(K)$ & $\Theta(K)$ \\ \hline
 \end{tabularx}
 \end{center}
 \subsubsection{Binary Search Tree -- BST}
@@ -2529,9 +2530,145 @@ Każdy przypadek naprawy wykonuje się w $\Theta(1)$. Kiedy naprawiamy drzewo pr
 
 \subsubsection{RB-Delete}
 
+\section{Wykład \date{2025-04-28}}
+\subsection{Direct Access Array}
+\begin{itemize}
+    \item klucze należą do zbioru $\left{0,\dots,k-1\right}$, gdzie $k$--rozmiar tablicy
+    \item klucze będziemy utożsamiać z adresami w pamięci komputera
+    \item operujemy w ramach pamięci WORD-Ram
+\end{itemize}
+Jednakże występują pewne ograniczenia:
+\begin{itemize}
+    \item adresy są 64-bitowe $\leftrightarrow$ $K\leq 2^{64}$
+    \item każdy obiekt musi mieć unikatowy klucz. Weźmy na przykład baze danych z numerami PESEL.
+\end{itemize}
+\subsection{Hash Tables}
+Jest to pewne ulepszenie DAA. Metoda ta polega na przypisaniu klucza do adresu w tablicy. Wykorzystuje się do tego funkcję haszującą, która przekształca klucz na adres w tablicy. Funkcja haszująca powinna być:
+    \[
+        h: \{0,\dots,k-1\} \rightarrow \{0,\dots,m-1\}
+    \]
+gdzie $m$--rozmiar tablicy oraz $m \ll k$. \\
+Ponieważ $k \gg m$, to $h$ nie może być różnowartościowa:
+\[
+    \exists i \neq j: h(i) = h(j)
+\]
+Chcemy, aby $h$ zwracała wyniki z rozkładu jednostajnego na zbiorze $\{0,\dots,m-1\}$.
+Zobaczmy sobie kilka przykładów funkcji haszujących:
+\begin{itemize}
+    \item Division hash function\footnote{jednym z problemów tej funkcji jest to, że nie jest ona jednostajna.}
+        \[
+            h(k) = k \mod m
+        \]
+    \item Counter, Wegmann 1977 Universal hash function:
+        \[
+            h_{a,b}(k) = ((ak + b) \mod p) \mod m
+        \]
+        gdzie $p$--liczba pierwsza, $a,b$--liczby losowe z przedziału $[1,p-1]$, $p > k$.\\
+        Zdefinujmy sobie następujący zbiór funkcji haszujacych
+        \[
+            \mathcal{H}(p,m) = \left\{h_{a,b}: a,b \in \{0,\dots,p-1\}\right\}
+        \]
+\end{itemize}
 
+\subsubsection{Universal Hash Property}
+\subsubsection*{Twierdzenie}
+\[
+    \forall k_i \neq k_j \in \{0,\dots, k-1\}:P_{h\in\mathcal{H}}\left(h(k_i) = h(k_j)\right) \leq \frac{1}{m}
+\]
+\begin{proof}
+    Zakładamy, że $h_{a,b}$ ma universal hashing property, wtedy
+    \[
+        h_{a,b}(x) = h_{a,b}(y), x \neq y
+    \]
+    a więc
+    \[
+        ax + b \equiv ay + b \mod p
+    \]
+    Skoro $p > k, x \neq y \implies x-y\neq 0$ oraz ma odwrotność $\mod p$, zatem
+    \[
+        a \equiv i\cdot m (x-y)^{-1} \mod p
+    \]
+    z czego wynika, że występuje $\left\lfloor \frac{p-1}{m}\right\rfloor$ możliwości.
+    \[
+        P_{h\in\mathcal{H}}\left(h(k_i) = h(k_j)\right) \leq \frac{1}{p-1} \cdot \left\lfloor \frac{p-1}{m}\right\rfloor \leq \frac{1}{m}
+    \]
+\end{proof}
 
+\subsubsection{Wartość oczekiwana kolizji}
+Niech $n$-liczba haszowanych elementów, $n=\Theta(m)$, zefinujmy zmienną losową
+\[
+    L = \text{\#kolizji}
+\]
+Do tego dodajmy zmienną losową indykatorową:
+\[
+    X_{i,j} = \begin{cases}
+        1, & \text{jeżeli } h(k_i) = h(k_j) \\
+        0, & \text{w przeciwnym przypadku}
+    \end{cases}
+\]
+wtedy
+\[
+    L=\sum_{j\geq 1, i \neq j}^{n} X_{i,j}
+\]
+nakładając wartość oczekiwaną na obie strony:
+\[
+    \mathbb{E}[L] = \mathbb{E}\left[\sum_{j\geq 1, i \neq j}^{n} X_{i,j}\right] = \sum_{j\geq 1, i \neq j}^{n} \mathbb{E}[X_{i,j}]= \sum_{j\geq 1, i \neq j}^{n} P_{h\in\mathcal{H}}\left(h(k_i) = h(k_j)\right)
+\]
+Kożystając tutaj z universal hashing property:
+\[
+    \mathbb{E}[L] \leq \sum_{j\geq 1, i \neq j}^{n} \frac{1}{m} = \frac{n-1}{m} = \Theta(1)
+\]
 
+\subsection{Wzbogacona struktura danych}
+Rozważmy przykład Dynamicznej statystyki pozycyjnej z zadanymi funkcjami
+\begin{itemize}
+    \item dynamizcne struktury danych
+    \item OS-Select(i) -- zwraca i-tą statystykę pozycyjną
+    \item OS-Rank(x) -- zwraca statystykę pozycyjną elementu $x$
+\end{itemize}
+Zobrazujmy to na przykładzie RB-Tree:
+%jebnać tutaj drzewo czerwono-czarne
+Wzbogacamy taką strukturę danych o pole \textbf{size}. Zachowuje on kilka własności:
+\begin{itemize}
+    \item $size(x)$--rozmiar poddrzewa $x$
+    \item $size(x) = size(x.left) + size(x.right) + 1$
+    \item $size(null)=0$
+    \item $OS-Select(i)$--wykonuje się w $\Theta(\log n)$
+    \item $OS-Rank(x)$--wykonuje się w $\Theta(\log n)$
+\end{itemize}
+
+\subsubsection{Algorytm OS-Select}
+\begin{algorithm}
+    \caption{OS-Select}
+    \begin{algorithmic}[1]
+        \Procedure{OS-Select}{x, i}
+        \State $k=x.left.size+1$
+        \If{$i=k$}
+        \State \textbf{return} $x$
+        \ElsIf{$i<k$}
+        \State \textbf{return} OS-Select($x.left, i$)
+        \Else
+        \State \textbf{return} OS-Select($x.right, i-k$)
+        \EndIf
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\subsubsection{OS-Rank}
+\begin{algorithm}
+    \caption{OS-Rank}
+    \begin{algorithmic}[1]
+        \Procedure{OS-Rank}{x}
+            \State $r=x.left.size+1$
+            \State $y=x$
+            \While{$y \neq root$}
+            \If{$y=(y.parent).right$}
+            \State $r=r+(y.parent).left.size+1$
+            \EndIf
+            \EndWhile
+        \EndProcedure
+    \end{algorithmic}[1]
+\end{algorithm}
+\pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
