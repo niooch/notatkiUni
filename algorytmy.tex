@@ -23,6 +23,17 @@
 \usepackage{algpseudocode}           % Pseudokod
 \usetikzlibrary{positioning, shapes.geometric, arrows.meta}
 \geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+\tikzset{
+  rednode/.style={
+    ellipse, draw=red!80!black, fill=red!50,
+    text=white, font=\footnotesize\bfseries, minimum width=14mm, minimum height=8mm
+  },
+  blacknode/.style={
+    rectangle, draw=black, fill=black!70, rounded corners=2mm,
+    text=white, font=\footnotesize\bfseries, minimum width=16mm, minimum height=8mm
+  },
+  edgestyle/.style={-Stealth, thick, gray!70},
+}
 
 % Dodatkowe ustawienia
 \newlength{\exprwidth}
@@ -2666,8 +2677,131 @@ Wzbogacamy taką strukturę danych o pole \textbf{size}. Zachowuje on kilka wła
             \EndIf
             \EndWhile
         \EndProcedure
-    \end{algorithmic}[1]
+    \end{algorithmic}
 \end{algorithm}
+Należy zauważyć, że dynamiczne operacje przeprowadzane na strukturze danych takiej jak RB-Tree da się również zmodyfikować w taki sposób, aby jednocześnie zmieniać pole size. Na Przykładzie RB-Insert:
+\begin{enumerate}
+    \item BSTinsert -- podczas przechodzenia po drzewie zwiększamy size
+    \item fixup -- dalej nie zmieniamy złożonośći poszczególnych funkcji, jedynie zwiększamy stałą w ich złożoności
+        \begin{itemize}
+            \item recolor -- nie wpływa na size
+            \item rotate -- znowu nie wpływa na size w poddrzewach, jednynie rotowanych nodów, ale da się je zmienić w $\Theta(1)$
+        \end{itemize}
+\end{enumerate}
+
+\subsubsection{Metodologia wzbogacania struktur danych}
+\begin{enumerate}
+    \item Wybierz strukturę danych, która ma być wzbogacona
+    \item Wybrać dodatkową informację, która ma być przechowywana w strukturze
+    \item \textbf{Upewnić się}, że dodatkowa informacja nie \textif{``pogorszy asymptotycznej złożoności''} operacji
+    \item Zaprojektować dodatkowe operacje na strukturze danych wykorzystując dodatkową informację
+\end{enumerate}
+\subsubsection{Drzewa Przedziałowe (Interval Trees)}
+Teraz na innym przykładzie pokażemy metode wzbogacania danych do drzew przedziałowych. Drzewa przedziałowe są to struktury danych, które przechowują zbiory przedziałów. \\
+Rozważmy najpierw przykład. Mamy dane takie odcinki:
+%4, 8; 5, 11; 7, 10; 15, 18; 17, 19; 21, 23
+\begin{center}
+\begin{tikzpicture}[xscale=0.4, yscale=1]
+  % Oś liczbowa
+    \draw[->] (3,0) -- (24,0) node[right] {$x$};
+    \foreach \x in {4,5,7,8,10,11,15,17,18,19,21,23}{
+        \draw (\x,0.1) -- (\x,-0.1) node[below=3pt] {\small $\x$};
+    }
+
+  % Odcinki (y = poziom linii)
+    \draw[thick, blue]  (4,1)  -- (8,1)  node[right] {$(4,8)$};
+    \draw[thick, red]   (5,2)  -- (11,2) node[right] {$(5,11)$};
+    \draw[thick, green] (7,3)  -- (10,3) node[right] {$(7,10)$};
+    \draw[thick, orange](15,4) -- (18,4) node[right] {$(15,18)$};
+    \draw[thick, purple] (17,5) -- (19,5) node[right] {$(17,19)$};
+    \draw[thick, teal]  (21,6) -- (23,6) node[right] {$(21,23)$};
+
+  % Etykiety poziomów
+    \foreach \y/\lbl in {1/{1.},2/{2.},3/{3.},4/{4.},5/{5.},6/{6.}} {
+        \node[left] at (3,\y) {\lbl};
+    }
+\end{tikzpicture}\end{center}
+\begin{enumerate}
+    \item Wybieramy strukturę danych do przechowywania informacji: \textbf{RB-Tree} $\rightarrow$ kluczem będzie \textif{low} każdego odcinka
+    \item dodatkową informacja $m$
+        \[
+            x.m = \max \begin{cases}
+                x.high \\
+                x.left.m \\
+                x.right.m
+            \end{cases}
+        \]
+        \begin{center}
+            \begin{tikzpicture}[node distance=1.5cm and 2cm]
+  % Węzły
+                \node[blacknode]                    (n5)  {$(5,11;23)$};
+                \node[blacknode, below left=of n5] (n4)  {$(4,8;8)$};
+                \node[rednode,   below right=of n5](n15) {$(15,18;23)$};
+                \node[blacknode, below left=of n15](n7)  {$(7,10;10)$};
+                \node[blacknode, below right=of n15](n17){$(17,19;23)$};
+                \node[rednode,   below=of n17]      (n21) {$(21,23;23)$};
+
+  % Krawędzie
+                \draw[edgestyle] (n5)  -- (n4);
+                \draw[edgestyle] (n5)  -- (n15);
+                \draw[edgestyle] (n15) -- (n7);
+                \draw[edgestyle] (n15) -- (n17);
+                \draw[edgestyle] (n17) -- (n21);
+            \end{tikzpicture}
+        \end{center}
+    \item Dodatkowe operacje na drzewie przedziałowym:
+        \begin{itemize}
+            \item \textbf{Interval-Search} -- zwraca wszystkie odcinki, które przecinają się z danym przedziałem $[a,b]$\\
+                \begin{algorithm}
+                    \caption{Interval-Search}
+                    \begin{algorithmic}[1]
+                        \Procedure{Interval-Search}{i, T}
+                        \State $x=root(T)$
+                        \While {$x=\text{null}\quad \& \quad(i.low > x.high | x.low> i.high)$} \Comment{if TRUE to $i$ nie przecina się z $x$}
+                        \If{$x.left \neq \text{null}\quad \&\quad i.low \leq x.left.m$}
+                            \State $x=x.left$
+                            \Else
+                            \State $x=x.right$
+                        \EndIf
+                        \EndWhile
+                        \State \textbf{return} $x$
+                    \end{algorithmic}
+                \end{algorithm}
+                \textbf{Poprawność algorytmu}:\\
+                Dla $x \in T$ niech $L=\{j \in x.left\}$ oraz $R=\{j \in x.right\}$.\\
+                Jeśli algorytm ``idzie w prawo'', wtedy
+                \[
+                    \{j \in L: j \text{ przecina } i\}=\emptyset.
+                \]
+                Jeśli algorytm ``idzie w lewo'', wtedy:
+                \[
+                    \{j \in L: i \text{ przecina } j\}\neq \emptyset
+                \]
+                \textbf{lub}
+                \[
+                    \{j \in R: i \text{ przecina } j\}= \emptyset
+                \]
+                \begin{proof}
+                    załóżmy, że algorytm ``idzie w prawo'' z $x$, wtedy
+                    \begin{itemize}
+                        \item[$\rightarrow$] $x.left=null \rightarrow L=\emptyset$
+                        \item[$\rightarrow$] $x.left \neq null, \quad i.low > x.left.m$
+                            \begin{itemize}
+                                \item[$\rightarrow$] $\exists j \in L: i.low > j.high (= x.left.m) \implies \{j \in L: i \text{ przecina } j\}=\emptyset$
+                            \end{itemize}
+                    \end{itemize}
+                    Załóżmy teraz, że algorytm ``idzie w lewo'' z $x$, wtedy
+                    \begin{itemize}
+                        \item[$\rightarrow$] $x.right=null \rightarrow R=\emptyset$
+                        \item[$\rightarrow$] $x.right \neq null, \quad i.low \leq x.right.m$
+                            \begin{itemize}
+                                \item[$\rightarrow$] $\exists j \in R: i.low \leq j.high (= x.right.m) \implies \{j \in R: i \text{ przecina } j\}=\emptyset$
+                            \end{itemize}
+                    \end{itemize}
+                \end{proof}
+        \end{itemize}
+\end{enumerate}
+
 \pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
