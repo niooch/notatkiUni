@@ -2802,6 +2802,108 @@ Rozważmy najpierw przykład. Mamy dane takie odcinki:
         \end{itemize}
 \end{enumerate}
 
+\section{Wykład \date{2025-05-05}}
+Dzisiaj zastępstwo z MG.
+\section*{Programowanie Dynaniczne}
+Do tej pory poznane metody programowania to:
+\begin{itemize}
+    \item rekurencyjne
+    \item D\&C
+\end{itemize}
+Do nich dołączy dzisaj programowanie dynamiczne. Na pierwszy rzut oka wygląda ona podobnie do rekurencji. Zobaczmy to na przykładzie
+\subsection{Problem znalezienia najdłuższego rosnącego podciągu}
+\begin{itemize}
+    \item \textbf{Input}: $a_1, a_2 \dots, a_n$--tablica liczb całkowitych
+    \item \textbf{Output}: $L$ -- ciąg rosnący
+    \item \textbf{Problem}: Znaleść $L$--najdłuższy rosnący podciąg
+\end{itemize}
+\subsubsection*{Rozwiązanie rekurencyjne}
+Zastnaówmy się jak wyglądałoby rozwiązanie tego problemu w sposób dynamiczny. Niech
+\[
+    L(i) = 1 + \max_{1\leq j\leq i}\left\{\left\{L(j): a_i > a_j\right\}\cup\left\{0\right\}\right\}
+\]
+$L(i)$--najdłuższy rosnący podciąg kończący się na $a_i$. Teraz należało by przejść od $i=1$ do $n$ i policzyć $L(i)$ dla każdego $i$, zapisać w tablicy i zwrócić $\max_{1\leq i \leq n}\{L(i)\}$.\\
+Złożoność czasowa tego algorytmu to $O(n^2)$, ponieważ dla każdego $i$ musimy przejść przez wszystkie $j$ i policzyć $L(j)$, natomiast złożoność pamięciowa to $O(n)$.
+\subsection{Problem wydawania reszty}
+\begin{itemize}
+    \item \textbf{Input}: $c_1 < c_2 < \dots < c_n$ -- zbiór nominałów $\in \mathbb{N}$, $R$ -- reszta do wydania
+    \item \textbf{Output}: $k \in \mathbb{N}$ -- liczba monet do wydania
+    \item \textbf{Problem}: Znaleść minimalne $k$ takie, że $k$ monet wystarczy do wydania reszty $R$
+\end{itemize}
+Niech $L(i)$ oznacza minimalną liczbę monet do wydania reszty $i$.
+\[
+    L(i)=1+\min_{1\leq j\leq n}\left\{L(i-c_j): c_j\leq i\right\}
+\]
+Z warunkami początkowymi $L(0)=0$. Zobaczmy to na przykładzie, zbiór nominałów to $\{1,4,5\}$:
+%stworz dwu wierszowa tabelke z i i L(i)
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+        \hline
+        $i$  & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\
+        \hline
+        $L(i)$  & 0 & 1 & 2 & 3 & 1 & 1 & 2 & 3 & 2 \\
+        \hline
+    \end{tabular}
+\end{center}
+Jeżeli trafimy na $L(i)$, którego nie możemy policzyć bo się nie da wydać reszty z danymi nominałami, to zwracamy \textit{inf}.\\
+Złożoność takiego algorytmu to $O(nR)$, natomiast z analizy długości danych wynika, że $m$--długość w bitach danych to:
+\[
+    m=n\cdot \log c_n + \log R \impliedby n \cdot \log c_n \leq \log R
+\]
+Wtedy Złożoność naszego algorytmu jest wykładnicza $O(2^m)$.
+\subsubsection*{Fakt}
+Jeśli zbiór nominałów zawiera $1$, to rozwiązanie istnieje dla każdego $R \in \mathbb{N}$.
+
+\subsection{Problem plecakowy -- Knapsack}
+\begin{itemize}
+    \item \textbf{Input}: $n$ par waga, wartość $(w_i, v_i)$, ograniczone górnie pezez pojemność plecaka $W$
+    \item \textbf{Output}: $I \subset \{1,\dots,n\}$ -- zbiór przedmiotów zabieranych do plecaka, takie że
+        \begin{enumerate}
+            \item $\sum_{i\in I} w_i \leq W$
+            \item $\sum_{i\in I} v_i$ -- maksymalne
+        \end{enumerate}
+\end{itemize}
+Naiwnym algorytmem byłoby przeszukiwane wszystkich podzbiorów zbioru przedmiotów, co daje nam złożoność $O(2^n)$.\\
+Przyjrzyjmy się jednak temu problemowi rekurencyjnie. Niech $V(n, W)$ -- maksymalna wartość rozwiązania na $n$ przedmiotach
+\[
+    V(i, W) = \max\left\{ \underbrace{V(i-1, W),}_{\text{discard $i^\text{th}$ item}} \quad \underbrace{V(i-1, W-w_i)+v_i}_{\text{bierzemy $i$-ty przedmiot}} \right\}
+\]
+Z pewnymi warunkami początkowymi $V(\cdot, 0) = V(0, \cdot ) = 0$. Teraz możemy zacząć budować rozwiązanie rekurencyjne, odrazu rozwiązując rekurencje.\\
+\begin{algorithm}
+    \caption{Knapsack}
+    \begin{algorithmic}[1]
+        \Procedure{Knapsack}{n, W}
+        \If{$n=0 \lor W=0$}
+            \State \textbf{return} 0
+        \EndIf
+        \For{$i=1$ to $n$}
+            \For{$w=1$ to $W$}
+                \If{$w_i \leq w$}
+                    \State $V(i, w) = \max\left\{V(i-1, w), V(i-1, w-w_i)+v_i\right\}$
+                \Else
+                    \State $V(i, w) = V(i-1, w)$
+                \EndIf
+            \EndFor
+        \EndFor
+        \State \textbf{return} $V(n, W)$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+Złożoność tego algorytmu to $O(nW)$, natomiast z podobnego powodu jak poprzednio (analiza długości danych) złożoność algorytmu jest wykładnicza $O(2^m)$, gdzie $m$ to długość danych.
+
+\subsection{Optymalne mnożenie macierzy}
+\begin{itemize}
+    \item \textbf{Input}: $A_1, A_2, \dots, A_n$, gdzie $A_i:m_{i-1}\times m_i$
+    \item \textbf{Output}: $P = \prod_{i=1}^n A_i$
+    \item \textbf{Problem}: Znaleść optymalny sposób mnożenia macierzy
+\end{itemize}
+Niech $c(i, j)$ -- optymalny koszt przemnożenia macierzy $A_i, A_{i+1}, \dots, A_j$. Wtedy
+\[
+    c(i, j) = \min_{i\leq k < j}\left\{c(i, k)+c(k+1, j)+m_{i-1}m_k m_j\right\}
+\]
+Z warunkami początkowymi $c(i, i) = 0$.\\
+
+
 \pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
