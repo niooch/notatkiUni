@@ -2901,10 +2901,188 @@ Niech $c(i, j)$ -- optymalny koszt przemnożenia macierzy $A_i, A_{i+1}, \dots, 
 \[
     c(i, j) = \min_{i\leq k < j}\left\{c(i, k)+c(k+1, j)+m_{i-1}m_k m_j\right\}
 \]
-Z warunkami początkowymi $c(i, i) = 0$.\\
+Z warunkami początkowymi $c(i, i) = 0$.
 
+\section{Wykład \date{2025-05-12}}
+Dzisiaj zaczcynamy używać grafów. Grafy są to struktury danych, które składają się z węzłów i krawędzi. Węzły są to obiekty, które mogą być połączone ze sobą krawędziami. Krawędzie mogą być skierowane lub nieskierowane.
+\begin{enumerate}
+    \item Najkrótsza scieżka w DAG
+        \begin{center}\begin{tikzpicture}[
+            every node/.style={circle,draw,inner sep=2pt,minimum size=6mm},
+            every edge/.style={draw,thick},
+            node distance=2cm
+            ]
+  % Węzły
+            \node (S)                                    {S};
+            \node (A) [below right=of S]                {A};
+            \node (C) [above right=of A]                {C};
+            \node (B) [below right=of C]                {B};
+            \node (D) [below right=of B]                {D};
+            \node (E) [below left=of D]                 {E};
 
+  % Krawędzie z wagami nad liniami
+            \path
+                (S) edge node[above,fill=white,pos=0.5] {2} (C)
+                edge node[above,fill=white,pos=0.5] {1} (A)
+                (C) edge node[above,fill=white,pos=0.5] {4} (A)
+                edge node[above,fill=white,pos=0.5] {3} (D)
+                (A) edge node[above,fill=white,pos=0.5] {6} (B)
+                (B) edge node[above,fill=white,pos=0.5] {1} (D)
+                edge node[above,fill=white,pos=0.5] {2} (E)
+                (D) edge node[above,fill=white,pos=0.5] {1} (E);
+        \end{tikzpicture}\end{center}
+        W grafach możemy wyróżnić pewne węzły na podstawie ich krawędzi. Jeżeli do węzła $u$ nie wchodzą żadne krawędzie, to nazywamy go \textbf{źródłem}. Jeżeli z węzła $u$ nie wychodzą żadne krawędzie, to nazywamy go \textbf{ujściem}.\\
+        Liczenie najkrótszej scieżki w DAG można wykonać w czasie $O(V+E)$, gdzie $V$ to liczba węzłów, a $E$ to liczba krawędzi. Wygląda to następująco na przykładzie
+        \[
+            L(A) = \max \begin{cases}
+                L(S)+w(S, A) \\
+                L(C)+w(C, A)
+            \end{cases}
+        \]
+        Natomiast w pseudokodzie:
+        \begin{center}
+        \begin{algorithm}
+            \caption{Najkrótsza ścieżka w DAG}
+            \begin{algorithmic}[1]
+                \Procedure{ShortestPath}{G, E}
+
+    % --- oznaczenie sekcji inicjalizacji ---
+                \Statex \Comment{\textbf{Inicjalizacja:} \(\Theta(|V|)\)}
+                \For {$v \in V$}
+                \State $L(v) \gets \infty$
+                \EndFor
+                \State $L(S) \gets 0$
+    % --- dalsza część algorytmu ---
+                \Statex \Comment{\textbf{Meat algorytmu:} \(\Theta(|E|)\)}
+                \For {$v \in V\setminus\{S\}$}
+                \State $L(v) \gets \min_{(u,v) \in E}\{L(u)+w(u,v)\}$
+                \EndFor
+                \Statex
+                \State \textbf{return} $L$
+                \EndProcedure
+            \end{algorithmic}
+        \end{algorithm}
+    \end{center}
+        Całkowita złożoność algorytmu to $\Theta(|V|+|E|)$, ponieważ w najgorszym przypadku musimy przejść przez wszystkie węzły i krawędzie.
+\end{enumerate}
+
+Rozważmy problem znajdowania nadłuższego rosnącego podciągu. Weźmy na przykład ciag:
+\[
+    5,2,8,6,3,6,9,7
+\]
+W reprezentacji graficznej wygląda to następująco:
+\begin{center}
+\begin{tikzpicture}[
+  every node/.style={circle,draw,inner sep=1.5pt,minimum size=7mm},
+  node distance=1cm
+]
+  % Węzły w rzędzie
+  \node (1)                        {5};
+  \node (2) [right=of 1]          {2};
+  \node (3) [right=of 2]          {8};
+  \node (4) [right=of 3]          {6};
+  \node (5) [right=of 4]          {3};
+  \node (6) [right=of 5]          {6};
+  \node (7) [right=of 6]          {9};
+  \node (8) [right=of 7]          {7};
+
+  % Krawędzie: i -> j gdy i<j i a_i < a_j
+  \path
+    (1) edge (3) edge (4) edge (6) edge (7) edge (8)
+    (2) edge (3) edge (4) edge (5) edge (6) edge (7) edge (8)
+    (3) edge (7)
+    (4) edge (7) edge (8)
+    (5) edge (6) edge (7) edge (8)
+    (6) edge (7) edge (8)
+  ;
+\end{tikzpicture}
+\end{center}
+
+\subsection{Edit Distance}
+Przykładem wykożystania tego problemu jest użycie go w spellcheckerach, które sugerują poprawne słowa na podstawie podobieństwa do błędnie napisanego słowa.
+\begin{itemize}
+    \item \textbf{Input}: $w_1, w_2$ -- słowa, $\Sigma$ -- alfabet
+    \item \textbf{Output}: $EditDistance(w_1, w_2)$ -- minimalna liczba operacji potrzebnych do przekształcenia $w_1$ w $w_2$
+    \item \textbf{Problem}: Znaleść minimalną liczbę operacji potrzebnych do przekształcenia $w_1$ w $w_2$
+\end{itemize}
+Zobaczmy to najpierw na \textbf{przykładzie}:
+%w_1=SNOWY
+%w_2=SNOW
+\[
+w_1=\text{SNOWY},\quad w_2=\text{SUNNY}.
+\]
+\[
+\begin{array}{c|cccccc}
+d_{i,j} &   & S & U & N & N & Y \\\hline
+        & 0 & 1 & 2 & 3 & 4 & 5 \\
+S       & 1 & 0 & 1 & 2 & 3 & 4 \\
+N       & 2 & 1 & 1 & 1 & 2 & 3 \\
+O       & 3 & 2 & 2 & 2 & 2 & 3 \\
+W       & 4 & 3 & 3 & 3 & 3 & 3 \\
+Y       & 5 & 4 & 4 & 4 & 4 & 3 \\
+\end{array}
+\]
+Stąd
+\[
+\mathrm{EditDistance}(\text{SNOWY},\text{SUNNY}) = d_{5,5} = 3,
+\]
+czyli potrzebne są trzy podstawienia (np. \(N\to U\), \(O\to N\), \(W\to N\)).
+
+Niech $E(i,j)$ -- edit distance $w_1[1\dots i], w_2[1\dots j]$. Mamy następujące możliwości
+\begin{itemize}
+    \item dodanie litery do $w_1 \gets E(i, j-1)+1$
+    \item usuniecie litery z $w_2 \gets E(i-1, j)+1$
+    \item podmienienie litery w $w_2 \gets E(i-1, j-1)+1$
+    \item bez zmian $w_1 \gets E(i-1, j-1)$
+\end{itemize}
+Przy wykonywaniu tego algorytmu musimy brać minimum z tych czterech możliwości, a więc
+\[
+    E(i,j) = \min \begin{cases}
+        E(i, j-1)+1 \\
+        E(i-1, j)+1 \\
+        E(i-1, j-1)+1 \\
+        E(i-1, j-1)
+    \end{cases}
+\]
+A jak wygląda graf? %TODO od szymiego
+\[
+    \begin{array}{c|ccccccc}
+        d_{i,j} & & 0 & 1 & 2 & 3 & 4 & \dots \\ \hline
+                & 0 & 1 & 2 & 3 & 4 & 5 & \dots \\
+        1 & 1 & 0 & 1 & 2 & 3 & 4 & \dots \\
+    \end{array}
+\]
+Pseudokod:
+\begin{center}
+\begin{algorithm}
+    \caption{Edit Distance}
+    \begin{algorithmic}[1]
+        \Procedure{EditDistance}{$w_1, w_2$}
+            \State $n \gets |w_1|$
+            \State $m \gets |w_2|$
+            \For{$i=0$ to $n$}
+                \For{$j=0$ to $m$}
+                    \If{$i=0$}
+                        \State $d(i,j) = j$
+                    \ElsIf{$j=0$}
+                        \State $d(i,j) = i$
+                    \Else
+                        \State $d(i,j) = \min\begin{cases}
+                            d(i-1,j)+1\\
+                            d(i,j-1)+1\\
+                            d(i-1,j-1)+1\\
+                            d(i-1,j-1)
+                        \end{cases}$
+                    \EndIf
+                \EndFor
+            \EndFor
+            \State \textbf{return} $d(n,m)$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\end{center}
 \pagebreak
+
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
