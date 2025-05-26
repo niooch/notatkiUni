@@ -5,6 +5,7 @@
 \usepackage[polish]{babel}       % Obsługa języka polskiego
 
 % Pakiety matematyczne i inne przydatne
+\usepackage{mathtools}
 \usepackage{tabularx}
 \usepackage{array} % for centering in p-columns
 \usepackage{calc}
@@ -3081,8 +3082,174 @@ Pseudokod:
     \end{algorithmic}
 \end{algorithm}
 \end{center}
-\pagebreak
 
+\section{Wykład \date{26-05-2025}}
+Rozważmy graf skierowany
+\begin{tikzpicture}[
+    >=Stealth,                     % arrow tip
+    every node/.style={           % node style
+        circle, draw, minimum size=6mm, inner sep=1pt
+    }
+    ]
+  %--- nodes in a square + midpoints ---
+    \node (A) at (0,2) {A};
+    \node (C) at (2,2) {C};
+    \node (G) at (2,0) {G};
+    \node (E) at (0,0) {E};
+    \node (B) at (0,1) {B};
+    \node (H) at (1,2) {H};
+    \node (D) at (2,1) {D};
+    \node (F) at (1,0) {F};
+
+  %--- directed edges ---
+    \draw[->] (A) -- (F);
+    \draw[->] (A) -- (B);
+    \draw[->] (A) -- (C);
+
+    \draw[->] (B) -- (E);
+
+    \draw[->] (C) -- (D);
+
+    \draw[->] (E) -- (F);
+    \draw[->] (E) -- (G);
+    \draw[->] (E) -- (H);
+
+    \draw[->] (F) -- (G);
+
+    \draw[->] (H) -- (G);
+\end{tikzpicture}
+\subsubsection{Własność 1}
+Dla każdego $\forall v,u \in V$:
+\begin{enumerate}
+    \item $pre(v)<pre(u)<post(u)<post(v)$
+    \item $pre(v)<post(v)<pre(u)<post(u)$
+\end{enumerate}
+\subsubsection{Własność 2}
+Dla każdej krawędzi $(u,v) \in V$ mamy nazewnictwo:
+\begin{enumerate}
+    \item Tree/forward edge: $pre(u)<pre(v)<post(v)<post(u)$
+    \item Back edge: $pre(v)<pre(u)<post(u)<post(v)$
+    \item Cross edge: $pre(v)<post(v)<pre(u)<post(u)$
+\end{enumerate}
+\subsubsection{Własność 3}
+W grafie skierowanym istnieje cykl wtedy i tylko wtedy, gdy DFS wykryje back edge
+\begin{proof}
+    $\implies$\\
+    Rozważmy następującą sytłację:
+    \[
+        v_0 \to v_1 \to v_2 \to \dots \to v_k \to \dots \to v_0
+    \]
+    powiedzmy, że DFS odwiedzi jako pierwszy w tym cyklu wieżchołek $v_i$. Dalej eksploruje, aż napotka się na $v_{i-1}$, wtedy krawędź $v_{i-1} \to v_i$ musi być back edge.
+    \bigskip
+    $\impliedby$\\
+    Do własnego zastanowienia się
+\end{proof}
+
+\subsection{Sortowanie topologiczne DAG'ów}
+Rozważmy następujący problem:
+\begin{itemize}
+    \item \textbf{Input}: $G=(V,E)$ -- acykliczny graf skierowany
+    \item \textbf{Output}: $(V, \prec)$ -- porządek topologiczny
+\end{itemize}
+Algorytm musi wykonywać następujące operacje:
+\begin{enumerate}
+    \item wykonujemy DFS, zapisuje pre i post
+    \item zwrócić wierzchołki w malejącej kolejności po post
+\end{enumerate}
+\subsubsection*{Przykład}
+\begin{tikzpicture}[
+    >=Stealth,                     % typ strzałki
+    every node/.style={           % styl węzłów
+        circle, draw, minimum size=6mm, inner sep=1pt
+    }
+    ]
+  %--- węzły w siatce 3x2 ---
+    \node (A) at (0,1) {A};
+    \node (C) at (1,1) {C};
+    \node (E) at (2,1) {E};
+    \node (B) at (0,0) {B};
+    \node (D) at (1,0) {D};
+    \node (F) at (2,0) {F};
+
+  %--- skierowane krawędzie ---
+    \draw[->] (A) -- (C);    % A → C
+    \draw[->] (C) -- (E);    % C → E
+    \draw[->] (C) -- (F);    % C → F
+    \draw[->] (B) -- (A);    % B → A
+    \draw[->] (B) -- (D);    % B → D
+    \draw[->] (D) -- (C);    % D → C
+\end{tikzpicture}
+Algorytm DFS bedzię odwiedzał odpowiednio wierzchołki w kolejności, gdzie $\sideset{^{pre}}{^{post}}X$
+\begin{itemize}
+    \item $\sideset{^1}{^2}F$
+    \item $\sideset{^3}{^6}C \to \sideset{^4}{^5}E$
+    \item $\sideset{^7}{^8}D$
+    \item $\sideset{^9}{^{12}}B \to \sideset{^{10}}{^{11}}A$
+\end{itemize}
+co wraca następujący porządek topologiczny po post:\\
+\begin{tikzpicture}[
+    ->,                    % make all paths directed by default
+    >=stealth,             % nice arrow tip
+    node distance=2cm,     % default distance between nodes
+    on grid,               % align nodes on grid
+    auto,                  % automatic placement of labels (not needed here)
+    state/.style={         % redefine “state” style for our nodes
+      circle, draw, minimum size=6mm, inner sep=1pt
+    }
+  ]
+  %--- place the states in one row ---
+  \node[state] (B) {B};
+  \node[state] (A) [right=of B] {A};
+  \node[state] (D) [right=of A] {D};
+  \node[state] (C) [right=of D] {C};
+  \node[state] (E) [right=of C] {E};
+  \node[state] (F) [right=of E] {F};
+
+  %--- draw the edges (automata style snaps to borders) ---
+  \path
+    (B) edge              (A)
+        edge[bend left]   (D)
+        (A) edge[bend right]              (C)
+    (D) edge              (C)
+    (C) edge[bend left]   (E)
+        edge[bend right]  (F);
+\end{tikzpicture}
+\subsection{costam}
+%TODO nazwac to jakos
+\subsubsection*{Definicja}
+W grafie skierowanym $G=(V,E)$ powiemy, że wierzchołki $u,v \in V$ są połączone jeśli isnieje ścieżka z $u$ do $v$ oraz z $v$ do $u$.
+\subsubsection*{Definicja}
+Będziemy mówić, że $v_i, v_2 \in V$ tworzą silnie spójną komponentę w grafie $G$, jeśli:
+\begin{itemize}
+    \item $\forall 1 \leq j \leq k: v_i \text{ jest połączony z } v_j$
+    \item nie istnije wieżchołek $u\in V$ taki, że $u$ jest połączony z $v_i \forall 1 \leq i \leq k$
+\end{itemize}
+\subsubsection{Własność 4}
+wieżchołek z największą wartością post będzie znajdował się w źródłowym silnie spójnym komponencie grafu skierowanego.
+\subsubsection{Własność 5}
+Niech $C$ i $C'$ będą silnie spójnymi składowymi grafu skierowanego, $G$ oraz $\exists (u,v) \in G: u\in C, c \in C'$. Wtedy
+maksymalna wartość post wierzchołka z $C$ będzie większa niż maksymalna wartość z $C'$
+\begin{proof}
+    Rozważmy możliwe przypadki
+    \begin{enumerate}
+        \item DFS najpiwer odwiedzi wierzchołek $u \in C$, przed wierzchołkami z $C'$ (DFS wróci i ustawi wiekszego posta, prosta idea)
+        \item DFS najpierw odwiedzi wierzchołek $v \in C'$ przed wierzchołkami z $C$ (eksploracja $C$ odbędzie się ostatnia, bo musi do niej wrócić w poźniejszych eksplorach)
+    \end{enumerate}
+\end{proof}
+
+\subsubsection{Własnośc 6}
+Niech $G^R=(V,E^R)$, gdzie
+\[
+    E^R=\{(v,u): (u,v) \in E\}
+\]
+wtedy źródło metagrafu $G^R$ jest ujściem w metagrafie $G$
+\subsection{Strongly Connected Componets algorytm}
+\begin{itemize}
+    \item \textbf{Input}: $G$ -- graf skierowany
+    \item \textbf{Output}: metagraf silnie spójnych składowych $G$
+\end{itemize}
+Algorytm musi wyglądać następująco:
+\pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
 
@@ -3786,6 +3953,23 @@ Zaprojektuj algorytm, który sortuje $n$ liczb całkowitych z przedziału od $1$
 \bigskip
 \hrule
 \bigskip
+
+\subsection{lista 5}
+\subsubsection{zadanie 6}
+Zaproponuj strukturę danych \mathcal{Q} dla dynamicznych zbiorów liczb, w której można wykonywać operację Min − Luka wyznaczającą odległość między dwoma najbliższymi sobie liczbami w \mathcal{Q}. Jeśli np. $\mathcal{Q} = \{1, 5, 9, 15, 18, 22\}$, to Min − Luka(\mathcal{Q}) daje w wyniku $18 − 15 = 3$. Zaimplementuj jak najefektywniej operacje Insert, Delete, Search oraz Min − Luka i wykonaj analizę ich złożoności czasowej.
+
+\bigskip
+\hrule
+\bigskip
+
+Do implementacji struktury użyjemy wzbogaconych drzew RBT o mdb i mdt, gdzie
+\[
+    mdt = \min\{key- Parent.key, S.key-key\}
+\]
+oraz
+\[
+    mdb = \min\{mdt, x.left.mdb, x.right.mdb\}
+\]
 
 
 \end{document}
