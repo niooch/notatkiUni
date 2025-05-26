@@ -3083,7 +3083,552 @@ Pseudokod:
 \end{algorithm}
 \end{center}
 
-\section{Wykład \date{26-05-2025}}
+\section{Wykład \date{2025-05-19}}
+\subsection{Kopiec binarny}
+Kopiec binarny jest to struktura danych, która jest zbudowana na zasadzie drzewa binarnego. Jest to drzewo, w którym każdy węzeł ma co najwyżej dwóch potomków. Kopiec binarny jest zbudowany na zasadzie porządku, czyli każdy węzeł ma wartość większą lub równą wartości swoich potomków. Kopiec binarny jest używany do implementacji kolejki priorytetowej.\\
+Inaczej można powiedzieć, że jest to drzewo binarne przechowywane w tablicy.
+\subsubsection*{Przykład}
+Kopiec binarny zapisany w tablicy:
+\[
+    [16, 14, 10, 8, 7, 3, 2, 4, 1]
+\]
+odpowiada następującemu drzewu binarnemu:
+\begin{center}\begin{tikzpicture}[
+    level distance=1.2cm,
+    level 1/.style={sibling distance=3.5cm},
+    level 2/.style={sibling distance=1.8cm},
+    level 3/.style={sibling distance=1cm},
+    every node/.style={circle, draw, minimum size=6mm}
+    ]
+    \node {16}
+        child { node {14}
+            child { node {8}
+                child { node {4} }
+                child { node {1} }
+            }
+            child { node {7} }
+        }
+        child { node {10}
+            child { node {3} }
+            child { node {2} }
+        };
+\end{tikzpicture}\end{center}
+W jaki jest algortym przepisania:
+\begin{itemize}
+    \item $left(i) = 2i+1$
+    \item $right(i) = 2i+2$
+    \item $parent(i) = \lfloor\frac{i-1}{2}\rfloor$
+\end{itemize}
+\subsubsection{Własności kopca (maksymalnego)}
+\begin{enumerate}
+    \item $\forall i: A[parent(i)] > A[i]$ -- każdy węzeł jest większy od swoich potomków
+    \item wysokość węzła = długość najdłuższej prostej ścieżki od tego węzła do liscia
+\end{enumerate}
+\subsubsection{Heapify}
+Heapify jest to operacja, która przekształca drzewo binarne w kopiec binarny. Operacja ta jest wykonywana na drzewie binarnym, które nie jest kopcem binarnym. Operacja ta jest wykonywana w czasie $O(n)$.
+\begin{center}
+    \begin{algorithm}
+        \caption{Heapify}
+        \begin{algorithmic}[1]
+            \Procedure{Heapify}{$A, i$}
+                \State $l \gets left(i)$
+                \State $r \gets right(i)$
+                \State $largest \gets i$
+                \If{$l < |A|$ \textbf{and} $A[l] > A[largest]$}
+                    \State $largest \gets l$
+                \EndIf
+                \If{$r < |A|$ \textbf{and} $A[r] > A[largest]$}
+                    \State $largest \gets r$
+                \EndIf
+                \If{$largest \neq i$}
+                    \State swap($A[i], A[largest]$)
+                    \State Heapify($A, largest$)
+                \EndIf
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+\subsubsection*{Przykład}
+Rozważmy następujący kopiec binarny:
+\begin{center}\begin{tikzpicture}[
+    every node/.style={circle, draw, minimum size=6mm, inner sep=1pt},
+    level distance=1.2cm,
+    level 1/.style={sibling distance=3.5cm},
+    level 2/.style={sibling distance=1.8cm},
+    level 3/.style={sibling distance=1cm}
+    ]
+    \node {16}
+        child { node {4}
+            child { node {14}
+                child { node {2} }
+                child { node {8} }
+            }
+            child { node {7} 
+                child { node {3} }
+            }
+        }
+        child { node {10}
+            child { node {9} }
+            child { node {5} }
+        };
+\end{tikzpicture}\end{center}
+Jeżeli wykonamy operację Heapify na węźle $14$, to otrzymamy następujący kopiec binarny:
+\begin{center}\begin{tikzpicture}[
+    every node/.style={circle, draw, minimum size=6mm, inner sep=1pt},
+    level distance=1.2cm,
+    level 1/.style={sibling distance=3.5cm},
+    level 2/.style={sibling distance=1.8cm},
+    level 3/.style={sibling distance=1cm}
+    ]
+    \node {16}
+        child { node {14}
+            child { node {4}
+                child { node {2} }
+                child { node {8} }
+            }
+            child { node {7} 
+                child { node {3} }
+            }
+        }
+        child { node {10}
+            child { node {9} }
+            child { node {5} }
+        };
+\end{tikzpicture}\end{center}
+I ostatecznie
+\begin{center}\begin{tikzpicture}[
+    every node/.style={circle, draw, minimum size=6mm, inner sep=1pt},
+    level distance=1.2cm,
+    level 1/.style={sibling distance=3.5cm},
+    level 2/.style={sibling distance=1.8cm},
+    level 3/.style={sibling distance=1cm}
+    ]
+    \node {16}
+        child { node {14}
+            child { node {8}
+                child { node {2} }
+                child { node {4} }
+            }
+            child { node {7} 
+                child { node {3} }
+            }
+        }
+        child { node {10}
+            child { node {9} }
+            child { node {5} }
+        };
+\end{tikzpicture}\end{center}
+\subsubsection*{Złożoność obliczeniowa}
+Algorytm spełnia rekurencję:
+\[
+    T(n) = T\left(\frac{2}{3}n\right) + O(1)
+\]
+Z \textbf{Master Theorem} otrzymujemy, że złożoność czasowa tego algorytmu to $O(\log n)$, ponieważ $a=1$, $b=\frac{3}{2}$, $\log_{\frac{3}{2}}1=0$.
+
+Analogicznie wszystko na odwrót dla kopca minimalnego.
+
+\subsubsection{Build Heap}
+Build Heap jest to operacja, która przekształca tablicę w kopiec binarny. Operacja ta jest wykonywana na tablicy, która nie jest kopcem binarnym. Wykożystuje ona wcześniejszy algorytm Heapify. 
+\begin{center}
+    \begin{algorithm}
+        \caption{Build Heap}
+        \begin{algorithmic}[1]
+            \Procedure{BuildHeap}{$A$}
+                \For{$i = \lfloor\frac{|A|-1}{2}\rfloor$ down to $0$}
+                    \State Heapify($A, i$)
+                \EndFor
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+\subsubsection{Przykład}
+ii
+\section*{Build-Heap na tablicy $A=[4,1,3,2,16,9,10,14,8,7]$}
+
+\subsection*{Krok 0: drzewo początkowe}
+\begin{center}\begin{tikzpicture}[
+      level distance=1.2cm,
+  level 1/.style={sibling distance=4cm},
+  level 2/.style={sibling distance=2cm},
+  level 3/.style={sibling distance=1cm},
+  every node/.style={circle, draw, minimum size=6mm}]
+\node {4}
+  child { node {1}
+    child { node {2}
+      child { node {14} }
+      child { node {8} }
+    }
+    child { node {16}
+      child { node {7} }
+    }
+  }
+  child { node {3}
+    child { node {9} }
+    child { node {10} }
+  };
+\end{tikzpicture}\end{center}
+
+\subsection*{Heapify(@i=5) – brak zmiany}
+Węzeł o indeksie 5 ma wartość 16, jego jedyny potomek (indeks 10) to 7 – już warunek kopca jest spełniony.
+
+\subsection*{Heapify(@i=4) – zamiana $2 \leftrightarrow 14$}
+\begin{center}\begin{tikzpicture}[
+      level distance=1.2cm,
+  level 1/.style={sibling distance=4cm},
+  level 2/.style={sibling distance=2cm},
+  level 3/.style={sibling distance=1cm},
+  every node/.style={circle, draw, minimum size=6mm}]
+\node {4}
+  child { node {1}
+    child { node {14}
+      child { node {2} }
+      child { node {8} }
+    }
+    child { node {16}
+      child { node {7} }
+    }
+  }
+  child { node {3}
+    child { node {9} }
+    child { node {10} }
+  };
+\end{tikzpicture}\end{center}
+
+\subsection*{Heapify(@i=3) – zamiana $3 \leftrightarrow 10$}
+\begin{center}\begin{tikzpicture}[
+      level distance=1.2cm,
+  level 1/.style={sibling distance=4cm},
+  level 2/.style={sibling distance=2cm},
+  level 3/.style={sibling distance=1cm},
+  every node/.style={circle, draw, minimum size=6mm}]
+\node {4}
+  child { node {1}
+    child { node {14}
+      child { node {2} }
+      child { node {8} }
+    }
+    child { node {16}
+      child { node {7} }
+    }
+  }
+  child { node {10}
+    child { node {9} }
+    child { node {3} }
+  };
+\end{tikzpicture}\end{center}
+
+\subsection*{Heapify(@i=2) – zamiana $1 \leftrightarrow 16$, następnie $1 \leftrightarrow 7$}
+\begin{center}\begin{tikzpicture}[
+      level distance=1.2cm,
+  level 1/.style={sibling distance=4cm},
+  level 2/.style={sibling distance=2cm},
+  level 3/.style={sibling distance=1cm},
+  every node/.style={circle, draw, minimum size=6mm}]
+\node {4}
+  child { node {16}
+    child { node {14}
+      child { node {2} }
+      child { node {8} }
+    }
+    child { node {7}
+      child { node {1} }
+    }
+  }
+  child { node {10}
+    child { node {9} }
+    child { node {3} }
+  };
+\end{tikzpicture}\end{center}
+
+\subsection*{Heapify(@i=1) – zamiana $4 \leftrightarrow 16$, dalej $4 \leftrightarrow 14$, dalej $4 \leftrightarrow 8$}
+\begin{center}\begin{tikzpicture}[
+      level distance=1.2cm,
+  level 1/.style={sibling distance=4cm},
+  level 2/.style={sibling distance=2cm},
+  level 3/.style={sibling distance=1cm},
+  every node/.style={circle, draw, minimum size=6mm}]
+\node {16}
+  child { node {14}
+    child { node {8}
+      child { node {2} }
+      child { node {4} }
+    }
+    child { node {7}
+      child { node {1} }
+    }
+  }
+  child { node {10}
+    child { node {9} }
+    child { node {3} }
+  };
+\end{tikzpicture}\end{center}
+
+\subsubsection*{Złożoność obliczeniowa}
+Niech $|A|=n$ bedzie długością tablicy. musimy wykonać przynajmniej $\frac{n}{2}$ razy operację Heapify, a każda z nich ma złożoność $O(\log n)$. Zatem całkowita złożoność algorytmu to $O(n\log n)$.
+\subsubsection*{Fakt}
+W $n$-elementowym kopcu binarnym mamy co najwyżej $\lceil\frac{n}{2^{h+1}}\rceil$ węzłów na wysokości $h$.
+\begin{proof}
+    jeśli $h=0$, to są to liście, a zatem jest ich $\lceil\frac{n}{2}\rceil= \frac{n}{2}$.
+
+    Założenie indukcyjne: 
+    \[
+        \forall_{k<n} \text{ ilość węzłów na wysokości k } \leq \left\lceil\frac{n}{2^{k+1}}\right\rceil
+    \]
+
+    Krok indykcyjny:
+
+    węzły o wysokości $h-1$ z zał. ind. jest $\leq \left\lceil\frac{n}{2^{h}}\right\rceil$. Na wysokości $h$ mamy co najwyżej dwa potomki każdego węzła, a zatem liczba węzłów na wysokości $h$ jest $\leq 2\left\lceil\frac{n}{2^{h}}\right\rceil = \left\lceil\frac{n}{2^{h+1}}\right\rceil$.
+\end{proof}
+\subsubsection{Złożoność Obliczeniowa BuildHeap}
+Algorytm spełnia:
+\[
+    T(n)= O\left(\sum_{h=0}^{\log n} \text{(liczba węzłów o wysokości $h$)} -h\right)
+\]
+Natomiast z Faktu wynika, że 
+\[
+    T(n) \leq O\left(\sum_{h=0}^{\log n} \frac{n}{2^{h+1}}\cdot h\right) =O\left(n\sum_{h=0}^{\log n} \frac{h}{2^{h+1}}\right)=\dots=O(n)
+\]
+
+\subsection{Kolejka priorytetowa}
+Kolejka priorytetowa jest to struktura danych, która przechowuje elementy w taki sposób, że możemy szybko znaleźć element o najwyższym priorytecie. Kolejka priorytetowa jest implementowana za pomocą kopca binarnego. Operacje, które możemy wykonać na kolejce priorytetowej to:
+\begin{itemize}
+    \item $Insert(Q,x)$
+    \item $Maximum(Q)$
+    \item $ExtractMax(Q)$
+    \item $IncreaseKey(Q,x,y)$
+    \item $Delete(Q,x)$
+    \item $Union(Q_1, Q_2)$
+\end{itemize}
+Jak będą wyglądały te operacje:
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{Maximum}{$Q$}
+                \State \textbf{return} $Q[1]$
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{Union}{$Q_1, Q_2$}
+            \State BuildHeap($Q_1 \cup Q_2$) \Comment {Złożoność: $O(|Q_1|+|Q_2|)$}
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{Delete}{$Q, i$}
+            \State $Q[i] \gets Q[size(Q)]$ \Comment {Zamiana z ostatnim elementem}
+            \State $size(Q) \gets size(Q)-1$ \Comment {Zmniejszenie rozmiaru kolejki}
+            \If{$Q[i] > Q[parent(i)]$}
+                \State Heapify($Q, i$) \Comment {Przywrócenie własności kopca}
+            \Else
+                \While{$i > 1$ \textbf{and} $Q[i] < Q[parent(i)]$}
+                    \State swap($Q[i], Q[parent(i)]$) \Comment {Przeniesienie węzła w górę}
+                    \State $i \gets parent(i)$
+                \EndWhile
+            \EndIf
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{Insert}{$Q, key$}
+            \State $size(Q) \gets size(Q)+1$ \Comment {Zwiększenie rozmiaru kolejki}
+            \State $i=size(Q)$ \Comment {Indeks nowego elementu}
+            \While{$i > 1$ \textbf{and} $key > Q[parent(i)]$}
+                \State $Q[i] \gets Q[parent(i)]$ \Comment {Przeniesienie węzła w górę}
+                \State $i \gets parent(i)$
+            \EndWhile
+            \State $Q[i] \gets key$ \Comment {Wstawienie nowego elementu}
+            %Empty line
+            \State \quad \Comment {Złożoność: $O(\log n)$}
+            \EndProcedure
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{ExtractMax}{$Q$}
+            \If $size(Q) < 1$
+                \State \textbf{error} "Kolejka jest pusta"
+            \Else
+                \State $max \gets Q[1]$ \Comment {Zapisanie maksymalnego elementu}
+                \State $Q[1] \gets Q[size(Q)]$ \Comment {Zamiana z ostatnim elementem}
+                \State $size(Q) \gets size(Q)-1$ \Comment {Zmniejszenie rozmiaru kolejki}
+                \State Heapify($Q, 1$) \Comment {Przywrócenie własności kopca}
+            \EndIf
+            \State \textbf{return} $max$ \Comment {Zwrócenie maksymalnego elementu}
+            \EndProcedure \Comment {Złożoność: $O(\log n)$}
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+\begin{center}
+    \begin{algorithm}
+        \begin{algorithmic}[1]
+            \Procedure{IncreaseKey}{$Q, i, newKey$}
+            \If{$Q[i]>newKey$}
+            \State $Q[i] \gets newKey$ \Comment {Zmniejszenie klucza}
+            \State Heapify($Q, i$) \Comment {Przywrócenie własności kopca}
+            \Else
+            \While{$i > 1$ \textbf{and} $newKey > Q[parent(i)]$}
+            \State $Q[i] \gets Q[parent(i)]$ \Comment {Przeniesienie węzła w górę}
+            \State $i \gets parent(i)$
+            \EndWhile
+            \State $Q[i] \gets newKey$ \Comment {Wstawienie nowego klucza}
+            \EndIf
+            \EndProcedure \Comment {Złożoność: $O(\log n)$}
+        \end{algorithmic}
+    \end{algorithm}
+\end{center}
+
+
+
+
+
+\subsection{Podsumowanie}
+\begin{table}[ht]
+  \centering
+  \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{polecenie}   & \textbf{kopiec binarny} & \textbf{kopiec dwumianowy} & \textbf{kopiec Fibonacciego\*} \\ \hline
+    Insert               & $O(\log n)$             & $O(\log n)$               & $O(1)$ amortyzowane           \\ \hline
+    Maximum              & $O(1)$                  & $O(\log n)$               & $O(1)$                        \\ \hline
+    ExtractMax           & $O(\log n)$             & $O(\log n)$               & $O(\log n)$ amortyzowane      \\ \hline
+    Decrease/Increase Key & $O(\log n)$            & $O(\log n)$               & $O(1)$ amortyzowane           \\ \hline
+    Delete               & $O(\log n)$             & $O(\log n)$               & $O(\log n)$ amortyzowane      \\ \hline
+    Union                & $O(n_1 + n_2)$          & $O(\log n)$               & $O(1)$ amortyzowane           \\ \hline
+  \end{tabular}
+  \caption{Złożoności obliczeniowe operacji na różnych kopcach}
+\end{table}
+
+\section{Wykład \date{2025-05-20}}
+\subsection{Grafy skierowane}
+Graf skierowany jest to graf, w którym krawędzie mają kierunek. Oznacza to, że krawędź z wierzchołka $u$ do wierzchołka $v$ jest inna niż krawędź z wierzchołka $v$ do wierzchołka $u$. Graf skierowany jest często używany do modelowania relacji między obiektami, gdzie kierunek relacji ma znaczenie.
+
+Przyjmujemy następujące oznaczenia:
+\begin{itemize}
+    \item $V$ -- zbiór wierzchołków
+    \item $E$ -- zbiór krawędzi
+    \item $|V|$ -- liczba wierzchołków
+    \item $|E|$ -- liczba krawędzi
+\end{itemize}
+Przy czym, jeżeli graf jest skierowany to:
+\[
+    E \subseteq \left\{ (i,j): i,j \in V, i \neq j \right\}
+\]
+A jeżeli nie skierowany to:
+\[
+    E \subseteq \{ \{i,j\}: i,j \in V, i \neq j \}
+\]
+Głownie skupimy się na skierowanych grafach.
+
+\subsection{Lista sąsiedztwa}
+Lista sąsiedztwa jest to struktura danych, która przechowuje graf w postaci listy wierzchołków i ich sąsiadów. Jest to efektywny sposób reprezentacji grafu, szczególnie dla grafów rzadkich, gdzie liczba krawędzi jest znacznie mniejsza niż liczba wierzchołków kwadratowa.
+
+\begin{center}\begin{tikzpicture}[->,>=stealth,auto]
+  % Nodes in a 3×2 grid
+    \node (V1) at (0,0)   {$V_1$};
+    \node (V2) at (2,0)   {$V_2$};
+    \node (V3) at (4,0)   {$V_3$};
+    \node (V4) at (0,-2)  {$V_4$};
+    \node (V5) at (2,-2)  {$V_5$};
+    \node (V6) at (4,-2)  {$V_6$};
+
+  % Edges with bends to route around nodes
+    \path
+        (V1) edge[bend left=20]  (V3)
+        edge[bend right=20] (V6)
+        (V2) edge                  (V1)
+        edge[bend left=20]  (V3)
+        edge                  (V5)
+        (V3) edge[bend right=20] (V2)
+        (V4) edge                  (V1)
+        edge                  (V5)
+        (V5) edge[bend left=20]  (V3);
+  % V6 has no outgoing edges
+\end{tikzpicture}\end{center}
+Taki DAG jest tożsamy z następującą listą sąsiedztwa:
+\begin{itemize}
+    \item $V_1 \to V_3 \to V_6$
+    \item $V_2 \to V_1 \to V_3 \to V_5$
+    \item $V_3 \to V_2$
+    \item $V_4 \to V_1 \to V_5$
+    \item $V_5 \to V_3$
+    \item $V_6$ (brak krawędzi wychodzących)
+\end{itemize}
+\textbf{Złożoność pamięciowa} wynosi $O(n+m)=O(|V|+|E|)$
+
+\subsubsection{Macierz sąsiedztwa}
+Możemy reprezentować sąsiedztwo za pomocą macierzy zdefinowanej w następujący sposób, niech $A=(a_{ij})_{i,j \in [1..n]}$ będzie macierzą sąsiedztwa grafu skierowanego, gdzie:
+\[
+    a_{ij} = \begin{cases}
+        1 & \text{jeśli istnieje krawędź } (i,j) \in E \\
+        0 & \text{w przeciwnym wypadku}
+    \end{cases}
+\]
+\textbf{Złożoność pamięciowa} wynosi $O(n^2)$, ponieważ mamy macierz o wymiarach $n \times n$, ale zyskujemy na czasie dostępu do krawędzi, ponieważ możemy sprawdzić istnienie krawędzi w czasie $O(1)$.
+
+\subsection{Depth First Search} 
+Rozważmy najpierw składową algorytmu DFS, czyli \textbf{explore}:
+
+\begin{algorithm}
+    \caption{DFS Explore}
+    \begin{algorithmic}[1]
+        \Procedure{Explore}{$G, v$}
+        \State $visited(v)=true$
+        \State $previsit(v)$ \Comment {operacja przed odwiedzeniem wierzchołka}
+        \For{each edge $(v,u) \in E$}
+            \If{$visited(u)=false$}
+                \State explore($G, u$) \Comment {rekurencyjne wywołanie dla sąsiada}
+            \EndIf
+        \EndFor
+        \State $postvisit(v)$ \Comment {operacja po odwiedzeniu wierzchołka}
+        \EndProcedure
+        \Procedure{previsit}{$v$}
+            \State $pre[v]=clock$
+            \State $clock \gets clock + 1$
+        \EndProcedure
+        \Procedure{postvisit}{$v$}
+            \State $post[v]=clock$
+            \State $clock \gets clock + 1$
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+Kożystając z tego algorytm DFS wygląda następująco:
+\begin{algorithm}
+    \caption{DFS}
+    \begin{algorithmic}[1]
+        \Procedure{DFS}{$G$}
+        \State $visited(v) = false$ dla każdego $v \in V$
+        \For{each vertex $v \in V$}
+            \If{$visited(v)=false$}
+                \State explore($G, v$)
+            \EndIf
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\subsubsection{Złożoność obliczeniowa}
+Złożoność czasowa algorytmu DFS wynosi $O(n+m)$, gdzie $n$ to liczba wierzchołków, a $m$ to liczba krawędzi. Złożoność pamięciowa wynosi $O(n)$, ponieważ musimy przechowywać informacje o odwiedzonych wierzchołkach.
+
+
+
+\section{Wykład \date{2025-05-26}}
+\subsection{DFS i porządek topologiczny}
 Rozważmy graf skierowany
 \begin{tikzpicture}[
     >=Stealth,                     % arrow tip
@@ -3118,6 +3663,7 @@ Rozważmy graf skierowany
 
     \draw[->] (H) -- (G);
 \end{tikzpicture}
+
 \subsubsection{Własność 1}
 Dla każdego $\forall v,u \in V$:
 \begin{enumerate}
@@ -3248,7 +3794,8 @@ wtedy źródło metagrafu $G^R$ jest ujściem w metagrafie $G$
     \item \textbf{Input}: $G$ -- graf skierowany
     \item \textbf{Output}: metagraf silnie spójnych składowych $G$
 \end{itemize}
-Algorytm musi wyglądać następująco:
+%TODO napiac jak ten algo wyglada z whilem
+
 \pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
@@ -3956,7 +4503,7 @@ Zaprojektuj algorytm, który sortuje $n$ liczb całkowitych z przedziału od $1$
 
 \subsection{lista 5}
 \subsubsection{zadanie 6}
-Zaproponuj strukturę danych \mathcal{Q} dla dynamicznych zbiorów liczb, w której można wykonywać operację Min − Luka wyznaczającą odległość między dwoma najbliższymi sobie liczbami w \mathcal{Q}. Jeśli np. $\mathcal{Q} = \{1, 5, 9, 15, 18, 22\}$, to Min − Luka(\mathcal{Q}) daje w wyniku $18 − 15 = 3$. Zaimplementuj jak najefektywniej operacje Insert, Delete, Search oraz Min − Luka i wykonaj analizę ich złożoności czasowej.
+Zaproponuj strukturę danych $\mathcal{Q}$ dla dynamicznych zbiorów liczb, w której można wykonywać operację Min -- Luka wyznaczającą odległość między dwoma najbliższymi sobie liczbami w $\mathcal{Q}$. Jeśli np. $\mathcal{Q} = \{1, 5, 9, 15, 18, 22\}$, to Min -- Luka($\mathcal{Q}$) daje w wyniku $18 -- 15 = 3$. Zaimplementuj jak najefektywniej operacje Insert, Delete, Search oraz Min -- Luka i wykonaj analizę ich złożoności czasowej.
 
 \bigskip
 \hrule
