@@ -89,6 +89,49 @@ Jak reprezentować sieć? Robimy to za pomocą grafu, w którym wierzchołkami s
     \item \textbf{Opóźnienie} -- czas, jaki upływa od wysłania pakietu do jego odbioru
     \item \textbf{Szerokość pasma} -- szerokość zakresu częstotliwości, który jest wykorzystywany przez nadawane lub odbierane sygnały w danym medium transmisyjnym. Szerokość pasma jest wyrażana w różnicy pomiędzy najwyższą a najniższą częstotliwością składnika transmitowanego sygnału
 \end{itemize}
+
+\section{ważne}
+Ważna jest niezawodność w przesyłaniu tych bitów
+\begin{itemize}
+    \item najniżej jest sygnał, fale itp.
+    \item dalej mamy ramkę ethernetową. Już na tym etapie możemy sprawdzić, czy ramka jest poprawna na podstawie sumy kontrolnej (algorytm CRC).
+    \item do ramek wkładamy inne paczki, które nazywamy datagramami/pakietami, które należą do protokołu sieciowego ip4 lub ip6. Tutaj rutery zajmują się wyznaczaniem trasy -- routing/trasowanie -- czyli wybieraniem najkrótszej trasy do danego hosta. Dane potrzebne do routowania są zaszyte w nagłówku pakietu.\footnote{routery aktualizuja sobie \textbf{tablice routingu} -- jest to tablica, która zawiera informacje o tym, jak dotrzeć do danego hosta.} Tutaj również można przeprowadzić werfikację poprawności pakietu. Jeżeli pakiet jest niepoprawny, to jest on odrzucany. W przeciwnym wypadku jest przekazywany do kolejnej warstwy.
+    \item Następnie mamy warstwę transportową, która zajmuje się przesyłaniem danych między hostami. W tej warstwie mamy dwa protokoły: TCP i UDP. TCP jest protokołem połączeniowym, który zapewnia niezawodność przesyłania danych, natomiast UDP jest protokołem bezpołączeniowym, który nie zapewnia niezawodności przesyłania danych. W tej warstwie również możemy przeprowadzić werfikację poprawności pakietu. TCP zapewnia niezawodność przesyłania danych poprzez mechanizm potwierdzeń i retransmisji. UDP nie zapewnia niezawodności, ale jest szybszy, ponieważ nie wymaga potwierdzeń.
+
+        \textbf{WAŻNE!} TCP zapewnia niezawodność poprzez \textbf{pozytywne potwierdzenie} i \textbf{retransmisje}. Również zapewnia \textbf{kontrole przepływu} -- efektywne wykożystanie kanału komunikacyjnego. W przypadku TCP mamy \textbf{okno przesuwne} -- jest to mechanizm, który pozwala na przesyłanie wielu pakietów bez oczekiwania na potwierdzenie każdego z nich. Okno przesuwne jest dynamicznie dostosowywane w zależności od przepustowości łącza i opóźnienia. TCP posiada również \textbf{reakcje na przeciążenia}, nadawca kontroluje ilość wysyłanych danych w zależności od stanu sieci. W przypadku przeciążenia sieci, nadawca zmniejsza ilość wysyłanych danych, a w przypadku braku przeciążenia, zwiększa ją.
+
+        Protokoły te zajmóją sie przesyłaniem \textbf{bajtów/oktetów}. Jest to system \textbf{połączeniowy}, musi zostać otwarty kanał komunijaci oraz potwierdzenie nadawcy i odbiorcy. Po skończonym nadawaniu kanał/połączenie musi zostać zamknięte. W przypadku TCP mamy \textbf{trójfazowe uzgadnianie połączenia} -- jest to proces, który pozwala na ustalenie parametrów połączenia między nadawcą a odbiorcą. Proces ten składa się z trzech kroków:
+        \begin{enumerate}
+            \item Nadawca wysyła do odbiorcy pakiet SYN (synchronizacja), w którym informuje o chęci nawiązania połączenia.
+            \item Odbiorca odpowiada pakietem SYN-ACK (synchronizacja i potwierdzenie), w którym informuje nadawcę o chęci nawiązania połączenia oraz potwierdza otrzymanie pakietu SYN.
+            \item Nadawca wysyła pakiet ACK (potwierdzenie), w którym potwierdza otrzymanie pakietu SYN-ACK i kończy proces uzgadniania połączenia.
+        \end{enumerate}
+\begin{table}[ht]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+    \hline
+    \multicolumn{2}{|c|}{\textbf{Source Port (16 bits)}}
+      & \multicolumn{2}{c|}{\textbf{Destination Port (16 bits)}} \\ \hline
+
+    \multicolumn{4}{|c|}{\textbf{Sequence Number (32 bits)}} \\ \hline
+
+    \multicolumn{4}{|c|}{\textbf{Acknowledgment Number (32 bits)}} \\ \hline
+
+    \textbf{Data Offset (4 bits)}
+      & \textbf{Reserved (6 bits)}
+      & \textbf{Flags (6 bits)}
+      & \textbf{Window Size (16 bits)} \\ \hline
+
+    \textbf{Checksum (16 bits)}
+      & \textbf{Urgent Pointer (16 bits)}
+      & \multicolumn{2}{c|}{\textbf{Options \& Padding (variable)}} \\ \hline
+  \end{tabular}
+  \caption{TCP Header Segment Fields}
+  \label{tab:tcp-segment}
+\end{table}
+
+\end{itemize}
 \section{Podsumowanie}
 
 \end{document}
