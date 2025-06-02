@@ -3163,7 +3163,7 @@ Rozważmy następujący kopiec binarny:
                 child { node {2} }
                 child { node {8} }
             }
-            child { node {7} 
+            child { node {7}
                 child { node {3} }
             }
         }
@@ -3186,7 +3186,7 @@ Jeżeli wykonamy operację Heapify na węźle $14$, to otrzymamy następujący k
                 child { node {2} }
                 child { node {8} }
             }
-            child { node {7} 
+            child { node {7}
                 child { node {3} }
             }
         }
@@ -3209,7 +3209,7 @@ I ostatecznie
                 child { node {2} }
                 child { node {4} }
             }
-            child { node {7} 
+            child { node {7}
                 child { node {3} }
             }
         }
@@ -3228,7 +3228,7 @@ Z \textbf{Master Theorem} otrzymujemy, że złożoność czasowa tego algorytmu 
 Analogicznie wszystko na odwrót dla kopca minimalnego.
 
 \subsubsection{Build Heap}
-Build Heap jest to operacja, która przekształca tablicę w kopiec binarny. Operacja ta jest wykonywana na tablicy, która nie jest kopcem binarnym. Wykożystuje ona wcześniejszy algorytm Heapify. 
+Build Heap jest to operacja, która przekształca tablicę w kopiec binarny. Operacja ta jest wykonywana na tablicy, która nie jest kopcem binarnym. Wykożystuje ona wcześniejszy algorytm Heapify.
 \begin{center}
     \begin{algorithm}
         \caption{Build Heap}
@@ -3370,7 +3370,7 @@ W $n$-elementowym kopcu binarnym mamy co najwyżej $\lceil\frac{n}{2^{h+1}}\rcei
 \begin{proof}
     jeśli $h=0$, to są to liście, a zatem jest ich $\lceil\frac{n}{2}\rceil= \frac{n}{2}$.
 
-    Założenie indukcyjne: 
+    Założenie indukcyjne:
     \[
         \forall_{k<n} \text{ ilość węzłów na wysokości k } \leq \left\lceil\frac{n}{2^{k+1}}\right\rceil
     \]
@@ -3384,7 +3384,7 @@ Algorytm spełnia:
 \[
     T(n)= O\left(\sum_{h=0}^{\log n} \text{(liczba węzłów o wysokości $h$)} -h\right)
 \]
-Natomiast z Faktu wynika, że 
+Natomiast z Faktu wynika, że
 \[
     T(n) \leq O\left(\sum_{h=0}^{\log n} \frac{n}{2^{h+1}}\cdot h\right) =O\left(n\sum_{h=0}^{\log n} \frac{h}{2^{h+1}}\right)=\dots=O(n)
 \]
@@ -3581,7 +3581,7 @@ Możemy reprezentować sąsiedztwo za pomocą macierzy zdefinowanej w następuj�
 \]
 \textbf{Złożoność pamięciowa} wynosi $O(n^2)$, ponieważ mamy macierz o wymiarach $n \times n$, ale zyskujemy na czasie dostępu do krawędzi, ponieważ możemy sprawdzić istnienie krawędzi w czasie $O(1)$.
 
-\subsection{Depth First Search} 
+\subsection{Depth First Search}
 Rozważmy najpierw składową algorytmu DFS, czyli \textbf{explore}:
 
 \begin{algorithm}
@@ -3795,6 +3795,123 @@ wtedy źródło metagrafu $G^R$ jest ujściem w metagrafie $G$
     \item \textbf{Output}: metagraf silnie spójnych składowych $G$
 \end{itemize}
 %TODO napiac jak ten algo wyglada z whilem
+
+\section{Wykład \date{2025-06-02}}
+Na dzisiejszym wykładzie bedziemy zajmować się problemem najkrótszej ścieżki w grafie skierowanym. Używając algorytmu DFS dostajemy kiepskie wyniki, ponieważ DFS nie gwarantuje odwiedzenia wierzchołków w kolejności od najkrótszej ścieżki do najdłuższej. Dlatego będziemy używać algorytmu BFS, który jest bardziej odpowiedni do tego typu problemów.
+
+\textbf{Porównanie DFS i BFS w kontekcie najkrótszej ścieżki:}
+%TODO moze obrazek i pokazac jak DFS i BFS przechodza przez niego
+\subsection{Przeszukiwanie w szerz (Breath First Search)}
+\begin{itemize}
+    \item \textbf{Input}: $G=(V,E)$, G--grafm $s\in V$ -- wierzchołek startowy
+    \item \textbf{Output}: $v \text{ do którego istnieje ścieżka z } s$ oraz $dist(v)$ -- odległość od $s$ do $v$
+\end{itemize}
+W pseudokodzie:
+\begin{algorithm}
+    \caption{BFS}
+    \begin{algorithmic}[1]
+        \Procedure{BFS}{$G, s$}
+        \For{each vertex $v \in V$} \Comment {$O(|V|)$}
+            \State $dist(v) = \infty$
+        \EndFor
+        \State $dist(s) = 0$
+        \State $Q = [s]$ \Comment {kolejka FIFO}
+        \While{$Q$ nie jest pusta}
+            \State $v = Q.pop()$
+            \For{each edge $(v,u) \in E$} \Comment {$\text{koniec konców }O(|E|)$}
+                \If{$dist(u)=\infty$}
+                    \State $dist(u)=dist(v)+1$
+                    \State $Q.push(u)$
+                \EndIf
+            \EndFor
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+%TODO moze jakis przyklad ale ...
+\subsubsection*{Dowód Poprawności}
+\begin{proof}
+    \textbf{Założenie indukcyjne:}
+    \begin{enumerate}
+        \item $\forall k\leq d: dist(v),\text{ który jest równy $k$ będzie poprawnie ustawiony}$
+        \item kolejka $Q$ zawiera tylko elementy oddalone o najkrótszą ścieżkę od $s$ do $v$
+    \end{enumerate}
+    \textbf{Krok indukcyjny:}
+    \begin{enumerate}
+        \item Załóżmy, że $dist(v)=k$ jest poprawnie ustawiony, wtedy $dist(u)=k+1$ będzie poprawnie ustawiony, ponieważ $u$ jest sąsiadem $v$ i nie był jeszcze odwiedzony.
+        \item Załóżmy, że kolejka $Q$ zawiera elementy oddalone o najkrótszą ścieżkę od $s$ do $v$, wtedy po dodaniu nowego elementu $u$, który jest sąsiadem $v$, kolejka będzie zawierała elementy oddalone o najkrótszą ścieżkę od $s$ do $u$.
+    \end{enumerate}
+\end{proof}
+\subsubsection*{Złożoność obliczeniowa}
+Złożoność czasowa algorytmu BFS wynosi $O(n+m)$, gdzie $n$ to liczba wierzchołków, a $m$ to liczba krawędzi. Złożoność pamięciowa wynosi $O(n)$, ponieważ musimy przechowywać informacje o odległościach i kolejce.
+
+\subsection{Algorytm Dijkstry}
+Kiedy \footnote{wojtas ssie pęto bo nie przyszedł na wykład} w grafie wysępuje waga krawędzi pojawia sie problem przy wyznaczaniu najkrótszej ścieżki. Wtedy algorytm BFS nie jest wystarczający, ponieważ nie uwzględnia wag krawędzi. Dlatego używamy algorytmu Dijkstry, który jest bardziej odpowiedni do tego typu problemów.
+
+Pierwszym intuicyjnym pomysłem byłoby dodanie \textit{dummy} wierzchołków do grafu, które będą reprezentować wagi krawędzi, to znaczy jeżeli waga krawędzi między $A$ i $B$ to $4$ to dodajemy $3$ wierzchołki, które będą reprezentować krawędzie $A \to A_1 \to A_2 \to B$, gdzie $A_1$ i $A_2$ będą wierzchołkami o wadze $1$, nastepnie odpalamy BFS na nowym grafie. Jednakże jest to bardzo nieefektywne, ponieważ wprowadza dodatkowe wierzchołki i krawędzie, co zwiększa złożoność obliczeniową algorytmu, która będzie zależeć od samej wagi krawędzi grafu.
+
+Zastanówmy się nad innym podejściem:\\
+\textbf{Alarm Clock Algorithm} -- algorytm zegara alarmowego, który będzie działał na zasadzie podobnej do zegara, gdzie w każdej iteracji będziemy sprawdzać sąsiadów aktualnego wierzchołka i aktualizować odległości do nich.
+\begin{itemize}
+    \item ustaw alarm $s$ na $0$
+    \item \textit{Repeat until} no more alarms \\
+        powiedzmy, że następny ustawiony alarm zadzwoni w momencie $T$ w wierzchołku $v$
+        \begin{itemize}
+            \item ustaw $dist(v)=T$
+            \item dla każdego siąsiada $v$, niech nazywa się $u$:
+                \begin{itemize}
+                    \item jeśli $u$ nie ma ustawionego alarmu to
+                        \[
+                            alarm(u)=T+w(v,u)
+                        \]
+                    \item jeśli $alarm(u) > T+w(v,u)$
+                        \[
+                            alarm(u)=T+w(v,u)+ alarm(u)
+                        \]
+                \end{itemize}
+        \end{itemize}
+\end{itemize}
+
+Z jeżeli do implementacji alarmów użyjemy kolejki priorytetowej, to rodzi się \textbf{algorytm Dijkstry}:
+\begin{itemize}
+    \item \textbf{Input}: $G=(V,E)$, $s \in V$ -- wierzchołek startowy
+    \item \textbf{Output}: $dist(v)$ -- odległość od $s$ do $v$
+\end{itemize}
+\textbf{Pseudokod}:
+\begin{algorithm}
+    \caption{Algorytm Dijkstry}
+    \begin{algorithmic}[1]
+        \Procedure{Dijkstra}{$G, s$}
+        \For{each vertex $v \in V$} \Comment {$O(|V|)$}
+            \State $dist(v) = \infty$
+            \State $Q.push(v)$
+        \EndFor
+        \State $Q = \text{PriorityQueue()}$ \Comment {kolejka priorytetowa -- $dist(\cdot)$}
+        \State $dist(s) = 0$
+        \While{$Q$ nie jest pusta} \Comment{$O(|V|)\times ExtractMin$}
+            \State $v = Q.pop()$ \Comment {element z najmniejszą odległością}
+            \For{each edge $(v,u) \in E$} \Comment {$O(|E|)$}
+                \If{$dist(u) > dist(v) + w(v,u)$}
+                    \State $dist(u) = dist(v) + w(v,u)$
+                    \State $Q.update(u)$ \Comment {$O(|E|)\times DecreaseKey$}
+                \EndIf
+            \EndFor
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+\textbf{Złożoność obliczeniowa}:\\
+Zgodnie z tym co jest napisane w pseudokodzie złożoność obliczeniowa algorytmu Dijkstry wynosi $O(n+m\log n)$, gdzie $n$ to liczba wierzchołków, a $m$ to liczba krawędzi. Złożoność pamięciowa wynosi $O(n)$, ponieważ musimy przechowywać informacje o odległościach i kolejce priorytetowej.
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{c|c}
+        \textbf{Dijkstra} & $O(|V|)\times ExtractMin\footnote{$O(\frac{}{}$} + O(|E|)\times DecreaseKey\footnote{$O(\frac{\log|V|}{d})$}$ \\ \hline
+        Array & $O(|V|^2\log|V|)$ \\ \hline
+        Kopiec binarny & $O(|V| \log |V| + |E|\log |V|)$ \\ \hline
+    $d$--arny Kopiec & $O(\frac{\log|V|}{\log d}\cdot(|V|d + \frac{\log |E|}{d}$ \\ \hline
+        Fibbonacci Heap & $O(|V|\log|V| + |E|)$ \\ \hline
+    \end{tabular}
+\end{table}
 
 \pagebreak
 \section{Ćwiczenia}
@@ -4518,5 +4635,121 @@ oraz
     mdb = \min\{mdt, x.left.mdb, x.right.mdb\}
 \]
 
+\subsection{lista 6}
+\subsubsection{zadanie 2}
+\begin{itemize}
+    \item \textbf{INPUT:} Zbiór n odcinków $[s_i, f_i, w_i]$ dla $i = \{1,\dots, n\}$, gdzie $s_i$ to początek $i$--tego odcinka, $f_i$ koniec $i$--tego odcinka, $w_i$ to waga $i$--tego odcinka.
+    \item \textbf{OUTPUT:} Podzbiór odcinków nie przecinających się o największej wadze.
+\end{itemize}
+Zaprojektuj efektywny algorytm rozwiązujący postawiony problem. Przeanalizuj poprawność i złożoność obliczeniową swojego algorytmu.
 
+\bigskip
+\hrule
+\bigskip
+
+Podejdźmy do problemu w następujący sposób:
+\begin{itemize}
+    \item Posortuj odcinki rosnąco względem końca $f_i$.
+    \item Niech $dp$ będzie $n$--elementową tablicą o wartościach -1\footnote{inicjalizacja całej tablicy na -1}, gdzie $dp[1]=w_1$.
+    \item $trace[1] = [T_1]$
+    \item dla każdego $i$ od $2$ do $n$ wykonujemy:
+        \begin{itemize}
+            \item wyszukujemy największe $j$ takie, że $f_j < s_i$ (można to zrobić binarnie, ponieważ odcinki są posortowane względem końca).
+            \item $if dp[j] + w_i > dp[i-1]$\\
+                $\quad dp[i]=dp[j] + w_i$\\
+                $\quad trace[i] = insert(trace[j], T_i)$
+            \item $else$\\
+                $\quad dp[i] = dp[i-1]$\\
+                $\quad trace[i] = trace[i-1]$
+            \item return $trace[n]$
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{zadanie 3}
+\begin{itemize}
+    \item \textbf{INNPUT:} Ciąg $[a_1, \dots , a_n]$.
+    \item \textbf{OUTPUT:} Ciąg spójny $a_i, a_{i+1},\dots , a_{i+k}$, którego suma będzie największa.
+\end{itemize}
+Zaprojektuj liniowy algorytm znajdowania ciągu opisanego w \textbf{OUTPUT}, zbadaj jego poprawność.\\
+\textbf{Przykład:} dla ciągu $5, 15, -30, 10, -5, 40, 10$ ciągu spójny o największej sumie to: $10, -5, 40, 10$.
+
+\bigskip
+\hrule
+\bigskip
+
+Pseudo kod programu dynamicznego dla zadania 3:
+\begin{algorithm}
+    \caption{Algorytm do zadania 3.}
+    \begin{algorithmic}[1]
+        \Procedure{MaxSubarray}{$A$}
+        \State{$max\_sum = A[0]$}
+        \State{$current\_sum = A[0]$}
+        \State{$start = 0$}
+        \State{$end = 0$}
+        \For{$i = 1$ to $n-1$}
+            \If{$current\_sum < 0$}
+                \State{$current\_sum = A[i]$}
+                \State{$start = i$}
+            \Else
+                \State{$current\_sum += A[i]$}
+            \EndIf
+            \If{$current\_sum > max\_sum$}
+                \State{$max\_sum = current\_sum$}
+                \State{$end = i$}
+            \EndIf
+        \EndFor
+        \State \Return{$A[start:end+1]$} % zwraca podciąg o największej sumie
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsubsection{zadanie 4}
+Jedziemy przez paliwową pustynię pojazdem palącym 1 litr paliwa na 1 km. Pojemność baku wynosi W. Znamy rozkład stacji benzynowych wzdłuż drogi, którą jedziemy i wszystkie one są położone na kilometrach będących liczbami całkowitymi. Na stacji numer $i$, cena paliwa wynosi $w_i$. Pokaż algorytm obliczający jak najtaniej można dojechać do końca drogi (czyli do stacji numer $n$). Przeanalizuj poprawność i złożoność obliczeniową swojego algorytmu.
+
+\bigskip
+\hline
+\bigskip
+
+
+\subsubsection{zadanie 5}
+Rozważmy ukorzenione drzewo, w którego korzeniu pojawia się pewna informacja. W każdej rundzie, wierzchołek posiadający informację, może poinformować jedno swoje dziecko. Pokaż algorytm, który na podstawie struktury drzewa obliczy dla każdego wierzchołka w jakiej kolejności ma on informować dzieci tak, żeby czas dotarcia informacji do wszystkich wierzchołków drzewa był jak najkrótszy. Przeanalizuj poprawności złożoność obliczeniową swojego algorytmu.
+
+\bigskip
+\hrule
+\bigskip
+
+Rozważmy drzewo $T$ jako DAG z wierzchołkiem $R$ jako korzeniem. Jeżeli ustawimy węzły w porządku np. topologicznym, i krawędzie będą wskazywały relacje (parent, child) na przykład:
+\begin{center}
+    \begin{tikzpicture}
+        \node (R) at (0, 0) {R};
+        \node (A) at (-1, -1) {A};
+        \node (B) at (1, -1) {B};
+        \node (C) at (-2, -2) {C};
+        \node (D) at (0, -2) {D};
+        \node (E) at (2, -2) {E};
+
+        \draw[->] (R) -- (A);
+        \draw[->] (R) -- (B);
+        \draw[->] (A) -- (C);
+        \draw[->] (A) -- (D);
+        \draw[->] (B) -- (E);
+    \end{tikzpicture}
+\end{center}
+\begin{center}
+    \begin{automata}
+        \node[state, initial] (R) {R};
+        \node[state] (A) [below left=of R] {A};
+        \node[state] (B) [below right=of R] {B};
+        \node[state] (C) [below left=of A] {C};
+        \node[state] (D) [below=of A] {D};
+        \node[state] (E) [below right=of B] {E};
+
+        \draw[->] (R) -- (A);
+        \draw[->] (R) -- (B);
+        \draw[->] (A) -- (C);
+        \draw[->] (A) -- (D);
+        \draw[->] (B) -- (E);
+    \end{automata}
+\end{center}
 \end{document}
