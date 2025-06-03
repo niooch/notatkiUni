@@ -3913,6 +3913,168 @@ Zgodnie z tym co jest napisane w pseudokodzie złożoność obliczeniowa algoryt
     \end{tabular}
 \end{table}
 
+
+\section{Wykład \date{2025-06-03}}
+Wracając do algorytmu Dijkstry jeżeli w grafie pojawią się ujemne wagi krawędzi, to algorytm Dijkstry może przestać działać poprawnie. Rozważmy przypadek cyklu w grafie, którego waga jest ujemna. Możemy po nim chodzić w nieskończoność, co spowoduje, że algorytm Dijkstry nigdy nie zakończy się. Dlatego w grafach z ujemnymi wagami krawędzi należy użyć innego algorytmu, takiego jak Bellman-Ford.
+\subsection{Algorytm Bellmana-Forda}
+Algorytm Bellmana-Forda jest algorytmem, który znajduje najkrótsze ścieżki z wierzchołka źródłowego do wszystkich innych wierzchołków w grafie skierowanym, nawet jeśli graf zawiera krawędzie o ujemnych wagach. Algorytm ten działa na zasadzie relaksacji krawędzi, czyli stopniowego aktualizowania odległości do wierzchołków.
+\begin{itemize}
+    \item \textbf{Input}: $G=(V,E), e \in E w_e, w_e \in \mathbb{R}$, bez ujemnych cykli, $s \in V$ -- wierzchołek startowy
+    \item \textbf{Output}: $\forall v \in V$ do którego da sie dojśc z $s$ mamy wyznaczyć $dist(v)$ -- odległość od $s$ do $v$
+\end{itemize}
+Pseudokod:
+\begin{algorithm}
+    \caption{Algorytm Bellmana-Forda}
+    \begin{algorithmic}[1]
+        \Procedure{Bellman-Ford}{$G, s$}
+        \For{each vertex $v \in V$} \Comment {$O(|V|)$}
+            \State $dist(v) = \infty$
+            \State $prev(v)=null$
+        \EndFor
+        \State $dist(s) = 0$
+        \For{$i = 1$ to $|V|-1$} \Comment {$O(|V|)$}
+            \For{each edge $(u,v) \in E$} \Comment {$O(|E|)$}
+                \If{$dist(v) > dist(u) + w(u,v)$}
+                    \State $dist(v) = dist(u) + w(u,v)$
+                    \State $prev(v) = u$
+                \EndIf
+            \EndFor
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\textbf{Dowód poprawności:}
+\begin{proof}
+    \textbf{Założenie indukcyjne:} $\forall k \leq |V|-1: \forall v \in V$ do którego da się dojść z $s$ mamy $dist(v)$ poprawnie ustawione.
+    \textbf{Krok indukcyjny:} Załóżmy, że dla $k$ iteracji mamy poprawnie ustawione odległości, wtedy w $k+1$ iteracji sprawdzamy każdą krawędź i aktualizujemy odległości do wierzchołków, które sąsiadują z wierzchołkiem $u$, który ma poprawnie ustawioną odległość.
+\end{proof}
+\textbf{Złożoność obliczeniowa}:\\
+Złożoność obliczeniowa algorytmu Bellmana-Forda wynosi $O(nm)$, gdzie $n$ to liczba wierzchołków, a $m$ to liczba krawędzi. Złożoność pamięciowa wynosi $O(n)$, ponieważ musimy przechowywać informacje o odległościach i poprzednikach wierzchołków.
+
+\subsection{Algorytmy zachłanne}
+\textbf{Problem:} Minimalne drzewo rozpinające/Minimum Spanning Tree (MST)
+
+\begin{center}\begin{tikzpicture}[
+    node/.style={circle, draw, minimum size=1cm},
+    weight/.style={font=\small\itshape, fill=white, inner sep=1pt},
+    edge/.style={draw, thick},
+    node distance=2.5cm and 2.5cm
+]
+
+% Define nodes in 3x2 grid
+\node[node] (A) at (0, 4) {A};
+\node[node] (B) at (0, 2) {B};
+\node[node] (C) at (2.5, 4) {C};
+\node[node] (D) at (2.5, 2) {D};
+\node[node] (E) at (5, 4) {E};
+\node[node] (F) at (5, 2) {F};
+
+% Draw edges with weight labels (not inside circles)
+\draw[edge] (A) -- (C) node[midway, above, weight] {1};
+\draw[edge] (A) -- (B) node[midway, left, weight] {4};
+\draw[edge] (A) -- (D) node[midway, above right, weight] {3};
+\draw[edge] (B) -- (C) node[midway, below left, weight] {4};
+\draw[edge] (B) -- (D) node[midway, below, weight] {4};
+\draw[edge] (C) -- (D) node[midway, above, weight] {2};
+\draw[edge] (C) -- (F) node[midway, above right, weight] {4};
+\draw[edge] (D) -- (F) node[midway, above, weight] {6};
+\draw[edge] (F) -- (E) node[midway, right, weight] {5};
+
+\end{tikzpicture}\end{center}
+\begin{itemize}
+    \item \textbf{Input}: $G=(V,E), e \in E, w_e \in \mathbb{R}$ -- graf nieskierowany z wagami krawędzi
+    \item \textbf{Output}: $T = (V, \tilde E)$ -- drzewo rozpinające o minimalnej wadze, takie, że $\tilde E \subseteq E$, $weight(T)=\sum_{e \in \tilde E} w_e$ jest minimalne
+\end{itemize}
+
+\subsubsection*{Definijca:}
+Drzewo $\equiv$ acykliczny spójny graf nieskierowany
+
+\subsubsection*{Wlasności:}
+\begin{itemize}
+    \item usunięcie krawędzi należącej do cylku nie rospójni grafu
+    \item drzewo o $n$ wierzchołkach ma $n-1$ krawędzi
+        \begin{proof}
+            Załóżmy, że drzewo ma $k$ krawędzi, wtedy ma $k+1$ wierzchołków. Jeśli usuniemy jedną krawędź, to otrzymamy dwa drzewa, które mają $k$ krawędzi i $k+2$ wierzchołków. Zatem drzewo o $n$ wierzchołkach ma $n-1$ krawędzi.
+        \end{proof}
+    \item Każdy spójny nieskierowany graf $G=(V,E)$ taki, że $|E|=|V| -1$ jest drzewem\footnote{Równoważna do definicji znajdującej się powyżej}
+        \begin{proof}
+            Musimy pokazać acykliczność.\\
+            Załóżmy, że graf $G$ ma cykl i $e \in E$ należy do tego cyklu. Wtedy usunięcie krawędzi $e$ spowoduje, kożystając z wlasności 1. spowoduje otrzymanie nowego grafu
+            \[
+                \hat G = (V, \hat E), \hat E = E \setminus \{e\}
+            \]
+            Zatem $\hat G$ jest drzewem jeśli $\hat |E|=|V|-1$, ale $G$ miał $|E|=|V|-1$, więc $|\hat E|=|V|-2$, co jest sprzeczne z założeniem, że $G$ ma cykl.
+        \end{proof}
+    \item \textbf{Cut property}\\
+        Niech X będzie podzbiorem krawędzi \textit{MST} grafu $G=(V,E)$.Wybieramy podzbiór wierzchołków $S \subset V$ taki, że każda krawędz z $X$ nie przechodzi między wierzchołkami z $S$ i $V \setminus S$. \\
+        Niech $e\in E$ będzie krawędzią o najmniejszej wadze pomiędzy $S$ i $V \setminus S$. Wtedy $X\cup \{e\}$ należy do \textit{MST} grafu $G$.
+        \begin{proof}
+            Niech $T$ będzie MST. Rozważmy dwa przypadki:
+            \begin{enumerate}
+                \item Jeśli $e \in T$, to $T\cup \{e\}$ jest drzewem rozpinającym, ponieważ dodanie krawędzi do drzewa nie tworzy cyklu. $\qed$
+                \item Jeśli $e \notin T$, zmodyfikujmy $T$ poprzez usunięcie krawędzi $\hat T = T\setminus \{e'\} \cup \{e\}$. Wtedy $\hat T$ jest drzewem ponieważ:
+                    \begin{itemize}
+                        \item jest nieskierowane
+                        \item jest acykliczne
+                        \item z wlasności 1. jest spójne
+                        \item ma $|V|-1$ krawędzi
+                    \end{itemize}
+                    A więc $\hat T$ jest drzewem z własności 3.
+                    \[
+                        weight(\hat T) = weight(T) - w(e') + w(e)
+                    \]
+                    natomiast z tego, że $T$ jest MST $weight(T) \leq weight(\hat T)$, oraz z założenia $w(e) \leq w(e')$, więc
+                    \[
+                        weight(T) = weight(\hat T)
+                    \]
+                    zatem $\hat T$ jest MST, ponieważ ma tę samą wagę co $T$.
+            \end{enumerate}
+        \end{proof}
+\end{itemize}
+
+\textbf{Pierwszy pomysł} Rozważmy przykład intuicyjnego algorytmu zachłannego: wybieranie krawędzi o najmniejszej wadze, która nie tworzy cyklu. Jednakże taki algorytm nie gwarantuje znalezienia minimalnego drzewa rozpinającego, ponieważ może wybrać krawędź, która nie jest częścią minimalnego drzewa rozpinającego.
+
+\begin{enumerate}
+    \item Zaczynamy od najmniejszej wadze, wartość $(A, C, 1)$ krawędzi w grafie, dodajemy ją do drzewa.
+    \item Następnie wybieramy kolejną najmniejszą krawędź, wartość $(C, D, 2)$, dodajemy ją do drzewa.
+    \item Jedyną krawędzą o wadze $3$ jest $(A, D, 3)$, ale nie dodajemy jej, ponieważ tworzy cykl z $(A, C, 1)$ i $(C, D, 2)$.
+    \item Teraz rozważamy krawędzie o wadze $4$
+        \begin{itemize}
+            \item $(A, B, 4)$ -- nie dodajemy, ponieważ tworzy cykl z $(A, C, 1)$ i $(C, D, 2)$
+            \item $(B, C, 4)$ -- nie dodajemy, ponieważ tworzy cykl z $(A, C, 1)$ i $(C, D, 2)$
+            \item $(B, D, 4)$ -- dodajemy do drzewa
+            \item $(C, F, 4)$ -- nie dodajemy, ponieważ tworzy cykl z $(A, C, 1)$ i $(C, D, 2)$
+        \end{itemize}
+    \item Następnie rozważamy krawędzie o wadze $5$. Jest ona jedyna i nie tworzy cyklu, więc dodajemy ją do drzewa.
+    \item Teraz rozważamy krawędzie o wadze $6$. Jest ona jedyna i nie tworzy cyklu, więc dodajemy ją do drzewa.
+\end{enumerate}
+
+\begin{center}\begin{tikzpicture}[
+    node/.style={circle, draw, minimum size=1cm},
+    weight/.style={font=\small\itshape, fill=white, inner sep=1pt},
+    edge/.style={draw, thick},
+    node distance=2.5cm and 2.5cm
+]
+
+% Define nodes in 3x2 grid
+\node[node] (A) at (0, 4) {A};
+\node[node] (B) at (0, 2) {B};
+\node[node] (C) at (2.5, 4) {C};
+\node[node] (D) at (2.5, 2) {D};
+\node[node] (E) at (5, 4) {E};
+\node[node] (F) at (5, 2) {F};
+
+% Draw edges with weight labels (not inside circles)
+\draw[edge] (A) -- (C) node[midway, above, weight] {1};
+\draw[edge] (A) -- (B) node[midway, left, weight] {4};
+\draw[edge] (C) -- (D) node[midway, above, weight] {2};
+\draw[edge] (C) -- (F) node[midway, above right, weight] {4};
+\draw[edge] (F) -- (E) node[midway, right, weight] {5};
+\end{tikzpicture}\end{center}
+
+%TUTAJ
+
 \pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
@@ -4720,36 +4882,4 @@ Rozważmy ukorzenione drzewo, w którego korzeniu pojawia się pewna informacja.
 \bigskip
 
 Rozważmy drzewo $T$ jako DAG z wierzchołkiem $R$ jako korzeniem. Jeżeli ustawimy węzły w porządku np. topologicznym, i krawędzie będą wskazywały relacje (parent, child) na przykład:
-\begin{center}
-    \begin{tikzpicture}
-        \node (R) at (0, 0) {R};
-        \node (A) at (-1, -1) {A};
-        \node (B) at (1, -1) {B};
-        \node (C) at (-2, -2) {C};
-        \node (D) at (0, -2) {D};
-        \node (E) at (2, -2) {E};
-
-        \draw[->] (R) -- (A);
-        \draw[->] (R) -- (B);
-        \draw[->] (A) -- (C);
-        \draw[->] (A) -- (D);
-        \draw[->] (B) -- (E);
-    \end{tikzpicture}
-\end{center}
-\begin{center}
-    \begin{automata}
-        \node[state, initial] (R) {R};
-        \node[state] (A) [below left=of R] {A};
-        \node[state] (B) [below right=of R] {B};
-        \node[state] (C) [below left=of A] {C};
-        \node[state] (D) [below=of A] {D};
-        \node[state] (E) [below right=of B] {E};
-
-        \draw[->] (R) -- (A);
-        \draw[->] (R) -- (B);
-        \draw[->] (A) -- (C);
-        \draw[->] (A) -- (D);
-        \draw[->] (B) -- (E);
-    \end{automata}
-\end{center}
 \end{document}
