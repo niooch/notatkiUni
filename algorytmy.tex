@@ -4297,11 +4297,6 @@ Gdzie:
     \end{itemize}
 \end{proof}
 Dla pewnosci sprawdzone empirycznie:
-%zalacz wykres wykresAlgoZad3.png
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{wykresAlgoZad3.png}
-\end{figure}
 
 \subsubsection{zadanie 4}
 Wyznacz asymptotyczne oszacowanie górne dla następujących rekurencji:
@@ -4963,4 +4958,40 @@ Rozważmy ukorzenione drzewo, w którego korzeniu pojawia się pewna informacja.
 \bigskip
 
 Rozważmy drzewo $T$ jako DAG z wierzchołkiem $R$ jako korzeniem. Jeżeli ustawimy węzły w porządku np. topologicznym, i krawędzie będą wskazywały relacje (parent, child) na przykład:
+\begin{center}\begin{tikzpicture}[
+    every node/.style={circle, draw, minimum size=1cm},
+    level/.style={font=\small}
+]
+  %---- Define the nodes ----
+  \node (R) at (0,0) {$R$};
+
+  % Compressed middle layer
+  \node[level] (dots1) at (0,-1.6) {$\cdots$};
+
+  % Bottom leaves
+  \node[level] (A)     at (-3,-3.6) {$A$};
+  \node[level] (B)     at (-1,-3.6) {$B$};
+  \node[level] (dots2) at ( 1,-3.6) {$\dots$};
+  \node[level] (C)     at ( 3,-3.6) {$C$};
+
+  %---- Draw edges R → “⋯” (multiple slanted lines) ----
+  \draw (R) to[out=-100, in=90] (-0.6,-1.3);
+  \draw (R) to[out=-90,  in=90] ( 0.0,-1.3);
+  \draw (R) to[out=-80,  in=90] ( 0.6,-1.3);
+
+  %---- Draw edges “⋯” → A, B, …, C ----
+  \draw (dots1) -- (A);
+  \draw (dots1) -- (B);
+  \draw (dots1) -- (dots2);
+  \draw (dots1) -- (C);
+\end{tikzpicture}\end{center}
+
+Niech $T(N)$ bedzie minimalnym czasem propagacji z noda $N$ do jego całego poddrzewa. Zachodzi wtedy taka relacja:
+\[
+    T(N) = \max_{M \in N.children} \left\{ T(M) + \text{kolejność wywołania} \right\}
+\]
+
+Aby zminimalizować tę wartość to odpalamy M w kolejności malejącej wartości $T(M)$.
+\textbf{Przykład:}
+
 \end{document}
