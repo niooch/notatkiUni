@@ -4073,6 +4073,87 @@ Drzewo $\equiv$ acykliczny spójny graf nieskierowany
 \draw[edge] (F) -- (E) node[midway, right, weight] {5};
 \end{tikzpicture}\end{center}
 
+\section{Wykład \date{2025-06-16}}
+
+Na dziejszym wykładzie będziemy zajmować się algorytmem Kruskala, który jest jednym z algorytmów do znajdowania minimalnego drzewa rozpinającego w grafie nieskierowanym. Algorytm ten działa na zasadzie sortowania krawędzi według ich wag i dodawania ich do drzewa, jeśli nie tworzą cyklu.
+
+\subsection{Algorytm Kruskala}
+Do implementacji tego algorytmu bedziemy potrzebować pewnej struktury, od której będziemy wymagać pewnych właściwości:\newline
+\textbf{Struktura Danych zbiorów rozłącznych (Disjoint Set Union, DSU)} \begin{itemize}
+    \item $makeset(x)$ -- tworzy nowy zbiór zawierający tylko element $x$.
+    \item $find(x)$ -- zwraca rozłączny zbiór do którego należy element $x$.
+    \item $union(x,y)$ -- łączy dwa zbiory rozłączne, do których należą elementy $x$ i $y$.
+\end{itemize}
+
+\textbf{Pseudokod algorytmu Kruskala}:
+\begin{algorithm}
+    \caption{Algorytm Kruskala}
+    \begin{algorithmic}[1]
+\Procedure{Kruskal}{$G=(V,E), \left\{w_i: i \in \{1, \dots, n\}\right\}$}
+        \State $T = \emptyset$ \Comment {początkowe drzewo rozpinające}
+        \State $DSU = \text{DisjointSetUnion()}$ \Comment {inicjalizacja struktury DSU}
+        \For{each vertex $v \in V$} \Comment {$O(|V|)$}
+            \State $DSU.makeset(v)$
+        \EndFor
+        \State $E.sort()$ \Comment {sortowanie krawędzi według wag -- $O(|E|\log|E|)$}
+        \For{each edge $(u,v) \in E$} \Comment {$O(|E|)\times find$}
+            \If{$DSU.find(u) \neq DSU.find(v)$} \Comment {sprawdzenie czy krawędź tworzy cykl}
+                \State $T = T \cup {(u,v)}$
+                \State $DSU.union(u,v)$ \Comment {$O(|V|)\times union$}
+            \EndIf
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\textbf{Złożoność algorytmu}:
+\[
+    O(|V|) \times makeset + O(|E| \log |E|) + O(|E|) \times find + O(|V|) \times union
+\]
+
+\textbf{Struktura danych}:
+
+Bedzie ona miała następujące pola:
+\begin{itemize}
+    \item $\pi$ -- wskaźnik na ojca
+    \item $rank$ -- wyskość poddrzewa zaczepionegi w tym węźle
+    \item $nazwa$
+\end{itemize}
+
+Trochę pseudokodów
+\begin{algorithm}
+    \caption{Struktura danych zbiorów rozłącznych}
+    \begin{algorithmic}[1]
+        \Procedure{makeset}{$x$}
+            \State $\pi[x] = x$ \Comment {ustawiamy ojca na siebie}
+            \State $rank[x] = 0$ \Comment {wysokość poddrzewa to 0}
+        \EndProcedure
+        \Procedure{find}{$x$}
+            \If{$\pi[x] \neq x$} \Comment {jeśli nie jesteśmy korzeniem}
+                \State $\pi[x] = find(\pi[x])$ \Comment {idź do ojca i ustaw go jako ojca dla $x$}
+            \EndIf
+            \State \Return $\pi[x]$ \Comment {zwróć ojca}
+        \EndProcedureation means updating the shortest distance to a node if a shorter path is found through another node. For an edge (u, v) with weight w:
+
+    If going through u gives a shorter path to v from the source node (i.e., distance[v] > distance[u] + w), we update the distance[v] as distance[u] + w.
+        \Procedure{union}{$x,y$}
+            \State $root_x = find(x)$
+            \State $root_y = find(y)$
+            \If{$root_x \neq root_y$} \Comment {jeśli są w różnych zbiorach rozłącznych}
+                \If{$rank[root_x] < rank[root_y]$}
+                    \State $\pi[root_x] = root_y$
+                \ElsIf{$rank[root_x] > rank[root_y]$}
+                    \State $\pi[root_y] = root_x$
+                \Else
+                    \State $\pi[root_y] = root_x$
+                    \State $rank[root_x] += 1$
+                \EndIf
+            \EndIf
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+
 %TUTAJ
 
 \pagebreak
