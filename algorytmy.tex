@@ -4133,9 +4133,6 @@ Trochę pseudokodów
                 \State $\pi[x] = find(\pi[x])$ \Comment {idź do ojca i ustaw go jako ojca dla $x$}
             \EndIf
             \State \Return $\pi[x]$ \Comment {zwróć ojca}
-        \EndProcedureation means updating the shortest distance to a node if a shorter path is found through another node. For an edge (u, v) with weight w:
-
-    If going through u gives a shorter path to v from the source node (i.e., distance[v] > distance[u] + w), we update the distance[v] as distance[u] + w.
         \Procedure{union}{$x,y$}
             \State $root_x = find(x)$
             \State $root_y = find(y)$
@@ -4153,7 +4150,157 @@ Trochę pseudokodów
     \end{algorithmic}
 \end{algorithm}
 
+\section{Wykład \date{2025-06-17}}
+\subsection{Min Cut Problem}
+Zaczynamy dziejszy wykład od opisu problemu \texit{Min Cut Problem}. Dysponując nie ważonym grafem nieskierowanym $G=(V,E)$, gdzie $|V|=n$ i $|E|=m$, chcemy znaleźć taki podzbiór krawędzi $E' \subseteq E$, że:
+\begin{itemize}
+    \item $E'$ jest minimalny, tzn. $|E'|$ jest minimalne
+    \item $G'=(V,E')$ jest nie jest spójny
+    \item \textit{Dodatkowo} jeżeli $G$ jest ważony, to $E'$ jest taki, że suma wag krawędzi w $E'$ jest minimalna.
+\end{itemize}
+Do rozwiązania tego problemu możemy użyć algorytmu kruskala. Załóżmym, że mamy dwa podzbiory w grafie $S$ i $V\setminus S$. Między nimi nie występuje żadna krawędź, natomiast w samych subsetach istnieją już zbudowane początki MST. Rozważmy teraz wszytkie krawędzie takie, że
+\[
+    A= \left\{(u,v) \in E: u \in S, v \in V\setminus S\right\}
+\]
+Krawędzie z zbioru A łączą dwa podzbiory $S$ i $V\setminus S$. Rozważmy teraz prawdopodobieństwio tego, że wybrana krawędź jest tą odpowiadająca \textit{MinCut}.
+\[
+    P(A \in MinCut) \geq \frac{1}{n(n-1)}
+\]
+oraz jeżeli powtórzymy $\Theta(n^2)$ razy algorytm Kruskala na tej krawędzi, to z prawdopodobieństwem $n\rightarrow \infty \implies ppb \rightarrow 1$, znajdziemy \textit{MinCut}.\\
+\textbf{Złożoność obliczeniowa}: Wynosi ona $O(n^2 m \log n)$, ponieważ musimy wykonać algorytm Kruskala $\Theta(n^2)$ razy, a jego złożoność wynosi $O(m\log n)$, gdzie $m$ to liczba krawędzi w grafie.
 
+Lepsze algorytmy wyszukiwania \textit{MinCut} ulepszają złożoność do $O(n^2 \log n)$, ale nie będziemy się nimi zajmować.
+
+\textbf{Rozważania}
+Zastanówmy się na działaniem algorytmu. Załóżmy, że mamy:
+\begin{itemize}
+    \item $k$ komponentów spójnych w grafie (jak $S$)
+    \item $|MinCut| = C$
+    \item liczba krawędzi które możemy wybrać to conajmneij $\frac{k \cdot C}{2}$ (gdyby istnijała komponęta mająca mniej wychodzacych krawędzi niż $C$, to była by to wartość \textit{MinCut})
+\end{itemize}
+Wtedy prawdopodobienstwo wyboru krawędzi z $MinCut$ wynosi:
+\[
+    P(A \in MinCut) \geq \frac{C}{\frac{k \cdot C}{2}} = \frac{2}{k}
+\]
+A więc
+\[
+    P(A \in MinCut) \geq \frac{n-2}{n} \cdot \frac{n-3}{n-1} \cdot \dots \cdot \frac{2}{4} \cdot \frac{1}{3} = \frac{2}{n(n-1)}
+\]
+
+\textbf{Pseudokod}:
+\begin{algorithm}
+    \caption{Algorytm MinCut}
+    \begin{algorithmic}[1]
+        \Procedure{MinCut}{$G=(V,E)$}
+        \State $X = \{\}$ \Comment {początkowy zbiór wierzchołków}
+        \While{$|X| < |V|-1$} \Comment {dopóki nie zostanie dodany ostatni wierzchołek}
+            \State wybierz $S\subset V$ dla, którego w $X$ nie ma krawędzi pomiędzy $S$ i $V\setminus S$
+            \State znajdź $e \in E$ krawędź o najmniejszej wadze, która łączy $S$ i $V\setminus S$
+            \State $X = X \cup \{e\}$ \Comment {dodaj krawędź do zbioru}
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Algorytm Prim'a}
+Algorytm Prim'a jest algorytmem zachłannym, który znajduje minimalne drzewo rozpinające w grafie nieskierowanym. Działa on na zasadzie stopniowego dodawania krawędzi do drzewa, zaczynając od jednego wierzchołka i rozszerzając drzewo o krawędź o najmniejszej wadze, która łączy drzewo z wierzchołkiem spoza drzewa.
+
+\textbf{Pseudokod algorytmu Prim'a}:
+\begin{algorithm}
+    \caption{Algorytm Prim'a}
+    \begin{algorithmic}[1]
+        \Procedure{Prim}{$G=(V,E), s, (w_i)_{i=1 \dots |E|}$} \Comment{s - wierzchołek startowy, $w_i$ - wagi krawędzi}
+        \For{v \in V}
+            \State $cost(v)=\infty$ \Comment {koszt dojścia do wierzchołka}
+            \State $prev(v)=null$ \Comment {poprzednik wierzchołka}
+        \EndFor
+        \State $cost(s)=0$ \Comment {koszt dojścia do wierzchołka startowego}
+        \State $Q = \text{PriorityQueue()}$ \Comment {kolejka priorytetowa na $cost$}
+        \While{$H$ is not \textbf{empty}}
+            \State $v= Q.extractMin()$ \Comment {wyciągamy wierzchołek o najmniejszym koszcie}
+            \For{each edge $(v,u) \in E$} \Comment {przechodzimy po wszystkich krawędziach wychodzących z $v$}
+                \If{$cost(u) > w(v,u)$} \Comment {jeśli koszt dojścia do $u$ jest większy niż waga krawędzi}
+                    \State $cost(u) = w(v,u)$ \Comment {aktualizujemy koszt dojścia do $u$}
+                    \State $prev(u) = v$ \Comment {ustawiamy poprzednika $u$ na $v$}
+                    \State $Q.update(u)$ \Comment {aktualizujemy kolejkę priorytetową}
+                \EndIf
+            \EndFor
+        \EndWhile
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\subsection{Kodoowanie Huffmana}
+Kodoanie Huffmana jest algorytmem kompresji danych, który wykorzystuje drzewo binarne do reprezentacji znaków w taki sposób, że znaki o większej częstotliwości występowania mają krótsze kody, a znaki o mniejszej częstotliwości mają dłuższe kody. Algorytm ten jest oparty na zasadzie budowania drzewa binarnego, gdzie każdy węzeł reprezentuje znak i jego częstotliwość występowania.
+
+Rozważmy sobie przykład kompresji pliku MP3. Musimy napoczątku wykonać kilka kroków
+\begin{itemize}
+    \item digitalizacja analogowego dzwięku: próbkowanie 44,1 KHz $\rightarrow$ 44100 próbek/sekundę
+    \item $\Gamma$-alfabet na który zmapowujemy próbki: $\Gamma = \{A,B,C,D\}$
+    \item zmapuj elementy alfabetu na ciągi bitowe
+\end{itemize}
+
+Jeżeli mamy dany jakiś ciąg znaków z naszego alfabetu (zdanie), na przykład:
+\[
+    ABACCD\dots
+\]
+możemy policzyć ilość wystąpień każdego znaku w tym ciągu:
+\begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        znak & ilość wystąpień \\
+        \hline
+        A & 70 000 000 \\
+        B & 3 000 000 \\
+        C & 20 000 000 \\
+        D & 37 000 000 \\
+        \hline
+    \end{tabular}
+\end{center}
+Na podstawie częstotliwości wystąpień znaków możemy stworzyć \textit{prefix-free codes}, które będą za pomocą mniejszej ilości bitów dla najczęściej występujących znaków, a dla rzadziej występujących znaków będą używać większej ilości bitów w jednoznaczy sposób zakodować zdanie. W tym celu możemy użyć algorytmu Huffmana.
+\[
+    A\rightarrow 0, D\rightarrow 10, C\rightarrow 110, B\rightarrow 111
+\]
+
+\subsubsection{W jaki sposób tworzyć prefix-free codes?}
+\textit{Prefix-free codes} możemy opisać przy pomocy drzewa binarego, gdzie każdy węzeł liściowy reprezentuje znak, a krawędzie reprezentują bity. Idać w drzewie w prawo oznacza dopisanie 0, a w lewo 1. W ten sposób możemy zakodować każdy znak w taki sposób, że żaden kod nie jest prefiksem innego kodu.
+
+W naszym przykładzie drzewo kodowe będzie wyglądać następująco:
+\begin{center}\begin{tikzpicture}[
+  level distance=10mm,
+  level 1/.style={sibling distance=30mm},
+  level 2/.style={sibling distance=20mm},
+  level 3/.style={sibling distance=10mm},
+  every node/.style={circle, draw, minimum size=6mm},
+  edge from parent/.style={draw, -latex},
+  edge label/.style={font=\footnotesize}
+]
+\node {}
+  child {
+    node {A}
+    edge from parent node[edge label,left] {0}
+  }
+  child {
+    node {}
+    edge from parent node[edge label,right] {1}
+    child {
+      node {D}
+      edge from parent node[edge label,left] {0}
+    }
+    child {
+      node {}
+      edge from parent node[edge label,right] {1}
+      child {
+        node {C}
+        edge from parent node[edge label,left] {0}
+      }
+      child {
+        node {B}
+        edge from parent node[edge label,right] {1}
+      }
+    }
+  };
+\end{tikzpicture}\end{center}
 %TUTAJ
 
 \pagebreak
