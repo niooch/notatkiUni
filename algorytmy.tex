@@ -4301,8 +4301,62 @@ W naszym przykładzie drzewo kodowe będzie wyglądać następująco:
     }
   };
 \end{tikzpicture}\end{center}
-%TUTAJ
 
+\subsubsection{Algortym zachłanny minimaliacji drzewa kodowego}
+Rozważmy sobie jak może wygladać algortym budujacy drzewo kodowe. Załóżmy, że mamy $\Gamma$--alfabet o mocy $n$.
+
+\textbf{Pseudokod algorytmu Huffmana}:
+\begin{algorithm}
+    \caption{Algorytm Huffmana}
+    \begin{algorithmic}[1]
+        \Procedure{Huffman}{$\Gamma, f$} \Comment{$f$ - funkcja częstości wystąpień znaków (praktycznie wysyłamy pary (symbol, częstość))}
+        \State $Q = \text{MakeQueue()}$ \Comment {kolejka na alfabecie, $O(n)$}
+        \For{$k =n+1$ to $2n-1$} \Comment {$O(n)$}
+        \State $(a_i, f_i) = \text{ExtractMin}(Q)$ \Comment {wyciągamy dwa znaki o najmniejszej częstości}
+        \State $(a_j, f_j) = \text{ExtractMin}(Q)$ \Comment {$O(\log n)$}
+        \State N = Node$(k, f_i + f_j)$ \Comment {tworzymy nowy węzeł z sumą częstości}
+        \State Q.insert(N) \Comment {wstawiamy nowy węzeł do kolejki, $O(\log n)$}
+        \EndFor
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\textbf{Złożoność algorytmu}:
+Złożoność algorytmu Huffmana wynosi $O(n \log n)$, ponieważ musimy wykonać $n$ operacji wyciągania z kolejki i wstawiania do kolejki, a każda operacja ma złożoność $O(\log n)$ (asymptotycznie najważniejsze).
+
+\section{Wykład \date{2025-06-23}}
+Na dzisiaj, już przedostatnim wykładzie zajmiemy się Set Cover Problem, który jest problemem NP-zupełnym. Problem ten polega na znalezieniu najmniejszego podzbioru zbiorów, który pokrywa wszystkie elementy z danego uniwersum.
+\subsection{Set Cover Problem}
+\begin{itemize}
+    \item \textbf{Input}: $B=\{1, \dots, n\}$ -- uniwersum, $S_i \subseteq B$ -- podzbiory, potęcjalne rozwiazania
+    \item \textbf{Output}: $\{S_{i_1}, S_{i_2}, \dots, S_{i_k}\}$ -- podzbiory takie, że $\bigcup_{j=1}^k S_{i_j} = B$ i $k$ jest minimalne
+\end{itemize}
+
+\subsubsection{Algorytm zachłanny}
+Algorytm zachłanny mógł by brać zbiór o największym stopniu -- znajdujący się w największej ilości podzbiorów, które nie są jeszcze pokryte. Jednakże taki algorytm nie gwarantuje znalezienia optymalnego rozwiązania, ponieważ może wybrać zbiory, które nie są częścią optymalnego rozwiązania.
+
+Tutaj pojawia się przykład na to że algortym zachłanny jest nie poprawny...
+
+\subsubsection{Twierdzenie}
+Niech w problemie Set Cover $|B|=n$, natomiast optymalne rozwiązanie ma koszt $m$. Wtedy algorytm zachłanny zwraca rozwiązanie o koszcie $\leq m \log n$.
+
+Jest to przykład algorytmu, który jest \textit{logarytmicznie aproksymujący}. Zostało również udowodnione, że nie istnieje algorytm, który aproksymuje rozwiązanie lepiej niż $O(\log n)$, chyba że $P=NP$.
+
+\begin{proof}
+    Założmy, że jesteśmy po $t$ krokach algorytmu zachłannego. Niech $n_t$ -- liczba nie pokrytych elementów w uniwersum $B$. Mam istniejące $S_i$ takie, że pokrywa ono co najmniej $\frac{n_t}{m}$ elementów z $B$. Dodajemy go do rozwiązania. Daje to nam następujące nierówności:
+    \[
+        n_{t+1} \leq n_t - \frac{n_t}{m} = n_0 \cdot \left(1-\frac{1}{m}\right)^{t+1}
+    \]
+    Kożystając teraz z faktu, że $1-x \leq e^{-x}$ dla $x \geq 0$ oraz zmienając zmienną $t$ na $t+1$, otrzymujemy:
+    \[
+        n_t \leq n_0\cdot \left(1-\frac{1}{m}\right)^{t} \leq n_0 \cdot e^{-\frac{t}{m}}
+    \]
+    Zatem
+    \[
+        t \leq -m \cdot \log\left(\frac{n_t}{n_0}\right)
+    \]
+\end{proof}
+%TUTAJ
 \pagebreak
 \section{Ćwiczenia}
 tu beda pojawialy sie notatki z cwiczen do przedmiotu Algorytmy i struktury danych na Politechnice Wrocławskiej na kierunku Informatyka Algorytmiczna rok 2025 semestr letni.
