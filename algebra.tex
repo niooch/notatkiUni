@@ -1,0 +1,246 @@
+\documentclass[11pt,a4paper]{article}
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{mathtools}
+\usepackage{tabularx}
+\usepackage{array} % for centering in p-columns
+\usepackage{calc}
+\usepackage[makeroom]{cancel}
+\usepackage{xcolor}
+\usepackage{bm}
+\usepackage{marginnote}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\usepackage{algorithm}               % Algorytmy
+\usepackage{algpseudocode}           % Pseudokod
+\newcommand{\curly}{\mathrel{\leadsto}}
+
+% Twierdzenia, lematy itd.
+\newtheorem{twierdzenie}{Twierdzenie}[section]
+\newtheorem{fakt}[twierdzenie]{Fakt}
+\newtheorem{lemat}[twierdzenie]{Lemat}
+\newtheorem{wniosek}[twierdzenie]{Wniosek}
+\newtheorem{stwierdzenie}[twierdzenie]{Stwierdzenie}
+
+% Definicje, przykłady, uwagi
+\theoremstyle{definition}
+\newtheorem{definicja}[twierdzenie]{Definicja}
+\newtheorem{przyklad}[twierdzenie]{Przykład}
+\newtheorem{zadanie}[twierdzenie]{Zadanie}
+
+\theoremstyle{remark}
+\newtheorem{uwaga}[twierdzenie]{Uwaga}
+\newtheorem{oznaczenie}[twierdzenie]{Oznaczenie}
+% Dodatkowe ustawienia
+\newlength{\exprwidth}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\title{Notatki z Algorytmów i Struktur Danych}
+\author{Jakub Kogut}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+
+\section{Wstęp}
+Notatki z przedmiotu Wybrane zagadnienia Algebry. Prowadzony przez dr Bojko.
+\section{Wykład 11.03.2026}
+Na start krótka poprawka do poprzedniego wykładu.
+\subsection{Dziedziny całkowitości}
+\begin{definicja}
+Dziedziną całkowitości $\mathbb{R} = (X, +, \cdot, 0)$ nazywamy dziedzinę euklidesową, jeśli
+\[
+    (\exists N: X \rightarrow \mathbb{N}) \forall a, b \in X: (b \neq 0 \Rightarrow \exists q, r \in X: a = bq + r \land (r = 0 \lor N(r) < N(b)))
+\]
+oraz
+\[
+    (\forall a, b \in X) (N(ab) \geq N(a))
+\]
+\end{definicja}
+\begin{przyklad}
+    Dziedziną całkowitości $\mathbb{Z}$ jest $\mathbb{Z}$ z funkcją $N(a) = |a|$.
+\end{przyklad}
+\begin{przyklad}
+    Dziedziną całkowitości $\mathbb{Z}[i]$ jest $\mathbb{Z}[i]$ z funkcją $N(a + bi) = a^2 + b^2$.
+\end{przyklad}
+Rozwazmy izomorfizm 
+\[
+    \mathbb{C} \cong \left\{\begin{bmatrix}a & -b \\ b & a
+\end{bmatrix} : a, b \in \mathbb{R}\right\}
+        \]
+        \[
+    \varphi(a + bi) = \begin{bmatrix}a & -b \\ b & a
+\end{bmatrix}
+\]
+można to udowodnić jako ćwiczenie
+\[
+    \varphi((a + bi)(c + di)) = \begin{bmatrix}ac - bd & -(ad + bc) \\ ad + bc & ac - bd\end{bmatrix} = \varphi(a + bi)\varphi(c + di)
+\]
+\begin{przyklad}
+    wracając do pierścienia Gaussa, zastanówmy się nad ideałem $<a + bi>$. Czy jest on główny? Odpowiedź brzmi tak, ponieważ $<a + bi> = <\gcd(a, b)>$.
+\end{przyklad}
+A jak wyglądają elementy odwracalne w tym pierścieniu? Są to elementy o normie równej 1, czyli $1, -1, i, -i$. Ponieważ $N(a + bi) = a^2 + b^2$, to $a^2 + b^2 = 1$ ma tylko te cztery rozwiązania całkowite.
+\begin{przyklad}
+    Niech $K[x]$ będzie pierścieniem wielomianów nad ciałem $K$. Zdefiniujmy funkcję $N: K[x] \rightarrow \mathbb{N}$ jako $N(f) = \deg(f)$. Wtedy $K[x]$ jest dziedziną całkowitości, ponieważ dla dowolnych $f, g \in K[x]$ z $g \neq 0$, istnieją wielomiany $q, r \in K[x]$ takie, że $f = gq + r$ oraz $\deg(r) < \deg(g)$ lub $r = 0$. Ponadto, dla dowolnych $f, g \in K[x]$, mamy $\deg(fg) = \deg(f) + \deg(g) \geq \deg(f)$, co spełnia warunek drugiej części definicji dziedziny całkowitości.
+\end{przyklad}
+\begin{przyklad}
+    Rozważmy wielomian $w = x^{11}+10x \in \mathbb{Z}_{11}[x]$. Można łatwo załóważyć, ze jego zera to:
+    \[
+        w(0) = 0, w(1) = 1 + 10 = 0, \dots, w(10) = 10^{11} + 10 \cdot 10 = 10 + 100 = 0
+    \]
+    Wynika to z małego tw. Fermata.
+\end{przyklad} 
+Rodzi się pytanie jak sprawdzić, kiedy $f \in K[x]$ spełnia $f \equiv 0$?\\
+Odpowiedź brzmi: $f \equiv 0$ wtedy i tylko wtedy, gdy $f$ ma co najmniej $|K|$ różnych zer. W przypadku $w$, ponieważ $w$ ma 11 różnych zer, to $w \equiv 0$ w $\mathbb{Z}_{11}[x]$.
+\begin{fakt}
+    $f \equiv 0$ jeśli:
+    \[
+        \exists A \subseteq K: |A| > \deg(f) 
+    \]
+    oraz
+    \[
+    \forall a \in A: f(a) = 0
+    \]
+\end{fakt}
+\begin{definicja}[Leading Term]
+    Niech $f \in K[x]$, $\sum_{i=0}^n a_i x^i$, $a_n \neq 0$. \\
+    Określamy $LT(f) = a_n x^n$ jako \textit{najwyższy wyraz} wielomianu $f$, $LT(0) = 0$.
+\end{definicja}
+\subsection{Dziedziny ideałów głównych}
+\begin{definicja}[Principal Ideal Domain, PID]
+    Dziedzine całkowitości $\mathcal{R}$ nazywamy dziedziną ideałów głównych, jeśli
+    \[
+        \forall \mathcal{I} \in ID(\mathcal{R}): \exists a \in \mathcal{R}: \mathcal{I} = \langle a \rangle
+    \]
+    gdzie $\langle a \rangle$ jest ideałem głowny.
+\end{definicja}
+\begin{fakt}
+    W dziedzinach euklidesowych zachodzi:
+    \[
+        \langle a,b \rangle = \langle \gcd(a, b) \rangle
+    \]
+\end{fakt}
+\begin{fakt}
+    \[
+        d|a \rightarrow \langle a \rangle \subseteq \langle d \rangle
+    \]
+\end{fakt}
+\begin{wniosek}
+    \[
+        (d|a \land d|b) \rightarrow \langle a, b \rangle \subseteq \langle d \rangle
+    \]
+\end{wniosek}
+
+\begin{fakt}
+    W $\mathcal{R} \in EUCL$ ideały generowane przez $(a,b)$, $b \neq 0$, $a = bq + r$ wyglądają następująco:
+    \[
+        \langle a, b \rangle = \langle b, r \rangle
+    \]
+\end{fakt}
+Aby to pokazać, należy zauważyć, że $ r \in \langle a, b \rangle$, ponieważ $r = a - bq$. Z drugiej strony, $a \in \langle b, r \rangle$, ponieważ $a = bq + r$. Ponadto, $b$ jest oczywiście elementem obu ideałów. W związku z tym, $\langle a, b \rangle$ i $\langle b, r \rangle$ zawierają te same elementy, co oznacza, że są one równe.
+\pagebreak
+\subsection{Algorytm Euklidesa}
+\begin{twierdzenie}[Euklidesa]
+    Jeśli $NWD(n,m) = d$, to istnieją liczby całkowite $x, y$ takie, że $nx + my = d$. Jest to tożsamość Bézouta. Ponadto, $d$ jest najmniejszą dodatnią liczbą całkowitą, którą można przedstawić w postaci $nx + my$.
+\end{twierdzenie}
+\begin{algorithm}
+\caption{Algorytm Euklidesa}
+\begin{algorithmic}[1]
+\Procedure{ExtendedGCD}{$a, b$}
+\If{$b = 0$}
+    \State \Return $(a, 1, 0)$
+\Else
+    \State $(d, x1, y1) \gets \text{ExtendedGCD}(b, a \mod b)$
+    \State $x \gets y1$
+    \State $y \gets x1 - \lfloor a / b \rfloor \cdot y1$
+    \State \Return $(d, x, y)$
+\EndIf
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\begin{przyklad}
+    Niech $f,g \in K[x]$,
+    \begin{algorithmic}[1]
+    \Procedure{div}{$f, g$}
+    \State $q \gets 0$
+    \State $p \gets f$
+    \While{$p \neq 0 \&\& LT(g) | LT(p)$}
+        \State $q \gets q + \frac{LT(p)}{LT(g)}$
+        \State $p \gets p - \frac{LT(p)}{LT(g)}g$
+    \EndWhile
+    \State \Return $(q, p)$
+    \EndProcedure
+    \end{algorithmic}
+    $q$ to wynik dzielenia, natomiast $p$ to reszta z dzielenia $f$ przez $g$. Algorytm ten jest poprawny, ponieważ w każdej iteracji zmniejszamy stopień wielomianu $p$, a proces kończy się, gdy $p$ jest równe zero lub gdy najwyższy wyraz $g$ nie dzieli najwyższego wyrazu $p$.
+\end{przyklad}
+\begin{definicja}[Relacja porządkowa]
+    W $\mathbb{N}^k$ definujemy relację porządkową $\leq$ w następujący sposób:
+    \[
+        (x_1, \dots, x_k) \leq (y_1, \dots, y_k) \iff \bigwedge_{i=0}^k: x_i \leq y_i
+    \]
+\end{definicja}
+\begin{przyklad}
+    W $\mathbb{R}[x, y]$ 
+    \[
+        xy^2 \curly (1, 2) \leq x^2y^4 \curly (2, 4)
+    \]
+\end{przyklad}
+
+\begin{lemat}[Dicksona]
+    Niech $\overline{x_n} = \left( x_1^{(n)}, \dots, x_k^{(n)} \right)$ będzie nieskończoną sekwencją elementów z $\mathbb{N}^k$. Wtedy istnie $i_1, i_2, \dots$, że $(\overline{x_i})_{j \in \mathbb{N}}$ jest niemalejącą sekwencją.
+\end{lemat}
+\begin{proof}
+    Niech $A_0 = \overline{x}[\mathbb{N}]$. Rozważmy następujące przypadki:
+    \begin{enumerate}
+        \item Jeśli $|A_0| < \aleph_0$, to istnie $\overline{z} \in \mathbb{N}^k$, że
+        \[
+            \left| \overline{z}^{-1}[\overline{z}] \right| = \aleph_0
+        \]
+        wystarczy wziąść podciąg taki, że $(\overline{x}_i_j) = \overline{z}$ dla każdego $j \in \mathbb{N}$, a wtedy $(\overline{x}_i_j) \in \mathbb{N}}$ jest niemalejącą sekwencją.
+        \item Indukcja wzgledem $k$:
+        \begin{itemize}
+            \item Dla $k = 1$: \\
+                kładziemy $\overline{x}_i_j = \min A_0$, $i_j \in \{ n \in \mathbb{N}: x_n = min A_0 \}$.
+            \[
+                A_1 = A_0 \setminus \{ \overline{x}_i_j \}
+            \]
+            Dalej $\overline{x}_i_j = \min A_{j-1}$, $i_j \in \{ n \in \mathbb{N}: x_n = min A_{j-1} \}$, $A_j = A_{j-1} \setminus \{ \overline{x}_i_j \}$.
+            \[
+                A_j = A_{j-1} \setminus \{ \overline{x}_i_j \}
+            \]
+            oczywiście $\overline{x}_i_j$ jest nierosnącą sekwencją.
+        \item $(k \rightarrow k +1)$ \\
+            Ciąg $(x_{k+1}^{(n)})_n$ ma podciąg niemalejący $(x_{k+1}^{(i_j)})_j$. \\
+            Z założenia indukcyjnego
+            \[
+                y_j = ( x_1^{(i_j)}, \dots, x_k^{(i_j)} )
+            \]
+            istneje $(y_{j_l})_l$ niemalejący w $\mathbb{N}^k$. Zatem 
+            \[
+                \left( x_1^{(i_{j_l})}, \dots, x_k^{(i_{j_l})}, x_{k+1}^{(i_{j_l})} \right)
+            \]
+            jest niemalejący
+    \end{enumerate}
+\end{proof}
+\begin{wniosek}
+    Jeśli $A \subseteq \mathbb{N}^k$, to zbiór elementów minimalnych w $A$ jest skończony.
+\end{wniosek}
+
+\end{document}
