@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper]{article}
+% Kodowanie i obsługa języka polskiego
+\usepackage[utf8]{inputenc}      % Kodowanie wejścia
+\usepackage[T1]{fontenc}         % Kodowanie fontów
+\usepackage[polish]{babel}       % Obsługa języka polskiego
+
+% Pakiety matematyczne i inne przydatne
+\usepackage{mathtools}
+\usepackage{tabularx}
+\usepackage{array} % for centering in p-columns
+\usepackage{calc}
+\usepackage[makeroom]{cancel}
+\usepackage{xcolor}
+\usepackage{bm}
+\usepackage{marginnote}
+\usepackage{tikz}
+\usetikzlibrary{trees}
+\usetikzlibrary{decorations.pathreplacing}
+\usepackage{amsmath, amssymb, amsthm}  % Pakiety do matematyki
+\usepackage{graphicx}                  % Obsługa grafiki
+\usepackage{hyperref}                  % Linki i spis treści
+\usepackage{geometry}                  % Ustawienie marginesów
+\usepackage{algorithm}               % Algorytmy
+\usepackage{algpseudocode}           % Pseudokod
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta}
+\geometry{margin=2cm}                  % Ustawienie marginesów na 2 cm
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,
+    urlcolor=cyan,
+}
+\title{Notatki z Kryptografii}
+\author{Jakub Kogut}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents  % Spis treści (opcjonalnie)
+\newpage
+\section{Wstęp do Wykładów}
+Zaliczenie przez ćwiczenia, prawdopodobnie będą 2 kolokwia/kartkówki, jak i również listy zadań. 
+\paragraph{Kilka słów wstępu}
+Generalne operacje kryptograficzne wykonuje się na elementach pewnych grup. Często wykożystyje się do tego grupy multiplikatywne $\mathbb{Z}_p^*$, gdzie $p$ jest liczbą pierwszą. Wykorzystuje się również grupy eliptyczne, które są bardziej skomplikowane, ale oferują większe bezpieczeństwo przy mniejszych rozmiarach kluczy.
+
+\end{document}
