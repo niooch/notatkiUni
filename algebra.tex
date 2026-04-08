@@ -48,7 +48,7 @@
     filecolor=magenta,
     urlcolor=cyan,
 }
-\title{Notatki z Algorytmów i Struktur Danych}
+\title{Notatki z Wybranych zagadnień Algebry}
 \author{Jakub Kogut}
 
 \begin{document}
@@ -60,10 +60,51 @@
 
 \section{Wstęp}
 Notatki z przedmiotu Wybrane zagadnienia Algebry. Prowadzony przez dr Bojko.
+\section{Wyklad 04.03.2026}
+Krótkie przypomnenie algebry z poprzednich lat.
+\subsection{Podstawowe definicje}
+\begin{definicja}[Ciało, Field]~\\
+    Jeśli Pierścień z jedynka spełnia następujące warunki:
+    \begin{itemize}
+        \item $(X\setminus \{0\}, \cdot)$ jest grupą abelową
+    \end{itemize}
+    to nazywamy go ciałem.
+\end{definicja}
+\begin{definicja}[Rozszerzenie pierścienia]~\\
+    Mamy pierścień $\mathcal{R} = (X, +, \cdot, 0)$ oraz $A$ taki, że $A \cap X = \emptyset$. Rozszerzeniem pierścienia $\mathcal{R}$ o $A$ nazywamy pierścień $\mathcal{R}' = (X', +', \cdot', 0')$, gdzie $X' = X \cup A$, a operacje $+'$ i $*'$ są rozszerzeniami odpowiednio $+$ i $\cdot$.
+\end{definicja}
+\begin{uwaga}~\\
+    Jeśli $|A| = n \in \mathbb{N}$, to dla $A= \{a_1, \dots, a_n\}$, piszemy 
+    \[
+        \mathcal{R} [A]=\mathcal{R}[a_1, \dots, a_n]
+    \]
+\end{uwaga}
+\begin{przyklad}[Pierścień Gaussa]~\\
+    $\mathbb{Z}[i]$ jest rozszerzeniem pierścienia $\mathbb{Z}$ o element $i$, gdzie $i^2 = -1$. W tym przypadku, $\mathbb{Z}[i]$ składa się z wszystkich liczb postaci $a + bi$, gdzie $a, b \in \mathbb{Z}$.
+\end{przyklad}
+\begin{przyklad}~\\
+    $\mathbb{Q}[\sqrt{2}]$ jest rozszerzeniem pierścienia $\mathbb{Q}$ o element $\sqrt{2}$, gdzie $(\sqrt{2})^2 = 2$. W tym przypadku, $\mathbb{Q}[\sqrt{2}]$ składa się z wszystkich liczb postaci $a + b\sqrt{2}$, gdzie $a, b \in \mathbb{Q}$.
+\end{przyklad}
+\begin{przyklad}[Liczby Dualne]~\\
+    $(D, +, \cdot, 0, 1)$, gdzie $D = \{ a + b\epsilon : a, b \in \mathbb{R}, \epsilon^2 = 0 \}$, jest rozszerzeniem pierścienia $\mathbb{R}$ o element $\epsilon$, który jest nilpotentny (tzn. $\epsilon^2 = 0$). W tym przypadku, $D$ składa się z wszystkich liczb postaci $a + b\epsilon$, gdzie $a, b \in \mathbb{R}$.
+\end{przyklad}
+\begin{przyklad}[Liczby Podwójne]~\\
+$(D, +, \cdot, 0, 1)$, gdzie $D = \{ a + bj : a, b \in \mathbb{R}, j^2 = 1 \}$, jest rozszerzeniem pierścienia $\mathbb{R}$ o element $j$, który jest idempotentny (tzn. $j^2 = 1$). W tym przypadku, $D$ składa się z wszystkich liczb postaci $a + bj$, gdzie $a, b \in \mathbb{R}$.
+\end{przyklad}
+\begin{definicja}[Dziedzina Euklidesowa]~\\
+    Dziedziną całkowitości $\mathbb{R} = (X, +, \cdot, 0)$ nazywamy dziedzinę euklidesową, jeśli
+    \[
+        (\exists N: X \rightarrow \mathbb{N}) \forall a, b \in X: (b \neq 0 \Rightarrow \exists q, r \in X: a = bq + r \land (r = 0 \lor N(r) < N(b)))
+    \]
+\end{definicja}
+\begin{uwaga}~\\
+    Jeżeli istneje $N$, które spełnia warunek z definicji dziedziny euklidesowej, to można przyjąć, że $N$ jest minimalne, tzn. dla każdego $a \in X$ i każdego $N': X \rightarrow \mathbb{N}$, jeśli $N'$ spełnia warunek z definicji, to $N(a) \leq N'(a)$.
+\end{uwaga}
+
 \section{Wykład 11.03.2026}
 Na start krótka poprawka do poprzedniego wykładu.
 \subsection{Dziedziny całkowitości}
-\begin{definicja}
+\begin{definicja}~\\
 Dziedziną całkowitości $\mathbb{R} = (X, +, \cdot, 0)$ nazywamy dziedzinę euklidesową, jeśli
 \[
     (\exists N: X \rightarrow \mathbb{N}) \forall a, b \in X: (b \neq 0 \Rightarrow \exists q, r \in X: a = bq + r \land (r = 0 \lor N(r) < N(b)))
@@ -73,10 +114,10 @@ oraz
     (\forall a, b \in X) (N(ab) \geq N(a))
 \]
 \end{definicja}
-\begin{przyklad}
+\begin{przyklad}~\\
     Dziedziną całkowitości $\mathbb{Z}$ jest $\mathbb{Z}$ z funkcją $N(a) = |a|$.
 \end{przyklad}
-\begin{przyklad}
+\begin{przyklad}~\\
     Dziedziną całkowitości $\mathbb{Z}[i]$ jest $\mathbb{Z}[i]$ z funkcją $N(a + bi) = a^2 + b^2$.
 \end{przyklad}
 Rozwazmy izomorfizm 
@@ -92,14 +133,14 @@ można to udowodnić jako ćwiczenie
 \[
     \varphi((a + bi)(c + di)) = \begin{bmatrix}ac - bd & -(ad + bc) \\ ad + bc & ac - bd\end{bmatrix} = \varphi(a + bi)\varphi(c + di)
 \]
-\begin{przyklad}
+\begin{przyklad}~\\
     wracając do pierścienia Gaussa, zastanówmy się nad ideałem $<a + bi>$. Czy jest on główny? Odpowiedź brzmi tak, ponieważ $<a + bi> = <\gcd(a, b)>$.
 \end{przyklad}
 A jak wyglądają elementy odwracalne w tym pierścieniu? Są to elementy o normie równej 1, czyli $1, -1, i, -i$. Ponieważ $N(a + bi) = a^2 + b^2$, to $a^2 + b^2 = 1$ ma tylko te cztery rozwiązania całkowite.
-\begin{przyklad}
+\begin{przyklad}~\\
     Niech $K[x]$ będzie pierścieniem wielomianów nad ciałem $K$. Zdefiniujmy funkcję $N: K[x] \rightarrow \mathbb{N}$ jako $N(f) = \deg(f)$. Wtedy $K[x]$ jest dziedziną całkowitości, ponieważ dla dowolnych $f, g \in K[x]$ z $g \neq 0$, istnieją wielomiany $q, r \in K[x]$ takie, że $f = gq + r$ oraz $\deg(r) < \deg(g)$ lub $r = 0$. Ponadto, dla dowolnych $f, g \in K[x]$, mamy $\deg(fg) = \deg(f) + \deg(g) \geq \deg(f)$, co spełnia warunek drugiej części definicji dziedziny całkowitości.
 \end{przyklad}
-\begin{przyklad}
+\begin{przyklad}~\\
     Rozważmy wielomian $w = x^{11}+10x \in \mathbb{Z}_{11}[x]$. Można łatwo załóważyć, ze jego zera to:
     \[
         w(0) = 0, w(1) = 1 + 10 = 0, \dots, w(10) = 10^{11} + 10 \cdot 10 = 10 + 100 = 0
@@ -108,7 +149,7 @@ A jak wyglądają elementy odwracalne w tym pierścieniu? Są to elementy o norm
 \end{przyklad} 
 Rodzi się pytanie jak sprawdzić, kiedy $f \in K[x]$ spełnia $f \equiv 0$?\\
 Odpowiedź brzmi: $f \equiv 0$ wtedy i tylko wtedy, gdy $f$ ma co najmniej $|K|$ różnych zer. W przypadku $w$, ponieważ $w$ ma 11 różnych zer, to $w \equiv 0$ w $\mathbb{Z}_{11}[x]$.
-\begin{fakt}
+\begin{fakt}~\\
     $f \equiv 0$ jeśli:
     \[
         \exists A \subseteq K: |A| > \deg(f) 
@@ -118,12 +159,12 @@ Odpowiedź brzmi: $f \equiv 0$ wtedy i tylko wtedy, gdy $f$ ma co najmniej $|K|$
     \forall a \in A: f(a) = 0
     \]
 \end{fakt}
-\begin{definicja}[Leading Term]
+\begin{definicja}[Leading Term]~\\
     Niech $f \in K[x]$, $\sum_{i=0}^n a_i x^i$, $a_n \neq 0$. \\
     Określamy $LT(f) = a_n x^n$ jako \textit{najwyższy wyraz} wielomianu $f$, $LT(0) = 0$.
 \end{definicja}
 \subsection{Dziedziny ideałów głównych}
-\begin{definicja}[Principal Ideal Domain, PID]
+\begin{definicja}[Principal Ideal Domain, PID]~\\
     Dziedzine całkowitości $\mathcal{R}$ nazywamy dziedziną ideałów głównych, jeśli
     \[
         \forall \mathcal{I} \in ID(\mathcal{R}): \exists a \in \mathcal{R}: \mathcal{I} = \langle a \rangle
@@ -154,7 +195,6 @@ Odpowiedź brzmi: $f \equiv 0$ wtedy i tylko wtedy, gdy $f$ ma co najmniej $|K|$
     \]
 \end{fakt}
 Aby to pokazać, należy zauważyć, że $ r \in \langle a, b \rangle$, ponieważ $r = a - bq$. Z drugiej strony, $a \in \langle b, r \rangle$, ponieważ $a = bq + r$. Ponadto, $b$ jest oczywiście elementem obu ideałów. W związku z tym, $\langle a, b \rangle$ i $\langle b, r \rangle$ zawierają te same elementy, co oznacza, że są one równe.
-\pagebreak
 \subsection{Algorytm Euklidesa}
 \begin{twierdzenie}[Euklidesa]
     Jeśli $NWD(n,m) = d$, to istnieją liczby całkowite $x, y$ takie, że $nx + my = d$. Jest to tożsamość Bézouta. Ponadto, $d$ jest najmniejszą dodatnią liczbą całkowitą, którą można przedstawić w postaci $nx + my$.
@@ -175,7 +215,7 @@ Aby to pokazać, należy zauważyć, że $ r \in \langle a, b \rangle$, poniewa�
 \end{algorithmic}
 \end{algorithm}
 
-\begin{przyklad}
+\begin{przyklad}~\\
     Niech $f,g \in K[x]$,
     \begin{algorithmic}[1]
     \Procedure{div}{$f, g$}
@@ -190,13 +230,13 @@ Aby to pokazać, należy zauważyć, że $ r \in \langle a, b \rangle$, poniewa�
     \end{algorithmic}
     $q$ to wynik dzielenia, natomiast $p$ to reszta z dzielenia $f$ przez $g$. Algorytm ten jest poprawny, ponieważ w każdej iteracji zmniejszamy stopień wielomianu $p$, a proces kończy się, gdy $p$ jest równe zero lub gdy najwyższy wyraz $g$ nie dzieli najwyższego wyrazu $p$.
 \end{przyklad}
-\begin{definicja}[Relacja porządkowa]
+\begin{definicja}[Relacja porządkowa]~\\
     W $\mathbb{N}^k$ definujemy relację porządkową $\leq$ w następujący sposób:
     \[
         (x_1, \dots, x_k) \leq (y_1, \dots, y_k) \iff \bigwedge_{i=0}^k: x_i \leq y_i
     \]
 \end{definicja}
-\begin{przyklad}
+\begin{przyklad}~\\
     W $\mathbb{R}[x, y]$ 
     \[
         xy^2 \curly (1, 2) \leq x^2y^4 \curly (2, 4)
@@ -237,10 +277,130 @@ Aby to pokazać, należy zauważyć, że $ r \in \langle a, b \rangle$, poniewa�
                 \left( x_1^{(i_{j_l})}, \dots, x_k^{(i_{j_l})}, x_{k+1}^{(i_{j_l})} \right)
             \]
             jest niemalejący
+    \end{itemize}
     \end{enumerate}
 \end{proof}
 \begin{wniosek}
     Jeśli $A \subseteq \mathbb{N}^k$, to zbiór elementów minimalnych w $A$ jest skończony.
 \end{wniosek}
+\section{Wykład 08.04.2026}
+\begin{definicja}[Rozmaitości Algebraiczne]~\\
+    Niech $\mathcal{F} \subseteq K[x_1,\dots,x_n]$ to zbiór 
+    \[
+        V(\mathcal{F}) = \{ (a_1, \dots, a_n)\in K^n: \forall f \in \mathcal{F}: f(\hat{a})=0\}
+    \]
+\end{definicja}
+\begin{przyklad}
+    \begin{enumerate}
+        \item $V(\{0\}) = K^n$
+        \item $ V(\{x, x+1\})$
+    \end{enumerate}
+\end{przyklad}
+\begin{fakt}
+    \begin{enumerate}
+        \item $V(\mathcal{F}) \cup V(\mathcal{G}) = V(\{fg: f \in \mathcal{F}, g \in \mathcal{G}\})$
+        \item $V(\mathcal{F}) \cap V(\mathcal{G}) = V(\mathcal{F} \cup \mathcal{G})$
+    \end{enumerate}
+\end{fakt}
+\begin{przyklad}~\\
+    $V(\{x^2 + y^2 - 1\})$ to okrąg o promieniu 1.
+\end{przyklad}
+
+\begin{definicja}[Przestrzeń Afiniczna]~\\
+    Niech $A \subseteq K^n$, wtedy mówimy, że, 
+    \[
+        \mathcal{I}(A) = \{ f \in K[x_1, \dots, x_n]: \forall (a_1, \dots, a_n) \in A: f(a_1, \dots, a_n) = 0\}.
+    \]
+\end{definicja}
+\begin{fakt}
+    \begin{enumerate}
+        \item $\mathcal{I}(A)$ to ideał
+        \item Niech $I$ -- ideał. Wtedy $I \subseteq \mathcal{I}(V(I))$
+    \end{enumerate}
+\end{fakt}
+\begin{przyklad}~\\
+    Rozważmy ideał generowany przez
+    \[
+        \langle x^2, y^2 \rangle = \{a(x,y)x^2+b(x,y)y^2: a,b \in K[x,y]\}
+    \]
+    Wtedy $V(\lange x^2, y^2 \rangle) = \{(0, 0)\}$, a 
+    \[
+        \mathcal{I}(\{(0, 0)\}) = \langle x, y \rangle
+    \]
+    wszyskie kombinacje liniowe.
+\end{przyklad}
+\begin{definicja}[Porządek jedomianowy (MO)]~\\
+    Dobry porządek na $\leq$ na $\mathbb{N}^n$ nazywamy porządkiem jedomianowym, jeśli 
+    \[
+        \forall \alpha, \beta, \gamma \in \mathbb{N}^n: (\alpha \leq \beta \Rightarrow \alpha + \gamma \leq \beta + \gamma)
+    \]
+    gdzie $a < b \iff a \leq b \land a \neq b$.
+\end{definicja}
+\begin{przyklad}[leksykograficzny]~\\
+    $\alpha = (a_1, \dots, a_n) <_{lex} \beta = (b_1, \dots, b_n)$ wtedy i tylko wtedy, gdy istnieje $i \in \{1, \dots, n\}$ takie, że $a_j = b_j$ dla każdego $j < i$ oraz $a_i < b_i$.
+\end{przyklad}
+\begin{definicja}~\\
+    Przy pomovy porządku jednomianowego MO na $\mathbb{N}^n$, możemy zbudować dobry porządek na jedenomianach $K[x_1, \dots, x_n]$ definiując 
+    \[
+        \bar{x}^\alpha \leq \bar{x}^\beta \iff \alpha \leq \beta
+    \]
+\end{definicja}
+\begin{przyklad}~\\
+    Dla $\leq_{lex}$ na $\mathbb{N}^2$, 
+    \[
+        1 < y < y^2 < \dots < x < xy < xy^2 < \dots < x^2 < x^2y < \dots
+    \]
+\end{przyklad}
+\begin{definicja}[Graded Lexicographic Order]~\\
+    $\alpha = (a_1, \dots, a_n) <_{grlex} \beta = (b_1, \dots, b_n)$ wtedy i tylko wtedy, gdy $|\alpha| < |\beta|$ lub $|\alpha| = |\beta|$ i $\alpha <_{lex} \beta$, gdzie $|\alpha| = a_1 + \dots + a_n$.
+\end{definicja}
+\begin{twierdzenie}~\\
+    Jeśli $\leq$--LO na $\mathbb{N}^n$ oraz 
+    \[
+        \forall \alpha, \beta \in \mathbb{N}^n: \alpha < \beta \rightarrow \alpha + \gamma < \beta + \gamma
+    \]
+    to $\leq$--WO jest równowazne z warunkiem $\forall \alpha, \beta \in \mathbb{N}^n: \alpha < \beta \rightarrow \alpha + \gamma < \beta + \gamma$.
+\end{twierdzenie}
+\begin{proof}
+    Załóżmy, że $\alpha <0$. Wtedy $\alpha + \alpha < \alpha + 0$. Analogicznie $(k+1)\alpha < k\alpha$ dla każdego $k \in \mathbb{N}$. Niech 
+    \[
+        c_k = k\alpha
+    \]
+    Wtedy
+    \[
+        \{ c_k: k \in \mathbb{N} \}
+    \] nie ma elementu najmniejszego względem $\leq$,
+    Wiemy, że $A\subseteq \mathbb{N}^n$, z wniosku z lematu Dicksona, $A$ ma skończenie wiele elemetów $\sqsubseteq$--minimalnych\footnote{$\sqsubseteq$ jest porządkiem produktowym.}.\\
+    Niech $\{\alpha_1, \dots, \alpha_m\}$ to zbiór tych elementów. Numerujemy je tak, by $\alpha_1 < \alpha_2 < \dots < \alpha_m$. Pokażemy, że $\alpha_1$ jest elementem najmniejszym w $A$. \\
+    Załóżmy, że $\beta < \alpha_1$ oraz $\beta \in A$. Ponieważ $\beta \notin M$, to $\exists i:\neg \alpha_i \sqsubseteq \beta$. Zatem
+    \[
+        \exists 0 \sqsubseteq \gamma: \beta + \gamma = \alpha_i
+    \]
+    co jest sprzeczne z założeniem, że $\alpha_i$ jest elementem minimalnym.\\
+\end{proof}
+\begin{definicja}[Leading Term, Monomial, Coefficient]~\\
+    Niech $f \in K[\bar{x}]$, $f = \sum_{\alpha} a_\alpha \bar{x}^\alpha$. Najwyższym wyrazem $f$ względem porządku jednomianowego $\leq$ jest $LT(f) = a_\beta \bar{x}^\beta$, gdzie $\beta$ jest minimalnym elementem w zbiorze $\{\alpha: a_\alpha \neq 0\}$.
+    \begin{itemize}
+        \item $LT(f) = a_\beta \cdot \bar{x}^\beta$ -- leading term
+        \item $LM(f) = \bar{x}^\beta$ -- leading monomial
+        \item $LC(f) = a_\beta$ -- leading coefficient
+    \end{itemize}
+\end{definicja}
+\begin{definicja}[Polynomial Quotient Reduce]~\\
+    Niech $f, g_1, \dots, g_n \in K[\bar{x}]$, $\forall_{1\leq i \leq n}: g_i \neq 0$, $f$ jest zdefiniowane jako:
+    \[
+        f(\bar{x}) = \sum_{i=1}^n q_i(\bar{x})g_i(\bar{x}) + r(\bar{x})
+    \]
+    gdzie $q_i, r \in K[\bar{x}]$ oraz $r = 0$ lub $LT(r)$ nie jest podzielny przez żaden z $LT(g_i)$.
+    \[
+        \text{PQR}(f, g_1, \dots, g_n) = (q_1, \dots, q_n, r)
+    \]
+\end{definicja}
+\begin{przyklad}~\\
+    Niech $f = x^2y + xy^2 + 1$, $g_1 = xy - 1$, $g_2 = y^2 - 1$ oraz porządek leksykograficzny. Wtedy
+    \[
+        \text{PQR}(f, g_1, g_2) = (x+y, 0, 2)
+    \]
+\end{przyklad}
 
 \end{document}
